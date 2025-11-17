@@ -52,7 +52,7 @@ const AssessmentDetailsModal = ({
         onClick={onClose}
       />
       {/* Modal */}
-      <div className={`relative bg-card border border-border rounded-lg elevation-3 w-full max-w-2xl mx-4 max-h-[90vh] overflow-hidden ${className}`}>
+      <div className={`relative bg-card border border-border rounded-lg elevation-3 w-full max-w-2xl mx-4 max-h-[100vh] overflow-hidden ${className}`}>
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-border">
           <div>
@@ -190,7 +190,7 @@ const AssessmentDetailsModal = ({
 
         {/* Footer */}
         <div className="flex justify-end space-x-3 p-6 border-t border-border">
-          {assessment?.isDraft && onEdit && (
+          {/* {assessment?.isDraft && onEdit && ( */}
             <Button
               variant="default"
               onClick={() => onEdit(assessment)}
@@ -199,7 +199,7 @@ const AssessmentDetailsModal = ({
             >
               Edit Assessment
             </Button>
-          )}
+          {/* )} */}
           <Button
             variant="outline"
             onClick={onClose}
