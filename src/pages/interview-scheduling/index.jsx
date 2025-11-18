@@ -359,7 +359,7 @@ const InterviewScheduling = () => {
     try {
       const result = await fetchAllTrainees();
       console.log("TRAINERS API RESULT:", result); // ✅ Add this
-      setTrainers(result);
+      setTrainers(result.data );
     } catch (error) {
       console.error("Failed to load trainers:", error);
     }
@@ -392,6 +392,8 @@ const InterviewScheduling = () => {
   useEffect(() => {
     loadAllTrainers();
     loadAllTrainees();
+    
+      // console.log("Selected Trainees:", selectedTrainees);
   }, []);
 
 
@@ -488,6 +490,7 @@ const InterviewScheduling = () => {
 
               {/* Trainee Selection Panel */}
               <div className="space-y-6">
+            
                 <TraineeSelectionPanel
                   trainees={trainees}
                   selectedTrainees={selectedTrainees}
@@ -550,7 +553,7 @@ const InterviewScheduling = () => {
                   >
                   </Button>
                 </div>
-
+              ldkgladkladjaj
                 <EmailNotificationPreview
                   interviewDetails={{
                     date: selectedDate,

@@ -3,14 +3,13 @@ import Icon from "../../../components/AppIcon";
 import Button from "../../../components/ui/Button";
 import Input from "../../../components/ui/Input";
 import Select from "../../../components/ui/Select";
-import { fetchAllTrainees } from "../../../api_service";
+import { getAllTrainers } from "../../../api_service";
 
 
 const SchedulingForm = ({
   selectedDate,
   selectedTime,
   selectedTrainees,
-  interviewers,
   onSchedule,
   onCancel,
   conflicts = [],
@@ -33,8 +32,9 @@ const SchedulingForm = ({
   useEffect(() => {
     const fetchTrainers = async () => {
       try {
-        const res = await fetchAllTrainees();
-        setTrainerList(res || []);
+        const res = await getAllTrainers();
+        setTrainerList(res.data);
+        console.log("Fetched trainers:", res);
       } catch (err) {
         console.error("Error loading trainers:", err);
       }
@@ -66,9 +66,9 @@ const SchedulingForm = ({
   ];
 
   // ✅ Build interviewer dropdown options
-  const interviewerOptions = Array.isArray(interviewers || trainerList)
-    ? (interviewers || trainerList).map((t) => ({
-        value: t.trainerId || t.empid,
+  const interviewerOptions = Array.isArray(trainerList)
+    ? (trainerList).map((t) => ({
+        value: t.trainerId,
         label: `${t.name}${t.title ? " - " + t.title : ""}`,
       }))
     : [];
@@ -136,7 +136,8 @@ const SchedulingForm = ({
         ...formData,
         duration: parseInt(formData.duration),
       };
-
+      console.log("Scheduling data:", scheduleData);
+      
       await onSchedule(scheduleData);
     } catch (error) {
       console.error("Scheduling error:", error);
