@@ -10,6 +10,7 @@ import SyllabusContentViewer from './pages/syllabus-content-viewer';
 import InterviewScheduling from './pages/interview-scheduling';
 import TraineeDashboard from './pages/trainee-dashboard';
 import AssessmentEntry from './pages/assessment-entry';
+import UploadSyllabus from "./pages/manager-dashboard/components/UploadSyllabus";
 
 const Routes = () => {
   return (
@@ -26,6 +27,8 @@ const Routes = () => {
         <Route path="/interview-scheduling" element={<InterviewScheduling />} />
         <Route path="/trainee-dashboard" element={<TraineeDashboard />} />
         <Route path="/assessment-entry" element={<AssessmentEntry />} />
+        <Route path="/upload-syllabus" element={<UploadSyllabus />} />
+
         <Route path="/progress-reports/:traineeId" element={<ProgressReports />} />
         <Route path="*" element={<NotFound />} />
       </RouterRoutes>

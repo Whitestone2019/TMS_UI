@@ -39,16 +39,22 @@ const Header = ({ userRole = 'trainee', userName = 'User', onLogout }) => {
       path: '/interview-scheduling',
       icon: 'Calendar',
       roles: ['manager']
+    },
+    {
+      label: 'Syllabus',
+      path: '/upload-syllabus',
+      icon: 'BookOpen',
+      roles: ['manager']
     }
   ];
 
-  const visibleNavItems = navigationItems?.filter(item => 
+  const visibleNavItems = navigationItems?.filter(item =>
     item?.roles?.includes(userRole)
-  )?.slice(0, 4);
+  )?.slice(0, 5);
 
-  const moreItems = navigationItems?.filter(item => 
+  const moreItems = navigationItems?.filter(item =>
     item?.roles?.includes(userRole)
-  )?.slice(4);
+  )?.slice(5);
 
   const handleNavigation = (path) => {
     navigate(path);
@@ -98,7 +104,7 @@ const Header = ({ userRole = 'trainee', userName = 'User', onLogout }) => {
               {item?.label}
             </Button>
           ))}
-          
+
           {moreItems?.length > 0 && (
             <div className="relative">
               <Button
@@ -188,20 +194,20 @@ const Header = ({ userRole = 'trainee', userName = 'User', onLogout }) => {
         <div className="lg:hidden bg-surface border-t border-border">
           <nav className="px-6 py-4 space-y-2">
             {navigationItems?.filter(item => item?.roles?.includes(userRole))?.map((item) => (
-                <Button
-                  key={item?.path}
-                  variant={isActivePath(item?.path) ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => handleNavigation(item?.path)}
-                  iconName={item?.icon}
-                  iconPosition="left"
-                  iconSize={16}
-                  fullWidth
-                  className="justify-start"
-                >
-                  {item?.label}
-                </Button>
-              ))}
+              <Button
+                key={item?.path}
+                variant={isActivePath(item?.path) ? "default" : "ghost"}
+                size="sm"
+                onClick={() => handleNavigation(item?.path)}
+                iconName={item?.icon}
+                iconPosition="left"
+                iconSize={16}
+                fullWidth
+                className="justify-start"
+              >
+                {item?.label}
+              </Button>
+            ))}
           </nav>
         </div>
       )}
