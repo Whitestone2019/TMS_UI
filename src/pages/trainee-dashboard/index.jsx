@@ -31,7 +31,7 @@ const TraineeDashboard = () => {
       await new Promise(resolve => setTimeout(resolve, 1000));
       setIsLoading(false);
     };
-    
+
     checkAuth();
   }, []);
 
@@ -76,7 +76,7 @@ const TraineeDashboard = () => {
         sessionDuration={30}
         warningTime={5}
         onSessionExpired={handleSessionExpired}
-        onSessionExtended={() => {}}
+        onSessionExtended={() => { }}
         isActive={true}
       />
       {/* Header */}

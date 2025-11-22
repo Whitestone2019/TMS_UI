@@ -148,3 +148,7 @@ export const updateSyllabusAPI = async (id, formData) => {
   });
   return res;
 };
+
+export const getSyllabusByIdAPI = async (id) => {
+  return await axios.get(`${API_URL}/syllabus/` + id);
+};
