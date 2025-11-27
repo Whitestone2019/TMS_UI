@@ -3,11 +3,11 @@ import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 import SecureContentWrapper from '../../../components/ui/SecureContentWrapper';
 
-const CurrentStepContent = ({ 
+const CurrentStepContent = ({
   currentStep = 1,
   traineeInfo = { name: 'John Doe', id: 'TRN001' },
   onStepComplete,
-  className = '' 
+  className = ''
 }) => {
   const [isCompleting, setIsCompleting] = useState(false);
 
@@ -78,14 +78,14 @@ Real-World Examples:
 
   const handleCompleteStep = async () => {
     setIsCompleting(true);
-    
+
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 2000));
-    
+
     if (onStepComplete) {
       onStepComplete(currentStep);
     }
-    
+
     setIsCompleting(false);
   };
 
@@ -151,14 +151,14 @@ Real-World Examples:
                 <div key={index} className="bg-muted/30 rounded-lg p-4 border border-border">
                   <div className="flex items-start space-x-3">
                     <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <Icon 
+                      <Icon
                         name={
                           resource?.type === 'PDF' ? 'FileText' :
-                          resource?.type === 'Video' ? 'Play' :
-                          resource?.type === 'Interactive'? 'Monitor' : 'Book'
-                        } 
-                        size={18} 
-                        className="text-primary" 
+                            resource?.type === 'Video' ? 'Play' :
+                              resource?.type === 'Interactive' ? 'Monitor' : 'Book'
+                        }
+                        size={18}
+                        className="text-primary"
                       />
                     </div>
                     <div className="flex-1 min-w-0">

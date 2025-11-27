@@ -159,4 +159,15 @@ export const fetchAllSchedules = async () => {
     console.error("Error fetching schedules:", error);
     throw error;
   }
+};  
+
+
+export const getSyllabusByIdAPI = async (id) => {
+  try {
+    const response = axios.get(`${API_URL}/syllabus/` + id);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching schedules:", error);
+    throw error;
+  }
 };
