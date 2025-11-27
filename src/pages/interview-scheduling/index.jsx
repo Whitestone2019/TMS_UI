@@ -13,7 +13,7 @@ import Button from '../../components/ui/Button';
 
 // import { } from "../../Api/apiAuth";
 
-import {createSchedule, assignTrainees, fetchAllTrainees, fetchAllTraineeSummary } from "../../api_service";
+import { createSchedule, assignTrainees, fetchAllTrainees, fetchAllTraineeSummary, fetchAllSchedules } from "../../api_service";
 // import { getAllTrainers, getAllTrainees } from "../../Api/apiAuth";
 
 
@@ -27,7 +27,7 @@ const InterviewScheduling = () => {
   const [showNotificationPreview, setShowNotificationPreview] = useState(false);
   const [trainers, setTrainers] = useState([]);
   const [trainees, setTrainees] = useState([]);
-
+  const [schedules, setSchedules] = useState([]);
 
 
   const mockTrainees = [
@@ -101,6 +101,12 @@ const InterviewScheduling = () => {
       availability: "Tue-Fri 9AM-6PM"
     }
   ];
+
+
+
+
+
+
 
   const mockInterviews = [
     {
@@ -245,6 +251,8 @@ const InterviewScheduling = () => {
   //   }
   // };
 
+
+
   const handleSchedule = async (scheduleData) => {
     try {
       // 1️⃣ Create Schedule
@@ -258,9 +266,8 @@ const InterviewScheduling = () => {
         notes: scheduleData.notes
       });
 
-      console.log("Schedule Response:", scheduleRes); // ✅ Debug
+      console.log("Schedule Response:", scheduleRes);
 
-      // 2️⃣ Extract scheduleId safely
       const scheduleId = scheduleRes?.data?.scheduleId;
 
       if (!scheduleId) {
@@ -359,7 +366,7 @@ const InterviewScheduling = () => {
     try {
       const result = await fetchAllTrainees();
       console.log("TRAINERS API RESULT:", result); // ✅ Add this
-      setTrainers(result.data );
+      setTrainers(result.data);
     } catch (error) {
       console.error("Failed to load trainers:", error);
     }
@@ -389,11 +396,41 @@ const InterviewScheduling = () => {
   };
 
 
+  const loadAllSchedules = async () => {
+    try {
+      const result = await fetchAllSchedules();
+      console.log("SCHEDULES API RESULT:", result);
+
+      const transformedSchedules = Object.values(result.data).map(item => {
+      
+        return {
+          id: item.interviewSchedule.scheduleId,
+          traineeName: item.user.firstname,
+          interviewerName: item.interviewSchedule.trainer.name,
+          scheduledDate: item.interviewSchedule.date,
+          time: item.interviewSchedule.time,
+          duration: item.interviewSchedule.duration,
+          type: item.interviewSchedule.interviewType,
+          location: item.interviewSchedule.location,
+          status: item.rsvpStatus,   
+          notes: item.interviewSchedule.notes
+        };
+      });
+
+
+      console.log("Transformed Schedules:", transformedSchedules);
+      setSchedules(transformedSchedules);
+    } catch (error) {
+      console.error("Failed to load schedules:", error);
+    }
+  };
+
+
   useEffect(() => {
     loadAllTrainers();
     loadAllTrainees();
-    
-      // console.log("Selected Trainees:", selectedTrainees);
+    loadAllSchedules();
+    // console.log("Selected Trainees:", selectedTrainees);
   }, []);
 
 
@@ -490,7 +527,7 @@ const InterviewScheduling = () => {
 
               {/* Trainee Selection Panel */}
               <div className="space-y-6">
-            
+
                 <TraineeSelectionPanel
                   trainees={trainees}
                   selectedTrainees={selectedTrainees}
@@ -511,7 +548,7 @@ const InterviewScheduling = () => {
 
           {activeView === 'tracker' && (
             <InterviewStatusTracker
-              interviews={mockInterviews}
+              interviews={schedules}
               onStatusUpdate={handleStatusUpdate}
               onViewDetails={handleViewInterviewDetails}
               onReschedule={handleRescheduleInterview}
@@ -553,7 +590,6 @@ const InterviewScheduling = () => {
                   >
                   </Button>
                 </div>
-              ldkgladkladjaj
                 <EmailNotificationPreview
                   interviewDetails={{
                     date: selectedDate,

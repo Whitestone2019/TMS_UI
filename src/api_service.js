@@ -148,3 +148,15 @@ export const updateSyllabusAPI = async (id, formData) => {
   });
   return res;
 };
+
+
+
+export const fetchAllSchedules = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/schedule/all`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching schedules:", error);
+    throw error;
+  }
+};

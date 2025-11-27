@@ -19,7 +19,7 @@ const SchedulingForm = ({
     interviewer: "",
     interviewType: "",
     location: "",
-    meetingLink: "",
+    // meetingLink: "",
     duration: "60",
     notes: "",
     emailTemplate: "default",
@@ -252,7 +252,7 @@ const SchedulingForm = ({
             description="Physical meeting location"
           />
 
-          <Input
+          {/* <Input
             label="Meeting Link"
             type="url"
             placeholder="https://meet.google.com/abc-defg-hij"
@@ -260,7 +260,7 @@ const SchedulingForm = ({
             onChange={(e) => handleInputChange("meetingLink", e.target.value)}
             error={errors.meetingLink}
             description="Virtual meeting link"
-          />
+          /> */}
         </div>
 
         {/* Notes */}
@@ -278,13 +278,13 @@ const SchedulingForm = ({
         </div>
 
         {/* Email Template */}
-        <Select
+        {/* <Select
           label="Email Template"
           description="Template for interview notification emails"
           options={emailTemplateOptions}
           value={formData.emailTemplate}
           onChange={(value) => handleInputChange("emailTemplate", value)}
-        />
+        /> */}
 
         {/* Actions */}
         <div className="flex items-center justify-end space-x-3 pt-4 border-t border-border">
