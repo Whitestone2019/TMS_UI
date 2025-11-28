@@ -10,6 +10,7 @@ import SecurityWatermark from './components/SecurityWatermark';
 import ProgressTracker from './components/ProgressTracker';
 import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
+import { updateStepProgress } from '../../api_service';
 
 const SyllabusContentViewer = () => {
   const navigate = useNavigate();
@@ -23,6 +24,8 @@ const SyllabusContentViewer = () => {
   const [subTopicIndex, setSubTopicIndex] = useState(0);
 
   const contentRef = useRef(null);
+  sessionStorage.setItem("empid", "TRN001");
+  const empid = sessionStorage.getItem("empid");
 
   useEffect(() => {
     setSubTopicIndex(0);
@@ -63,19 +66,39 @@ const SyllabusContentViewer = () => {
 
         setSyllabusSteps(formattedSteps);
 
-        // set current step to first if available
-        if (formattedSteps.length > 0) setCurrentStepId(formattedSteps[0].id);
+        //     // set current step to first if available
+        //     if (formattedSteps.length > 0) setCurrentStepId(formattedSteps[0].id);
 
-        // trainee info (mock or fetch if required)
-        setTraineeInfo({
-          id: "TRN-1001",
-          name: "John Doe",
-          email: "john@example.com"
-        });
+        //     // trainee info (mock or fetch if required)
+        //     setTraineeInfo({
+        //       id: "TRN-1001",
+        //       name: "John Doe",
+        //       email: "john@example.com"
+        //     });
+
+        //     setLoading(false);
+        //   } catch (err) {
+        //     console.error("Error fetching syllabus:", err);
+        //     setLoading(false);
+        //   }
+        // };
+
+
+
+        const traineeRes = await fetch("http://localhost:8080/api/users/${empid}");
+        const traineeJson = await traineeRes.json();
+
+        // Filter only trainee role users
+        const filteredTrainees = traineeJson.data.filter(
+          (user) => user.role === "trainee"
+        );
+
+        // If 1 trainee logged in, store only first trainee info
+        setTraineeInfo(filteredTrainees.length > 0 ? filteredTrainees[0] : {});
 
         setLoading(false);
-      } catch (err) {
-        console.error("Error fetching syllabus:", err);
+      } catch (error) {
+        console.error("Error fetching data:", error);
         setLoading(false);
       }
     };
@@ -173,7 +196,8 @@ const SyllabusContentViewer = () => {
   //   );
   // };
 
-  const handleCompleteStep = (stepId) => {
+  const handleCompleteStep = async (stepId) => {
+    // Update local state
     setSyllabusSteps((prevSteps) => {
       const updated = [...prevSteps];
       const idx = updated.findIndex((s) => s.id === stepId);
@@ -197,7 +221,17 @@ const SyllabusContentViewer = () => {
 
       return updated;
     });
+
+    // ---- POST to backend ----
+    try {
+      const res = await updateStepProgress(empid, stepId, 100);
+      console.log("Step progress updated. Overall:", res?.overallProgress);
+      // Overall progress is stored in backend; we do not display it yet
+    } catch (err) {
+      console.error("Error updating step progress:", err);
+    }
   };
+
 
 
 
@@ -250,7 +284,7 @@ const SyllabusContentViewer = () => {
 
   return (
     <SecureContentWrapper
-      watermarkText={`${traineeInfo?.name} | ID: ${traineeInfo?.id} | CONFIDENTIAL TRAINING MATERIAL`}
+      watermarkText={`${traineeInfo?.firstname} | ID: ${traineeInfo?.empid} | CONFIDENTIAL TRAINING MATERIAL`}
       sessionTimeout={30}
       onSessionExpired={handleSessionExpired}
       enableScreenshotProtection={true}
@@ -334,8 +368,3 @@ const SyllabusContentViewer = () => {
 };
 
 export default SyllabusContentViewer;
-
-
-
-
-

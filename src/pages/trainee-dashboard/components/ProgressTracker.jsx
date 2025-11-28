@@ -2,20 +2,26 @@ import React from 'react';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 
-const ProgressTracker = ({ 
-  currentStep = 1, 
-  totalSteps = 8, 
+const ProgressTracker = ({
+  currentStep = 1,
+  totalSteps = 8,
   completedSteps = 0,
   onStepClick,
-  className = '' 
+  className = '',
+  stepsStatus = []
+
 }) => {
   const progressPercentage = (completedSteps / totalSteps) * 100;
 
   const getStepStatus = (stepNumber) => {
-    if (stepNumber <= completedSteps) return 'completed';
-    if (stepNumber === currentStep) return 'current';
-    return 'locked';
+    const step = stepsStatus?.find(s => s.stepId === `step-${stepNumber}`);
+
+    if (!step) return "locked";
+    if (step.completed) return "completed";
+    if (!step.locked) return "current";
+    return "locked";
   };
+
 
   const getStepIcon = (stepNumber) => {
     const status = getStepStatus(stepNumber);
@@ -74,7 +80,7 @@ const ProgressTracker = ({
           <span className="text-sm text-muted-foreground">{Math.round(progressPercentage)}%</span>
         </div>
         <div className="w-full bg-muted rounded-full h-3">
-          <div 
+          <div
             className="bg-primary rounded-full h-3 transition-all duration-500 ease-out"
             style={{ width: `${progressPercentage}%` }}
           />
@@ -85,25 +91,23 @@ const ProgressTracker = ({
         {steps?.map((step) => {
           const status = getStepStatus(step?.id);
           const isClickable = status === 'completed' || status === 'current';
-          
+
           return (
             <div
               key={step?.id}
-              className={`relative p-4 rounded-lg border transition-all duration-200 ${
-                status === 'current' ?'border-primary bg-primary/5' 
-                  : status === 'completed' ?'border-success bg-success/5' :'border-border bg-muted/30'
-              } ${isClickable ? 'cursor-pointer hover:shadow-sm' : 'cursor-not-allowed'}`}
+              className={`relative p-4 rounded-lg border transition-all duration-200 ${status === 'current' ? 'border-primary bg-primary/5'
+                : status === 'completed' ? 'border-success bg-success/5' : 'border-border bg-muted/30'
+                } ${isClickable ? 'cursor-pointer hover:shadow-sm' : 'cursor-not-allowed'}`}
               onClick={() => isClickable && onStepClick && onStepClick(step?.id)}
             >
               {/* Step Number & Icon */}
               <div className="flex items-center space-x-3 mb-2">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                  status === 'current' ?'bg-primary text-primary-foreground' 
-                    : status === 'completed' ?'bg-success text-success-foreground' :'bg-muted text-muted-foreground'
-                }`}>
-                  <Icon 
-                    name={getStepIcon(step?.id)} 
-                    size={16} 
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${status === 'current' ? 'bg-primary text-primary-foreground'
+                  : status === 'completed' ? 'bg-success text-success-foreground' : 'bg-muted text-muted-foreground'
+                  }`}>
+                  <Icon
+                    name={getStepIcon(step?.id)}
+                    size={16}
                     className="text-current"
                   />
                 </div>
@@ -127,14 +131,12 @@ const ProgressTracker = ({
               </div>
               {/* Step Content */}
               <div className="space-y-1">
-                <h3 className={`font-medium ${
-                  status === 'locked' ? 'text-muted-foreground' : 'text-foreground'
-                }`}>
+                <h3 className={`font-medium ${status === 'locked' ? 'text-muted-foreground' : 'text-foreground'
+                  }`}>
                   {step?.title}
                 </h3>
-                <p className={`text-sm ${
-                  status === 'locked' ? 'text-muted-foreground/70' : 'text-muted-foreground'
-                }`}>
+                <p className={`text-sm ${status === 'locked' ? 'text-muted-foreground/70' : 'text-muted-foreground'
+                  }`}>
                   {step?.description}
                 </p>
               </div>
