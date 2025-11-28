@@ -18,10 +18,10 @@ const InterviewStatusTracker = ({
   const statusOptions = [
     { value: 'all', label: 'All Status' },
     { value: 'pending', label: 'Pending Confirmation' },
-    { value: 'confirmed', label: 'Confirmed' },
+    { value: 'accepted', label: 'Accepted' },
     { value: 'completed', label: 'Completed' },
-    { value: 'cancelled', label: 'Cancelled' },
-    { value: 'rescheduled', label: 'Rescheduled' }
+    { value: 'declined', label: 'Declined' },
+    { value: 'tentative', label: 'Tentative' }
   ];
 
   const sortOptions = [
@@ -40,12 +40,12 @@ const InterviewStatusTracker = ({
         icon: 'Clock',
         label: 'Pending'
       },
-      confirmed: {
+      accepted: {
         color: 'text-accent',
         bgColor: 'bg-accent/10',
         borderColor: 'border-accent/20',
         icon: 'CheckCircle',
-        label: 'Confirmed'
+        label: 'Accepted'
       },
       completed: {
         color: 'text-success',
@@ -54,19 +54,19 @@ const InterviewStatusTracker = ({
         icon: 'Check',
         label: 'Completed'
       },
-      cancelled: {
+      declined: {
         color: 'text-error',
         bgColor: 'bg-error/10',
         borderColor: 'border-error/20',
         icon: 'X',
-        label: 'Cancelled'
+        label: 'Declined'
       },
-      rescheduled: {
+      tentative: {
         color: 'text-primary',
         bgColor: 'bg-primary/10',
         borderColor: 'border-primary/20',
         icon: 'Calendar',
-        label: 'Rescheduled'
+        label: 'Tentative'
       }
     };
     return statusMap?.[status] || statusMap?.pending;

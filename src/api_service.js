@@ -149,8 +149,28 @@ export const updateSyllabusAPI = async (id, formData) => {
   return res;
 };
 
+
+
+export const fetchAllSchedules = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/schedule/all`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching schedules:", error);
+    throw error;
+  }
+};
+
+
 export const getSyllabusByIdAPI = async (id) => {
-  return await axios.get(`${API_URL}/syllabus/` + id);
+  //return await axios.get(`${API_URL}/syllabus/` + id);
+  try {
+    const response = axios.get(`${API_URL}/syllabus/` + id);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching schedules:", error);
+    throw error;
+  }
 };
 
 
@@ -168,4 +188,5 @@ export const updateStepProgress = async (empId, stepId, progress) => {
   if (!response.ok) throw new Error("Failed to update step progress");
   return await response.json(); // contains overallProgress
 };
+
 

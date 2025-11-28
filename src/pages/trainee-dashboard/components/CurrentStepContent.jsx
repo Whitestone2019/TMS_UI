@@ -100,12 +100,12 @@ const CurrentStepContent = ({
   };
 
   return (
-    <SecureContentWrapper
-      watermarkText={`${traineeInfo?.name} - ${traineeInfo?.id} - CONFIDENTIAL TRAINING MATERIAL`}
-      sessionTimeout={30}
-      onSessionExpired={handleSessionExpired}
-      className={className}
-    >
+    // <SecureContentWrapper
+    //   watermarkText={`${traineeInfo?.name} - ${traineeInfo?.id} - CONFIDENTIAL TRAINING MATERIAL`}
+    //   sessionTimeout={30}
+    //   onSessionExpired={handleSessionExpired}
+    //   className={className}
+    // >
       <div className="bg-card rounded-lg border border-border overflow-hidden">
         {/* Content Header */}
         <div className="bg-primary/5 border-b border-border p-6">
@@ -246,7 +246,7 @@ const CurrentStepContent = ({
           </div>
         </div>
       </div>
-    </SecureContentWrapper>
+    // </SecureContentWrapper>
   );
 };
 

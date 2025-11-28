@@ -283,88 +283,91 @@ const SyllabusContentViewer = () => {
   }
 
   return (
-    <SecureContentWrapper
-      watermarkText={`${traineeInfo?.firstname} | ID: ${traineeInfo?.empid} | CONFIDENTIAL TRAINING MATERIAL`}
-      sessionTimeout={30}
-      onSessionExpired={handleSessionExpired}
-      enableScreenshotProtection={true}
-      enableRightClickDisable={true}
-    >
-      <div className="min-h-screen bg-background">
-        <SessionTimeoutHandler
-          sessionDuration={30}
-          warningTime={5}
-          onSessionExpired={handleSessionExpired}
-          onSessionExtended={() => setSessionActive(true)}
-          isActive={sessionActive}
+    // <SecureContentWrapper
+    //   watermarkText={`${traineeInfo?.name} | ID: ${traineeInfo?.id} | CONFIDENTIAL TRAINING MATERIAL`}
+    //   sessionTimeout={30}
+    //   onSessionExpired={handleSessionExpired}
+    //   enableScreenshotProtection={true}
+    //   enableRightClickDisable={true}>
+
+    <div className="min-h-screen bg-background">
+      <SessionTimeoutHandler
+        sessionDuration={30}
+        warningTime={5}
+        onSessionExpired={handleSessionExpired}
+        onSessionExtended={() => setSessionActive(true)}
+        isActive={sessionActive}
+      />
+
+
+      {/* Security Watermark */}
+      {/* <SecurityWatermark traineeInfo={traineeInfo} /> */}
+
+      <Header userRole="trainee" userName={traineeInfo?.name} onLogout={handleLogout} />
+
+      <div className="pt-16 flex h-screen">
+        <StepNavigationSidebar
+          steps={syllabusSteps}
+          currentStepId={currentStepId}
+          onStepSelect={handleStepSelect}
+          isCollapsed={isSidebarCollapsed}
+          onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
         />
 
-        <SecurityWatermark traineeInfo={traineeInfo} />
+        <div className="flex-1 flex flex-col overflow-hidden">
+          <div className="bg-surface border-b border-border px-6 py-3">
+            <NavigationBreadcrumb userRole="trainee" />
+          </div>
 
-        <Header userRole="trainee" userName={traineeInfo?.name} onLogout={handleLogout} />
-
-        <div className="pt-16 flex h-screen">
-          <StepNavigationSidebar
-            steps={syllabusSteps}
-            currentStepId={currentStepId}
-            onStepSelect={handleStepSelect}
-            isCollapsed={isSidebarCollapsed}
-            onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-          />
-
-          <div className="flex-1 flex flex-col overflow-hidden">
-            <div className="bg-surface border-b border-border px-6 py-3">
-              <NavigationBreadcrumb userRole="trainee" />
+          <div className="flex-1 flex overflow-hidden">
+            <div className="flex-1 overflow-hidden" ref={contentRef}>
+              <ContentDisplay
+                currentStep={currentStep}
+                traineeInfo={traineeInfo}
+                onStepComplete={handleCompleteStep}
+                onNextStep={handleNextStep}
+                onPreviousStep={handlePreviousStep}
+                canGoNext={canGoNext}
+                canGoPrevious={canGoPrevious}
+              />
             </div>
 
-            <div className="flex-1 flex overflow-hidden">
-              <div className="flex-1 overflow-hidden" ref={contentRef}>
-                <ContentDisplay
+            {showProgressTracker &&
+              <div className="w-80 border-l border-border overflow-y-auto">
+                <ProgressTracker
                   currentStep={currentStep}
-                  traineeInfo={traineeInfo}
-                  onStepComplete={handleCompleteStep}
-                  onNextStep={handleNextStep}
-                  onPreviousStep={handlePreviousStep}
-                  canGoNext={canGoNext}
-                  canGoPrevious={canGoPrevious}
+                  totalSteps={syllabusSteps?.length}
+                  completedSteps={completedSteps}
+                  timeSpent={45}
+                  estimatedTimeRemaining={180}
+                  className="m-4"
                 />
               </div>
-
-              {showProgressTracker &&
-                <div className="w-80 border-l border-border overflow-y-auto">
-                  <ProgressTracker
-                    currentStep={currentStep}
-                    totalSteps={syllabusSteps?.length}
-                    completedSteps={completedSteps}
-                    timeSpent={45}
-                    estimatedTimeRemaining={180}
-                    className="m-4"
-                  />
-                </div>
-              }
-            </div>
+            }
           </div>
-
-          <Button
-            variant="default"
-            size="icon"
-            onClick={() => setShowProgressTracker(!showProgressTracker)}
-            className="fixed bottom-6 right-6 z-40 h-12 w-12 rounded-full elevation-2"
-            iconName={showProgressTracker ? "X" : "BarChart3"}
-            iconSize={20}
-            title={showProgressTracker ? "Hide Progress" : "Show Progress"}
-          />
         </div>
 
-        <div className="fixed bottom-4 left-4 bg-card border border-border rounded-lg p-3 text-xs z-30 max-w-xs">
-          <div className="flex items-center space-x-2">
-            <Icon name="Shield" size={14} className="text-warning" />
-            <span className="text-muted-foreground">This content is protected and monitored for security.</span>
-          </div>
+        <Button
+          variant="default"
+          size="icon"
+          onClick={() => setShowProgressTracker(!showProgressTracker)}
+          className="fixed bottom-6 right-6 z-40 h-12 w-12 rounded-full elevation-2"
+          iconName={showProgressTracker ? "X" : "BarChart3"}
+          iconSize={20}
+          title={showProgressTracker ? "Hide Progress" : "Show Progress"}
+        />
+      </div>
+
+      <div className="fixed bottom-4 left-4 bg-card border border-border rounded-lg p-3 text-xs z-30 max-w-xs">
+        <div className="flex items-center space-x-2">
+          <Icon name="Shield" size={14} className="text-warning" />
+          <span className="text-muted-foreground">This content is protected and monitored for security.</span>
         </div>
       </div>
-    </SecureContentWrapper>
+    </div>
+    // </SecureContentWrapper>
   );
+
 };
 
 export default SyllabusContentViewer;

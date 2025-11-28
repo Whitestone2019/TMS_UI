@@ -106,12 +106,15 @@ const ManagerDashboard = () => {
   }, []);
 
   const fetchTrainees = async () => {
-    // In real implementation, fetch from API
-    // For now, using mock data
+    try{
     const response = await fetchAllTraineeSummary();
     console.log('Fetched trainee summary:', response);
     setTrainees(response.data);
     setFilteredTrainees(response.data);
+    }catch(error){
+      console.error('Error fetching trainee summary:', error);
+    }
+    
   }
 
   // Calculate metrics
