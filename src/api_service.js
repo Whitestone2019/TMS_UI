@@ -159,10 +159,11 @@ export const fetchAllSchedules = async () => {
     console.error("Error fetching schedules:", error);
     throw error;
   }
-};  
+};
 
 
 export const getSyllabusByIdAPI = async (id) => {
+  //return await axios.get(`${API_URL}/syllabus/` + id);
   try {
     const response = axios.get(`${API_URL}/syllabus/` + id);
     return response.data;
@@ -171,3 +172,21 @@ export const getSyllabusByIdAPI = async (id) => {
     throw error;
   }
 };
+
+
+
+
+
+export const updateStepProgress = async (empId, stepId, progress) => {
+  const payload = { empId, stepId, progress };
+  const response = await fetch("http://localhost:8080/api/progress/update-step", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) throw new Error("Failed to update step progress");
+  return await response.json(); // contains overallProgress
+};
+
+

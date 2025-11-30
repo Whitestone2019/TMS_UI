@@ -16,6 +16,10 @@ const TraineeDashboard = () => {
   const [currentStep, setCurrentStep] = useState(2);
   const [completedSteps, setCompletedSteps] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
+  const [syllabus, setSyllabus] = useState([]);
+  const [stepsStatus, setStepsStatus] = useState([]);
+  const [overall, setOverall] = useState(0);
+
   const [traineeInfo] = useState({
     name: 'John Doe',
     id: 'TRN001',
@@ -23,6 +27,38 @@ const TraineeDashboard = () => {
     startDate: '2024-10-01',
     program: 'Software Development Training'
   });
+
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const empId = traineeInfo.id;
+
+        // 1) Syllabus data
+        const syllabusRes = await fetch(`http://localhost:8080/syllabus/all`);
+        const syllabusData = await syllabusRes.json();
+        setSyllabus(syllabusData);
+
+        // 2) Steps progress data
+        const stepsRes = await fetch(`http://localhost:8080/steps/${empId}`);
+        const stepsData = await stepsRes.json();
+        setStepsStatus(stepsData);
+
+        // 3) Overall progress
+        const overallRes = await fetch(`http://localhost:8080/overall/${empId}`);
+        const overallData = await overallRes.json();
+        setOverall(overallData.overallProgress);
+
+        setIsLoading(false);
+      } catch (err) {
+        console.error("Error loading dashboard:", err);
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
 
   // Mock authentication check
   useEffect(() => {
@@ -138,15 +174,19 @@ const TraineeDashboard = () => {
               <ProgressTracker
                 currentStep={currentStep}
                 totalSteps={8}
-                completedSteps={completedSteps}
+                completedSteps={stepsStatus.filter(s => s.completed).length}
                 onStepClick={handleStepClick}
+                stepsStatus={stepsStatus}
               />
+
 
               {/* Current Step Content */}
               <CurrentStepContent
                 currentStep={currentStep}
                 traineeInfo={traineeInfo}
                 onStepComplete={handleStepComplete}
+                syllabus={syllabus}
+                stepsStatus={stepsStatus}
               />
 
               {/* Assessment History */}
@@ -178,7 +218,8 @@ const TraineeDashboard = () => {
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">Overall Progress</span>
-                    <span className="font-medium text-primary">{Math.round((completedSteps / 8) * 100)}%</span>
+                    <span className="font-medium text-primary">{overall}%
+                    </span>
                   </div>
                   <div className="pt-4 border-t border-border">
                     <Button

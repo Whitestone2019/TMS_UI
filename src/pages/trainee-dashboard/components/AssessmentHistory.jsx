@@ -6,18 +6,18 @@ const AssessmentHistory = ({ className = '' }) => {
   const [selectedAssessment, setSelectedAssessment] = useState(null);
 
   const assessments = [
-  {
-    id: 1,
-    week: 1,
-    date: "2024-10-15",
-    step: "Introduction to Programming",
-    marks: 85,
-    maxMarks: 100,
-    grade: "A",
-    managerName: "Sarah Johnson",
-    managerAvatar: "https://images.unsplash.com/photo-1734456611474-13245d164868",
-    managerAvatarAlt: "Professional headshot of woman with brown hair in business attire smiling at camera",
-    remarks: `Excellent understanding of programming fundamentals. Shows strong logical thinking and problem-solving skills. Keep up the great work!
+    {
+      id: 1,
+      week: 1,
+      date: "2024-10-15",
+      step: "Introduction to Programming",
+      marks: 85,
+      maxMarks: 100,
+      grade: "A",
+      managerName: "Sarah Johnson",
+      managerAvatar: "https://images.unsplash.com/photo-1734456611474-13245d164868",
+      managerAvatarAlt: "Professional headshot of woman with brown hair in business attire smiling at camera",
+      remarks: `Excellent understanding of programming fundamentals. Shows strong logical thinking and problem-solving skills. Keep up the great work!
 
 Areas of strength:
 • Clear grasp of basic concepts
@@ -27,22 +27,22 @@ Areas of strength:
 Areas for improvement:
 • Practice more coding exercises
 • Focus on code optimization techniques`,
-    feedback: "Outstanding performance in the first week. The trainee demonstrates exceptional aptitude for programming concepts.",
-    submittedAt: "2024-10-15T14:30:00Z",
-    status: "completed"
-  },
-  {
-    id: 2,
-    week: 2,
-    date: "2024-10-22",
-    step: "Data Structures",
-    marks: 78,
-    maxMarks: 100,
-    grade: "B+",
-    managerName: "Sarah Johnson",
-    managerAvatar: "https://images.unsplash.com/photo-1734456611474-13245d164868",
-    managerAvatarAlt: "Professional headshot of woman with brown hair in business attire smiling at camera",
-    remarks: `Good progress in understanding data structures. The concepts of arrays and objects are well grasped, but there's room for improvement in complex data manipulation.
+      feedback: "Outstanding performance in the first week. The trainee demonstrates exceptional aptitude for programming concepts.",
+      submittedAt: "2024-10-15T14:30:00Z",
+      status: "completed"
+    },
+    {
+      id: 2,
+      week: 2,
+      date: "2024-10-22",
+      step: "Data Structures",
+      marks: 78,
+      maxMarks: 100,
+      grade: "B+",
+      managerName: "Sarah Johnson",
+      managerAvatar: "https://images.unsplash.com/photo-1734456611474-13245d164868",
+      managerAvatarAlt: "Professional headshot of woman with brown hair in business attire smiling at camera",
+      remarks: `Good progress in understanding data structures. The concepts of arrays and objects are well grasped, but there's room for improvement in complex data manipulation.
 
 Strengths observed:
 • Solid understanding of basic data structures
@@ -53,26 +53,26 @@ Recommendations:
 • Practice more with nested data structures
 • Work on algorithm efficiency
 • Review object-oriented principles`,
-    feedback: "Consistent improvement shown. Focus on practicing more complex data structure problems.",
-    submittedAt: "2024-10-22T16:45:00Z",
-    status: "completed"
-  },
-  {
-    id: 3,
-    week: 3,
-    date: "2024-10-29",
-    step: "Control Flow",
-    marks: null,
-    maxMarks: 100,
-    grade: null,
-    managerName: "Sarah Johnson",
-    managerAvatar: "https://images.unsplash.com/photo-1734456611474-13245d164868",
-    managerAvatarAlt: "Professional headshot of woman with brown hair in business attire smiling at camera",
-    remarks: null,
-    feedback: null,
-    submittedAt: null,
-    status: "pending"
-  }];
+      feedback: "Consistent improvement shown. Focus on practicing more complex data structure problems.",
+      submittedAt: "2024-10-22T16:45:00Z",
+      status: "completed"
+    },
+    {
+      id: 3,
+      week: 3,
+      date: "2024-10-29",
+      step: "Control Flow",
+      marks: null,
+      maxMarks: 100,
+      grade: null,
+      managerName: "Sarah Johnson",
+      managerAvatar: "https://images.unsplash.com/photo-1734456611474-13245d164868",
+      managerAvatarAlt: "Professional headshot of woman with brown hair in business attire smiling at camera",
+      remarks: null,
+      feedback: null,
+      submittedAt: null,
+      status: "pending"
+    }];
 
 
   const getGradeColor = (grade) => {
@@ -146,22 +146,20 @@ Recommendations:
       <div className="p-6">
         <div className="space-y-4">
           {assessments?.map((assessment) =>
-          <div
-            key={assessment?.id}
-            className={`border border-border rounded-lg p-4 transition-all duration-200 hover:shadow-sm ${
-            selectedAssessment === assessment?.id ? 'border-primary bg-primary/5' : ''}`
-            }>
+            <div
+              key={assessment?.id}
+              className={`border border-border rounded-lg p-4 transition-all duration-200 hover:shadow-sm ${selectedAssessment === assessment?.id ? 'border-primary bg-primary/5' : ''}`
+              }>
 
               {/* Assessment Summary */}
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center space-x-4">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                assessment?.status === 'completed' ? 'bg-success/10' : 'bg-warning/10'}`
-                }>
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${assessment?.status === 'completed' ? 'bg-success/10' : 'bg-warning/10'}`
+                  }>
                     <Icon
-                    name={getStatusIcon(assessment?.status)}
-                    size={20}
-                    className={getStatusColor(assessment?.status)} />
+                      name={getStatusIcon(assessment?.status)}
+                      size={20}
+                      className={getStatusColor(assessment?.status)} />
 
                   </div>
                   <div>
@@ -171,7 +169,7 @@ Recommendations:
                 </div>
                 <div className="text-right">
                   {assessment?.marks !== null ?
-                <div className="flex items-center space-x-3">
+                    <div className="flex items-center space-x-3">
                       <div>
                         <div className="text-lg font-semibold text-foreground">
                           {assessment?.marks}/{assessment?.maxMarks}
@@ -182,10 +180,10 @@ Recommendations:
                       </div>
                     </div> :
 
-                <div className="text-sm text-muted-foreground">
+                    <div className="text-sm text-muted-foreground">
                       Pending Assessment
                     </div>
-                }
+                  }
                 </div>
               </div>
 
@@ -197,56 +195,56 @@ Recommendations:
 
               {/* Remarks Preview */}
               {assessment?.remarks &&
-            <div className="bg-muted/30 rounded-lg p-3 mb-3">
+                <div className="bg-muted/30 rounded-lg p-3 mb-3">
                   <p className="text-sm text-foreground line-clamp-2">
                     {assessment?.remarks?.split('\n')?.[0]}
                   </p>
                 </div>
-            }
+              }
 
               {/* Actions */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   {assessment?.status === 'completed' &&
-                <div className="flex items-center space-x-1 text-xs text-success">
+                    <div className="flex items-center space-x-1 text-xs text-success">
                       <Icon name="CheckCircle" size={14} />
                       <span>Completed</span>
                     </div>
-                }
+                  }
                   {assessment?.status === 'pending' &&
-                <div className="flex items-center space-x-1 text-xs text-warning">
+                    <div className="flex items-center space-x-1 text-xs text-warning">
                       <Icon name="Clock" size={14} />
                       <span>Awaiting Assessment</span>
                     </div>
-                }
+                  }
                 </div>
                 {assessment?.remarks &&
-              <Button
-                variant="outline"
-                size="sm"
-                iconName={selectedAssessment === assessment?.id ? "ChevronUp" : "ChevronDown"}
-                iconPosition="right"
-                iconSize={14}
-                onClick={() => setSelectedAssessment(
-                  selectedAssessment === assessment?.id ? null : assessment?.id
-                )}>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    iconName={selectedAssessment === assessment?.id ? "ChevronUp" : "ChevronDown"}
+                    iconPosition="right"
+                    iconSize={14}
+                    onClick={() => setSelectedAssessment(
+                      selectedAssessment === assessment?.id ? null : assessment?.id
+                    )}>
 
                     {selectedAssessment === assessment?.id ? 'Hide Details' : 'View Details'}
                   </Button>
-              }
+                }
               </div>
 
               {/* Expanded Details */}
               {selectedAssessment === assessment?.id && assessment?.remarks &&
-            <div className="mt-4 pt-4 border-t border-border">
+                <div className="mt-4 pt-4 border-t border-border">
                   <div className="space-y-4">
                     {/* Manager Info */}
                     <div className="flex items-center space-x-3">
                       <div className="w-8 h-8 rounded-full overflow-hidden">
                         <img
-                      src={assessment?.managerAvatar}
-                      alt={assessment?.managerAvatarAlt}
-                      className="w-full h-full object-cover" />
+                          src={assessment?.managerAvatar}
+                          alt={assessment?.managerAvatarAlt}
+                          className="w-full h-full object-cover" />
 
                       </div>
                       <div>
@@ -265,14 +263,14 @@ Recommendations:
 
                     {/* Feedback */}
                     {assessment?.feedback &&
-                <div className="bg-primary/5 rounded-lg p-4">
+                      <div className="bg-primary/5 rounded-lg p-4">
                         <h4 className="font-medium text-foreground mb-2">Additional Feedback:</h4>
                         <p className="text-sm text-foreground">{assessment?.feedback}</p>
                       </div>
-                }
+                    }
                   </div>
                 </div>
-            }
+              }
             </div>
           )}
         </div>

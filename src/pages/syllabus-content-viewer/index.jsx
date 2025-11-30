@@ -10,6 +10,7 @@ import SecurityWatermark from './components/SecurityWatermark';
 import ProgressTracker from './components/ProgressTracker';
 import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
+import { updateStepProgress } from '../../api_service';
 
 const SyllabusContentViewer = () => {
   const navigate = useNavigate();
@@ -23,6 +24,8 @@ const SyllabusContentViewer = () => {
   const [subTopicIndex, setSubTopicIndex] = useState(0);
 
   const contentRef = useRef(null);
+  sessionStorage.setItem("empid", "TRN001");
+  const empid = sessionStorage.getItem("empid");
 
   useEffect(() => {
     setSubTopicIndex(0);
@@ -63,19 +66,39 @@ const SyllabusContentViewer = () => {
 
         setSyllabusSteps(formattedSteps);
 
-        // set current step to first if available
-        if (formattedSteps.length > 0) setCurrentStepId(formattedSteps[0].id);
+        //     // set current step to first if available
+        //     if (formattedSteps.length > 0) setCurrentStepId(formattedSteps[0].id);
 
-        // trainee info (mock or fetch if required)
-        setTraineeInfo({
-          id: "TRN-1001",
-          name: "John Doe",
-          email: "john@example.com"
-        });
+        //     // trainee info (mock or fetch if required)
+        //     setTraineeInfo({
+        //       id: "TRN-1001",
+        //       name: "John Doe",
+        //       email: "john@example.com"
+        //     });
+
+        //     setLoading(false);
+        //   } catch (err) {
+        //     console.error("Error fetching syllabus:", err);
+        //     setLoading(false);
+        //   }
+        // };
+
+
+
+        const traineeRes = await fetch("http://localhost:8080/api/users/${empid}");
+        const traineeJson = await traineeRes.json();
+
+        // Filter only trainee role users
+        const filteredTrainees = traineeJson.data.filter(
+          (user) => user.role === "trainee"
+        );
+
+        // If 1 trainee logged in, store only first trainee info
+        setTraineeInfo(filteredTrainees.length > 0 ? filteredTrainees[0] : {});
 
         setLoading(false);
-      } catch (err) {
-        console.error("Error fetching syllabus:", err);
+      } catch (error) {
+        console.error("Error fetching data:", error);
         setLoading(false);
       }
     };
@@ -173,7 +196,8 @@ const SyllabusContentViewer = () => {
   //   );
   // };
 
-  const handleCompleteStep = (stepId) => {
+  const handleCompleteStep = async (stepId) => {
+    // Update local state
     setSyllabusSteps((prevSteps) => {
       const updated = [...prevSteps];
       const idx = updated.findIndex((s) => s.id === stepId);
@@ -197,7 +221,17 @@ const SyllabusContentViewer = () => {
 
       return updated;
     });
+
+    // ---- POST to backend ----
+    try {
+      const res = await updateStepProgress(empid, stepId, 100);
+      console.log("Step progress updated. Overall:", res?.overallProgress);
+      // Overall progress is stored in backend; we do not display it yet
+    } catch (err) {
+      console.error("Error updating step progress:", err);
+    }
   };
+
 
 
 
@@ -256,73 +290,73 @@ const SyllabusContentViewer = () => {
       enableScreenshotProtection={true}
       enableRightClickDisable={true}>
 
-      <div className="min-h-screen bg-background">
-        <SessionTimeoutHandler
-          sessionDuration={30}
-          warningTime={5}
-          onSessionExpired={handleSessionExpired}
-          onSessionExtended={() => setSessionActive(true)}
-          isActive={sessionActive}
+    <div className="min-h-screen bg-background">
+      <SessionTimeoutHandler
+        sessionDuration={30}
+        warningTime={5}
+        onSessionExpired={handleSessionExpired}
+        onSessionExtended={() => setSessionActive(true)}
+        isActive={sessionActive}
+      />
+
+
+      {/* Security Watermark */}
+      {/* <SecurityWatermark traineeInfo={traineeInfo} /> */}
+
+      <Header userRole="trainee" userName={traineeInfo?.name} onLogout={handleLogout} />
+
+      <div className="pt-16 flex h-screen">
+        <StepNavigationSidebar
+          steps={syllabusSteps}
+          currentStepId={currentStepId}
+          onStepSelect={handleStepSelect}
+          isCollapsed={isSidebarCollapsed}
+          onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
         />
 
-
-        {/* Security Watermark */}
-        {/* <SecurityWatermark traineeInfo={traineeInfo} /> */}
-
-        <Header userRole="trainee" userName={traineeInfo?.name} onLogout={handleLogout} />
-
-        <div className="pt-16 flex h-screen">
-          <StepNavigationSidebar
-            steps={syllabusSteps}
-            currentStepId={currentStepId}
-            onStepSelect={handleStepSelect}
-            isCollapsed={isSidebarCollapsed}
-            onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-          />
-
-          <div className="flex-1 flex flex-col overflow-hidden">
-            <div className="bg-surface border-b border-border px-6 py-3">
-              <NavigationBreadcrumb userRole="trainee" />
-            </div>
-
-            <div className="flex-1 flex overflow-hidden">
-              <div className="flex-1 overflow-hidden" ref={contentRef}>
-                <ContentDisplay
-                  currentStep={currentStep}
-                  traineeInfo={traineeInfo}
-                  onStepComplete={handleCompleteStep}
-                  onNextStep={handleNextStep}
-                  onPreviousStep={handlePreviousStep}
-                  canGoNext={canGoNext}
-                  canGoPrevious={canGoPrevious}
-                />
-              </div>
-
-              {showProgressTracker &&
-                <div className="w-80 border-l border-border overflow-y-auto">
-                  <ProgressTracker
-                    currentStep={currentStep}
-                    totalSteps={syllabusSteps?.length}
-                    completedSteps={completedSteps}
-                    timeSpent={45}
-                    estimatedTimeRemaining={180}
-                    className="m-4"
-                  />
-                </div>
-              }
-            </div>
+        <div className="flex-1 flex flex-col overflow-hidden">
+          <div className="bg-surface border-b border-border px-6 py-3">
+            <NavigationBreadcrumb userRole="trainee" />
           </div>
 
-          <Button
-            variant="default"
-            size="icon"
-            onClick={() => setShowProgressTracker(!showProgressTracker)}
-            className="fixed bottom-6 right-6 z-40 h-12 w-12 rounded-full elevation-2"
-            iconName={showProgressTracker ? "X" : "BarChart3"}
-            iconSize={20}
-            title={showProgressTracker ? "Hide Progress" : "Show Progress"}
-          />
+          <div className="flex-1 flex overflow-hidden">
+            <div className="flex-1 overflow-hidden" ref={contentRef}>
+              <ContentDisplay
+                currentStep={currentStep}
+                traineeInfo={traineeInfo}
+                onStepComplete={handleCompleteStep}
+                onNextStep={handleNextStep}
+                onPreviousStep={handlePreviousStep}
+                canGoNext={canGoNext}
+                canGoPrevious={canGoPrevious}
+              />
+            </div>
+
+            {showProgressTracker &&
+              <div className="w-80 border-l border-border overflow-y-auto">
+                <ProgressTracker
+                  currentStep={currentStep}
+                  totalSteps={syllabusSteps?.length}
+                  completedSteps={completedSteps}
+                  timeSpent={45}
+                  estimatedTimeRemaining={180}
+                  className="m-4"
+                />
+              </div>
+            }
+          </div>
         </div>
+
+        <Button
+          variant="default"
+          size="icon"
+          onClick={() => setShowProgressTracker(!showProgressTracker)}
+          className="fixed bottom-6 right-6 z-40 h-12 w-12 rounded-full elevation-2"
+          iconName={showProgressTracker ? "X" : "BarChart3"}
+          iconSize={20}
+          title={showProgressTracker ? "Hide Progress" : "Show Progress"}
+        />
+      </div>
 
         <div className="fixed bottom-4 left-4 bg-card border border-border rounded-lg p-3 text-xs z-30 max-w-xs">
           <div className="flex items-center space-x-2">
@@ -333,12 +367,9 @@ const SyllabusContentViewer = () => {
       </div>
      </SecureContentWrapper>
     );
+      
+  // );
 
 };
 
 export default SyllabusContentViewer;
-
-
-
-
-

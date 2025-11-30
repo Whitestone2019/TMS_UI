@@ -3,6 +3,8 @@
 // import Button from '../../../components/ui/Button';
 // import SecureContentWrapper from '../../../components/ui/SecureContentWrapper';
 
+import { LayoutDashboard } from "lucide-react"
+
 // const CurrentStepContent = ({
 //   currentStep = 1,
 //   syllabusData = [],
@@ -536,6 +538,7 @@
 //     navigate('/trainee-dashboard');
 //   };
 
+
 //   if (!sessionActive) {
 //     return (
 //       <div className="flex items-center justify-center min-h-screen bg-background">
@@ -661,3 +664,361 @@
 // };
 
 // export default SyllabusContentViewer;
+
+
+
+
+//
+
+// Content
+
+// import React, { useState, useEffect } from "react";
+// import axios from "axios";
+// import Icon from "../../../components/AppIcon";
+// import Button from "../../../components/ui/Button";
+// import SecureContentWrapper from "../../../components/ui/SecureContentWrapper";
+
+// const CurrentStepContent = ({
+//   currentStep = 1,
+//   traineeInfo,
+//   className = "",
+// }) => {
+//   const [isCompleting, setIsCompleting] = useState(false);
+//   const [stepContent, setStepContent] = useState(null);
+//   const [progress, setProgress] = useState(null);
+
+//   const empid = traineeInfo?.id || "TRN001";
+
+//   // Fetch trainee progress
+//   const fetchProgress = async () => {
+//     try {
+//       const res = await axios.get(
+//         `http://localhost:8080/api/progress/${empid}`
+//       );
+//       setProgress(res.data);
+//     } catch (err) {
+//       console.error("Error fetching progress:", err);
+//     }
+//   };
+
+//   // Fetch syllabus content for specific step
+//   // Example fetchStepContent
+//   const fetchStepContent = async (stepNumber) => {
+//     if (!stepNumber || stepNumber < 1) return; // skip invalid steps
+//     try {
+//       const res = await axios.get(`http://localhost:8080/api/syllabus/${stepNumber}`);
+//       setStepContent(res.data);
+//     } catch (err) {
+//       console.error("Error fetching step content:", err);
+//     }
+//   };
+
+
+//   useEffect(() => {
+//     fetchProgress();
+//     fetchStepContent();
+//   }, [currentStep]);
+
+//   const handleCompleteStep = async () => {
+//     if (!stepContent) return;
+//     setIsCompleting(true);
+
+//     try {
+//       await axios.post(`http://localhost:8080/api/progress/update`, {
+//         empid,
+//         stepId: `step-${currentStep}`,
+//         progress: 100,
+//         completed: true,
+//       });
+
+//       // ✅ Fetch latest progress from backend
+//       if (onStepComplete) await onStepComplete();
+//     } catch (err) {
+//       console.error("Error completing step:", err);
+//     } finally {
+//       setIsCompleting(false);
+//     }
+//   };
+
+
+
+
+//   const handleSessionExpired = () => {
+//     console.log("Session expired");
+//   };
+
+//   if (!stepContent) {
+//     return <div>Loading step content...</div>;
+//   }
+
+//   return (
+//     <SecureContentWrapper
+//       watermarkText={`${traineeInfo?.name} - ${traineeInfo?.id} - CONFIDENTIAL`}
+//       sessionTimeout={30}
+//       onSessionExpired={handleSessionExpired}
+//       className={className}
+//     >
+//       <div className="bg-card rounded-lg border border-border overflow-hidden">
+//         {/* Header */}
+//         <div className="bg-primary/5 border-b border-border p-6">
+//           <div className="flex items-center justify-between">
+//             <div className="flex items-center space-x-4">
+//               <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center">
+//                 <Icon name="BookOpen" size={24} color="white" />
+//               </div>
+//               <div>
+//                 <h2 className="text-xl font-semibold">{stepContent?.title}</h2>
+
+//                 <div className="flex items-center space-x-4 mt-1">
+//                   <span className="text-sm flex items-center">
+//                     <Icon name="Clock" size={14} className="mr-1" />
+//                     {stepContent?.duration || "10 mins"}
+//                   </span>
+
+//                   <span className="text-sm flex items-center">
+//                     <Icon name="User" size={14} className="mr-1" />
+//                     Step {currentStep}
+//                   </span>
+//                 </div>
+//               </div>
+//             </div>
+
+//             <div className="px-3 py-1 bg-primary text-primary-foreground rounded-full text-sm">
+//               In Progress
+//             </div>
+//           </div>
+//         </div>
+
+//         {/* Content */}
+//         <div className="p-6">
+//           <div className="prose max-w-none mb-8 whitespace-pre-line">
+//             {stepContent?.content}
+//           </div>
+
+//           {/* Resources */}
+//           {stepContent?.resources?.length > 0 && (
+//             <div className="border-t border-border pt-6">
+//               <h3 className="text-lg font-semibold mb-4 flex items-center">
+//                 <Icon name="FileText" size={20} className="mr-2" />
+//                 Learning Resources
+//               </h3>
+
+//               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+//                 {stepContent.resources.map((res, index) => (
+//                   <div
+//                     key={index}
+//                     className="bg-muted/30 rounded-lg p-4 border border-border"
+//                   >
+//                     <h4 className="text-sm font-medium">{res.name}</h4>
+//                     <p className="text-xs text-muted-foreground">{res.type}</p>
+
+//                     <Button
+//                       variant="outline"
+//                       size="xs"
+//                       className="mt-2"
+//                       onClick={() =>
+//                         window.open(
+//                           `http://localhost:8080/api/syllabus/file-url?path=${res.path}`,
+//                           "_blank"
+//                         )
+//                       }
+//                     >
+//                       Access
+//                     </Button>
+//                   </div>
+//                 ))}
+//               </div>
+//             </div>
+//           )}
+
+//           {/* Actions */}
+//           <div className="border-t border-border pt-6">
+//             <div className="flex justify-between">
+//               <Button variant="outline">Bookmark</Button>
+//               <Button
+//                 variant="default"
+//                 loading={isCompleting}
+//                 onClick={handleCompleteStep}
+//               >
+//                 Mark as Complete
+//               </Button>
+//             </div>
+//           </div>
+//         </div>
+//       </div>
+//     </SecureContentWrapper>
+//   );
+// };
+
+// export default CurrentStepContent;
+
+
+// Progress Tracker
+
+
+// import React, { useEffect, useState } from 'react';
+// import Icon from '../../../components/AppIcon';
+// import Button from '../../../components/ui/Button';
+// import axios from 'axios';
+
+// const ProgressTracker = ({
+//   currentStep = 1,
+//   totalSteps = 8,
+//   completedSteps = 0,
+//   onStepClick,
+//   className = ''
+// }) => {
+
+//   const [steps, setSteps] = useState([]);
+
+//   // 🔥 Fetch syllabus from backend
+//   const fetchSteps = async () => {
+//     try {
+//       const res = await axios.get("http://localhost:8080/api/syllabus/all");
+//       setSteps(res.data);
+//     } catch (err) {
+//       console.error("Error fetching syllabus:", err);
+//     }
+//   };
+
+//   useEffect(() => {
+//     fetchSteps();
+//   }, []);
+
+//   const progressPercentage = steps.length
+//     ? (steps.filter(s => s.completed).length / steps.length) * 100
+//     : 0;
+
+//   const getStepStatus = (stepNumber) => {
+//     const step = steps[stepNumber - 1]; // index = stepNumber - 1
+//     if (!step) return 'locked';
+//     if (step.completed) return 'completed';
+//     if (stepNumber === currentStep) return 'current';
+//     return 'locked';
+//   };
+
+//   const getStepIcon = (stepNumber) => {
+//     const status = getStepStatus(stepNumber);
+//     switch (status) {
+//       case 'completed':
+//         return 'CheckCircle';
+//       case 'current':
+//         return 'PlayCircle';
+//       default:
+//         return 'Lock';
+//     }
+//   };
+
+//   const getStepColor = (stepNumber) => {
+//     const status = getStepStatus(stepNumber);
+//     switch (status) {
+//       case 'completed':
+//         return 'text-success';
+//       case 'current':
+//         return 'text-primary';
+//       default:
+//         return 'text-muted-foreground';
+//     }
+//   };
+
+//   return (
+//     <div className={`bg-card rounded-lg border border-border p-6 ${className}`}>
+
+//       {/* Header */}
+//       <div className="flex items-center justify-between mb-6">
+//         <div>
+//           <h2 className="text-xl font-semibold text-foreground">Learning Progress</h2>
+//           <p className="text-sm text-muted-foreground">
+//             Step {currentStep} of {steps?.length} • {Math.round(progressPercentage)}% Complete
+//           </p>
+//         </div>
+//         <div className="text-right">
+//           <div className="text-2xl font-bold text-primary">{completedSteps}/{steps?.length}</div>
+//           <div className="text-xs text-muted-foreground">Steps Completed</div>
+//         </div>
+//       </div>
+
+//       {/* Progress Bar */}
+//       <div className="mb-8">
+//         <div className="flex items-center justify-between mb-2">
+//           <span className="text-sm font-medium text-foreground">Overall Progress</span>
+//           <span className="text-sm text-muted-foreground">{Math.round(progressPercentage)}%</span>
+//         </div>
+//         <div className="w-full bg-muted rounded-full h-3">
+//           <div
+//             className="bg-primary rounded-full h-3 transition-all duration-500 ease-out"
+//             style={{ width: `${progressPercentage}%` }}
+//           />
+//         </div>
+//       </div>
+
+//       {/* Steps Grid */}
+//       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+//         {steps?.map((step, index) => {
+//           const stepNumber = index + 1; // backend me id na ho to numbering
+//           const status = getStepStatus(stepNumber);
+//           const isClickable = status === 'completed' || status === 'current';
+
+//           return (
+//             <div
+//               key={stepNumber}
+//               className={`relative p-4 rounded-lg border transition-all duration-200 ${status === 'current'
+//                 ? 'border-primary bg-primary/5'
+//                 : status === 'completed'
+//                   ? 'border-success bg-success/5'
+//                   : 'border-border bg-muted/30'
+//                 } ${isClickable ? 'cursor-pointer hover:shadow-sm' : 'cursor-not-allowed'}`}
+//               onClick={() => isClickable && onStepClick && onStepClick(stepNumber)}
+//             >
+
+//               {/* Step Number & Icon */}
+//               <div className="flex items-center space-x-3 mb-2">
+//                 <div className={`w-8 h-8 rounded-full flex items-center justify-center ${status === 'current'
+//                   ? 'bg-primary text-primary-foreground'
+//                   : status === 'completed'
+//                     ? 'bg-success text-success-foreground'
+//                     : 'bg-muted text-muted-foreground'
+//                   }`}>
+//                   <Icon name={getStepIcon(stepNumber)} size={16} className="text-current" />
+//                 </div>
+
+//                 <div className="flex-1">
+//                   <div className="flex items-center space-x-2">
+//                     <span className="text-xs font-medium text-muted-foreground">
+//                       Step {stepNumber}
+//                     </span>
+
+//                     {status === 'current' && (
+//                       <span className="px-2 py-0.5 bg-primary text-primary-foreground text-xs rounded-full">
+//                         Current
+//                       </span>
+//                     )}
+
+//                     {status === 'completed' && (
+//                       <span className="px-2 py-0.5 bg-success text-success-foreground text-xs rounded-full">
+//                         Completed
+//                       </span>
+//                     )}
+//                   </div>
+//                 </div>
+//               </div>
+
+//               {/* Step Content */}
+//               <div className="space-y-1">
+//                 <h3 className={`font-medium ${status === 'locked' ? 'text-muted-foreground' : 'text-foreground'}`}>
+//                   {step?.title}
+//                 </h3>
+//                 <p className={`text-sm ${status === 'locked' ? 'text-muted-foreground/70' : 'text-muted-foreground'}`}>
+//                   {step?.description}
+//                 </p>
+//               </div>
+
+//             </div>
+//           );
+//         })}
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default ProgressTracker;
