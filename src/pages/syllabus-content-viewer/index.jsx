@@ -249,12 +249,12 @@ const SyllabusContentViewer = () => {
   }
 
   return (
-    // <SecureContentWrapper
-    //   watermarkText={`${traineeInfo?.name} | ID: ${traineeInfo?.id} | CONFIDENTIAL TRAINING MATERIAL`}
-    //   sessionTimeout={30}
-    //   onSessionExpired={handleSessionExpired}
-    //   enableScreenshotProtection={true}
-    //   enableRightClickDisable={true}>
+    <SecureContentWrapper
+      watermarkText={`${traineeInfo?.name} | ID: ${traineeInfo?.id} | CONFIDENTIAL TRAINING MATERIAL`}
+      sessionTimeout={30}
+      onSessionExpired={handleSessionExpired}
+      enableScreenshotProtection={true}
+      enableRightClickDisable={true}>
 
       <div className="min-h-screen bg-background">
         <SessionTimeoutHandler
@@ -331,7 +331,7 @@ const SyllabusContentViewer = () => {
           </div>
         </div>
       </div>
-    // </SecureContentWrapper>
+     </SecureContentWrapper>
     );
 
 };
