@@ -37,14 +37,14 @@ const SyllabusContentViewer = () => {
         setLoading(true);
         const response = await fetch("http://localhost:8080/api/syllabus/all");
         const data = await response.json();
-
+        
         // safe mapping to the structure ContentDisplay expects
         const formattedSteps = (Array.isArray(data) ? data : []).map((item, index) => ({
           id: `step-${index + 1}`,
           stepNumber: index + 1,
           title: item?.title ?? `Step ${index + 1}`,
           description: item?.topic ?? "",
-          isCompleted: false,
+          // isCompleted: item,
           isLocked: index !== 0, // only first open
           progress: 0,
           estimatedTime: "2 hours",
@@ -283,21 +283,21 @@ const SyllabusContentViewer = () => {
   }
 
   return (
-    <SecureContentWrapper
-      watermarkText={`${traineeInfo?.name} | ID: ${traineeInfo?.id} | CONFIDENTIAL TRAINING MATERIAL`}
-      sessionTimeout={30}
-      onSessionExpired={handleSessionExpired}
-      enableScreenshotProtection={true}
-      enableRightClickDisable={true}>
+    // <SecureContentWrapper
+    //   watermarkText={`${traineeInfo?.name} | ID: ${traineeInfo?.id} | CONFIDENTIAL TRAINING MATERIAL`}
+    //   sessionTimeout={30}
+    //   onSessionExpired={handleSessionExpired}
+    //   enableScreenshotProtection={true}
+    //   enableRightClickDisable={true}>
 
     <div className="min-h-screen bg-background">
-      <SessionTimeoutHandler
+      {/* <SessionTimeoutHandler
         sessionDuration={30}
         warningTime={5}
         onSessionExpired={handleSessionExpired}
         onSessionExtended={() => setSessionActive(true)}
         isActive={sessionActive}
-      />
+      /> */}
 
 
       {/* Security Watermark */}
@@ -365,7 +365,7 @@ const SyllabusContentViewer = () => {
           </div>
         </div>
       </div>
-     </SecureContentWrapper>
+    //  </SecureContentWrapper>
     );
       
   // );

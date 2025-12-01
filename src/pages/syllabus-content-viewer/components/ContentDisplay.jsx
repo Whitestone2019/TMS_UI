@@ -96,8 +96,9 @@ const ContentDisplay = ({
       .replace(/\\/g, "/")
       .split("/")
       .pop();
-
-    fetch(`http://localhost:8080/api/syllabus/preview?path=${cleanFileName}`)
+    const fixedFileName = "EJ_Practical(3A).pdf";
+    // alert(cleanFileName);
+    fetch(`http://localhost:8080/api/syllabus/preview?path=${fixedFileName}`)
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
         return res.blob();
@@ -145,6 +146,7 @@ const ContentDisplay = ({
   const confirmCompletion = () => {
     setShowCompletionModal(false);
     onStepComplete(currentStep?.id);
+    
   };
 
 
