@@ -23,6 +23,14 @@ const SyllabusContentViewer = () => {
   const [loading, setLoading] = useState(true);
   const [subTopicIndex, setSubTopicIndex] = useState(0);
 
+  const currentStep = syllabusSteps?.find((step) => step?.id === currentStepId);
+  const currentStepIndex = syllabusSteps?.findIndex((step) => step?.id === currentStepId);
+  const completedSteps = syllabusSteps?.filter((step) => step?.isCompleted)?.length;
+
+  const [timeSpent, setTimeSpent] = useState(currentStep?.durationSeconds || 0);
+
+
+
   const contentRef = useRef(null);
   sessionStorage.setItem("empid", "TRN001");
   const empid = sessionStorage.getItem("empid");
@@ -30,6 +38,8 @@ const SyllabusContentViewer = () => {
   useEffect(() => {
     setSubTopicIndex(0);
   }, [currentStepId]);
+
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -106,9 +116,28 @@ const SyllabusContentViewer = () => {
     fetchData();
   }, []);
 
-  const currentStep = syllabusSteps?.find((step) => step?.id === currentStepId);
-  const currentStepIndex = syllabusSteps?.findIndex((step) => step?.id === currentStepId);
-  const completedSteps = syllabusSteps?.filter((step) => step?.isCompleted)?.length;
+  useEffect(() => {
+    const fetchSteps = async () => {
+      const res = await fetch(`http://localhost:8080/api/progress/steps/${empid}`);
+      const data = await res.json();
+
+      setSyllabusSteps(prevSteps =>
+        prevSteps.map(step => {
+          const saved = data.find(s => s.stepId === step.id);
+          return saved ? {
+            ...step,
+            isCompleted: saved.completed,
+            progress: saved.progress,
+            durationTime: saved.durationTime
+          } : step;
+        })
+      );
+    };
+    fetchSteps();
+  }, []);
+
+
+
 
 
 
@@ -195,13 +224,10 @@ const SyllabusContentViewer = () => {
   //     })
   //   );
   // };
-
   const handleCompleteStep = async (stepId) => {
-    // Update local state
     setSyllabusSteps((prevSteps) => {
       const updated = [...prevSteps];
       const idx = updated.findIndex((s) => s.id === stepId);
-
       if (idx !== -1) {
         updated[idx] = {
           ...updated[idx],
@@ -209,24 +235,15 @@ const SyllabusContentViewer = () => {
           progress: 100,
           completedAt: new Date().toISOString(),
         };
-
-        // unlock next step
         if (idx + 1 < updated.length) {
-          updated[idx + 1] = {
-            ...updated[idx + 1],
-            isLocked: false,
-          };
+          updated[idx + 1] = { ...updated[idx + 1], isLocked: false };
         }
       }
-
       return updated;
     });
 
-    // ---- POST to backend ----
     try {
-      const res = await updateStepProgress(empid, stepId, 100);
-      console.log("Step progress updated. Overall:", res?.overallProgress);
-      // Overall progress is stored in backend; we do not display it yet
+      await updateStepProgress(empid, stepId, 100, timeSpent); // send duration
     } catch (err) {
       console.error("Error updating step progress:", err);
     }
@@ -326,6 +343,7 @@ const SyllabusContentViewer = () => {
                 traineeInfo={traineeInfo}
                 onStepComplete={handleCompleteStep}
                 onNextStep={handleNextStep}
+
                 onPreviousStep={handlePreviousStep}
                 canGoNext={canGoNext}
                 canGoPrevious={canGoPrevious}

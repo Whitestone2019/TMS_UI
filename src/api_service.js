@@ -177,16 +177,35 @@ export const getSyllabusByIdAPI = async (id) => {
 
 
 
-export const updateStepProgress = async (empId, stepId, progress) => {
-  const payload = { empId, stepId, progress };
-  const response = await fetch("http://localhost:8080/api/progress/update-step", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
+// export const updateStepProgress = async (empId, stepId, progress) => {
+//   const payload = { empId, stepId, progress };
+//   const response = await fetch("http://localhost:8080/api/progress/update-step", {
+//     method: "POST",
+//     headers: { "Content-Type": "application/json" },
+//     body: JSON.stringify(payload),
+//   });
 
-  if (!response.ok) throw new Error("Failed to update step progress");
-  return await response.json(); // contains overallProgress
+//   if (!response.ok) throw new Error("Failed to update step progress");
+//   return await response.json(); // contains overallProgress
+// };
+
+
+// export const fetchSteps = async (empId) => {
+//   const res = await axios.get(`${API_URL}/steps/${empId}`);
+//   return res.data;
+// };
+
+export const updateStepProgress = async (empId, stepId, progress, durationTime) => {
+  const res = await axios.post(`${API_URL}/progress/update-step`, {
+    empId,
+    stepId,
+    progress,
+    durationTime
+  });
+  return res.data;
 };
 
-
+export const getOverallProgressTime = async (empId) => {
+  const response = await axios.get(`http://localhost:8080/api/progress/overall-time?empId=${empId}`);
+  return response.data.overallTimeSeconds;
+};
