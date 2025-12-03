@@ -66,6 +66,16 @@ export const fetchAssessmentsByTrainee = async (empId) => {
   }
 };
 
+// export const fetchAssessmentsByTrainee = async (empId) => {
+//   try {
+//     const response = await axios.get(`${API_URL}/assessments/trainee/${empId}`);
+//     return response.data?.data || [];   // <-- return array only
+//   } catch (error) {
+//     console.error("Error fetching assessments for trainee:", error);
+//     throw error;
+//   }
+// };
+
 
 export const fetchAllTraineeSummary = async () => {
   try {
@@ -208,4 +218,19 @@ export const updateStepProgress = async (empId, stepId, progress, durationTime) 
 export const getOverallProgressTime = async (empId) => {
   const response = await axios.get(`http://localhost:8080/api/progress/overall-time?empId=${empId}`);
   return response.data.overallTimeSeconds;
+};
+
+
+export const fetchUserByEmpId = async (empId) => {
+  try {
+    const res = await axios.get(`${API_URL}/users/emp/${empId}`);
+
+    // API response format:
+    // { status: 200, success: true, message: "...", data: {...user} }
+
+    return res.data.data; // return actual user object
+  } catch (error) {
+    console.error("Error fetching user by empId:", error);
+    throw error;
+  }
 };

@@ -2,77 +2,77 @@ import React, { useState } from 'react';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 
-const AssessmentHistory = ({ className = '' }) => {
+const AssessmentHistory = ({ className = '', assessments = [] }) => {
   const [selectedAssessment, setSelectedAssessment] = useState(null);
 
-  const assessments = [
-    {
-      id: 1,
-      week: 1,
-      date: "2024-10-15",
-      step: "Introduction to Programming",
-      marks: 85,
-      maxMarks: 100,
-      grade: "A",
-      managerName: "Sarah Johnson",
-      managerAvatar: "https://images.unsplash.com/photo-1734456611474-13245d164868",
-      managerAvatarAlt: "Professional headshot of woman with brown hair in business attire smiling at camera",
-      remarks: `Excellent understanding of programming fundamentals. Shows strong logical thinking and problem-solving skills. Keep up the great work!
+  //   const assessments = [
+  //     {
+  //       id: 1,
+  //       week: 1,
+  //       date: "2024-10-15",
+  //       step: "Introduction to Programming",
+  //       marks: 85,
+  //       maxMarks: 100,
+  //       grade: "A",
+  //       managerName: "Sarah Johnson",
+  //       managerAvatar: "https://images.unsplash.com/photo-1734456611474-13245d164868",
+  //       managerAvatarAlt: "Professional headshot of woman with brown hair in business attire smiling at camera",
+  //       remarks: `Excellent understanding of programming fundamentals. Shows strong logical thinking and problem-solving skills. Keep up the great work!
 
-Areas of strength:
-• Clear grasp of basic concepts
-• Good participation in discussions
-• Well-structured approach to problems
+  // Areas of strength:
+  // • Clear grasp of basic concepts
+  // • Good participation in discussions
+  // • Well-structured approach to problems
 
-Areas for improvement:
-• Practice more coding exercises
-• Focus on code optimization techniques`,
-      feedback: "Outstanding performance in the first week. The trainee demonstrates exceptional aptitude for programming concepts.",
-      submittedAt: "2024-10-15T14:30:00Z",
-      status: "completed"
-    },
-    {
-      id: 2,
-      week: 2,
-      date: "2024-10-22",
-      step: "Data Structures",
-      marks: 78,
-      maxMarks: 100,
-      grade: "B+",
-      managerName: "Sarah Johnson",
-      managerAvatar: "https://images.unsplash.com/photo-1734456611474-13245d164868",
-      managerAvatarAlt: "Professional headshot of woman with brown hair in business attire smiling at camera",
-      remarks: `Good progress in understanding data structures. The concepts of arrays and objects are well grasped, but there's room for improvement in complex data manipulation.
+  // Areas for improvement:
+  // • Practice more coding exercises
+  // • Focus on code optimization techniques`,
+  //       feedback: "Outstanding performance in the first week. The trainee demonstrates exceptional aptitude for programming concepts.",
+  //       submittedAt: "2024-10-15T14:30:00Z",
+  //       status: "completed"
+  //     },
+  //     {
+  //       id: 2,
+  //       week: 2,
+  //       date: "2024-10-22",
+  //       step: "Data Structures",
+  //       marks: 78,
+  //       maxMarks: 100,
+  //       grade: "B+",
+  //       managerName: "Sarah Johnson",
+  //       managerAvatar: "https://images.unsplash.com/photo-1734456611474-13245d164868",
+  //       managerAvatarAlt: "Professional headshot of woman with brown hair in business attire smiling at camera",
+  //       remarks: `Good progress in understanding data structures. The concepts of arrays and objects are well grasped, but there's room for improvement in complex data manipulation.
 
-Strengths observed:
-• Solid understanding of basic data structures
-• Good implementation of array operations
-• Clear documentation in code
+  // Strengths observed:
+  // • Solid understanding of basic data structures
+  // • Good implementation of array operations
+  // • Clear documentation in code
 
-Recommendations:
-• Practice more with nested data structures
-• Work on algorithm efficiency
-• Review object-oriented principles`,
-      feedback: "Consistent improvement shown. Focus on practicing more complex data structure problems.",
-      submittedAt: "2024-10-22T16:45:00Z",
-      status: "completed"
-    },
-    {
-      id: 3,
-      week: 3,
-      date: "2024-10-29",
-      step: "Control Flow",
-      marks: null,
-      maxMarks: 100,
-      grade: null,
-      managerName: "Sarah Johnson",
-      managerAvatar: "https://images.unsplash.com/photo-1734456611474-13245d164868",
-      managerAvatarAlt: "Professional headshot of woman with brown hair in business attire smiling at camera",
-      remarks: null,
-      feedback: null,
-      submittedAt: null,
-      status: "pending"
-    }];
+  // Recommendations:
+  // • Practice more with nested data structures
+  // • Work on algorithm efficiency
+  // • Review object-oriented principles`,
+  //       feedback: "Consistent improvement shown. Focus on practicing more complex data structure problems.",
+  //       submittedAt: "2024-10-22T16:45:00Z",
+  //       status: "completed"
+  //     },
+  //     {
+  //       id: 3,
+  //       week: 3,
+  //       date: "2024-10-29",
+  //       step: "Control Flow",
+  //       marks: null,
+  //       maxMarks: 100,
+  //       grade: null,
+  //       managerName: "Sarah Johnson",
+  //       managerAvatar: "https://images.unsplash.com/photo-1734456611474-13245d164868",
+  //       managerAvatarAlt: "Professional headshot of woman with brown hair in business attire smiling at camera",
+  //       remarks: null,
+  //       feedback: null,
+  //       submittedAt: null,
+  //       status: "pending"
+  //     }];
 
 
   const getGradeColor = (grade) => {
