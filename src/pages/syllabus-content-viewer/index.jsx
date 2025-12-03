@@ -10,7 +10,7 @@ import SecurityWatermark from './components/SecurityWatermark';
 import ProgressTracker from './components/ProgressTracker';
 import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
-import { updateStepProgress } from '../../api_service';
+import { updateStepProgress, fetchUserByEmpId } from '../../api_service';
 
 const SyllabusContentViewer = () => {
   const navigate = useNavigate();
@@ -38,6 +38,33 @@ const SyllabusContentViewer = () => {
   useEffect(() => {
     setSubTopicIndex(0);
   }, [currentStepId]);
+
+
+  useEffect(() => {
+    const loadTraineeInfo = async () => {
+      try {
+        const empId = sessionStorage.getItem("empid");
+
+        const user = await fetchUserByEmpId(empId);
+
+        if (user) {
+          setTraineeInfo({
+            name: `${user.firstname} ${user.lastname}`,
+            id: user.empid,
+            email: user.email,
+            program: user.designation || "Training Program",
+            startDate: user.createdAt || "2024-10-01", // or whatever
+          });
+        }
+      } catch (err) {
+        console.error("Failed to load trainee info", err);
+      }
+    };
+
+    loadTraineeInfo();
+  }, []);
+
+
 
 
 
@@ -95,16 +122,7 @@ const SyllabusContentViewer = () => {
 
 
 
-        const traineeRes = await fetch("http://localhost:8080/api/users/${empid}");
-        const traineeJson = await traineeRes.json();
 
-        // Filter only trainee role users
-        const filteredTrainees = traineeJson.data.filter(
-          (user) => user.role === "trainee"
-        );
-
-        // If 1 trainee logged in, store only first trainee info
-        setTraineeInfo(filteredTrainees.length > 0 ? filteredTrainees[0] : {});
 
         setLoading(false);
       } catch (error) {

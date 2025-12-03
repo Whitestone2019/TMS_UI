@@ -10,6 +10,8 @@ import InterviewSchedule from './components/InterviewSchedule';
 import QuickActions from './components/QuickActions';
 import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
+import { fetchAssessmentsByTrainee } from '../../api_service';
+import { fetchUserByEmpId } from "../../api_service";
 
 const TraineeDashboard = () => {
   const navigate = useNavigate();
@@ -19,45 +21,132 @@ const TraineeDashboard = () => {
   const [syllabus, setSyllabus] = useState([]);
   const [stepsStatus, setStepsStatus] = useState([]);
   const [overall, setOverall] = useState(0);
+  const [assessments, setAssessments] = useState([]);
+  const [traineeInfo, setTraineeInfo] = useState(null);
 
-  const [traineeInfo] = useState({
-    name: 'John Doe',
-    id: 'TRN001',
-    email: 'john.doe@company.com',
-    startDate: '2024-10-01',
-    program: 'Software Development Training'
-  });
+  const empId = sessionStorage.setItem("empid", "TRN001");
 
+  // const [traineeInfo] = useState({
+  //   name: 'John Doe',
+  //   id: 'TRN001',
+  //   email: 'john.doe@company.com',
+  //   startDate: '2024-10-01',
+  //   program: 'Software Development Training'
+  // });
+
+
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const empId = traineeInfo.id;
+
+  //       // 1) Syllabus data
+  //       const syllabusRes = await fetch(`http://localhost:8080/syllabus/all`);
+  //       const syllabusData = await syllabusRes.json();
+  //       setSyllabus(syllabusData);
+
+  //       // 2) Steps progress data
+  //       const stepsRes = await fetch(`http://localhost:8080/steps/${empId}`);
+  //       const stepsData = await stepsRes.json();
+  //       setStepsStatus(stepsData);
+
+  //       // 3) Overall progress
+  //       const overallRes = await fetch(`http://localhost:8080/overall/${empId}`);
+  //       const overallData = await overallRes.json();
+  //       setOverall(overallData.overallProgress);
+
+  //       setIsLoading(false);
+  //     } catch (err) {
+  //       console.error("Error loading dashboard:", err);
+  //       setIsLoading(false);
+  //     }
+  //   };
+
+  //   fetchData();
+  // }, []);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const loadTraineeInfo = async () => {
       try {
-        const empId = traineeInfo.id;
+        const empId = sessionStorage.getItem("empid");
 
-        // 1) Syllabus data
-        const syllabusRes = await fetch(`http://localhost:8080/syllabus/all`);
-        const syllabusData = await syllabusRes.json();
-        setSyllabus(syllabusData);
+        const user = await fetchUserByEmpId(empId);
 
-        // 2) Steps progress data
-        const stepsRes = await fetch(`http://localhost:8080/steps/${empId}`);
-        const stepsData = await stepsRes.json();
-        setStepsStatus(stepsData);
-
-        // 3) Overall progress
-        const overallRes = await fetch(`http://localhost:8080/overall/${empId}`);
-        const overallData = await overallRes.json();
-        setOverall(overallData.overallProgress);
-
-        setIsLoading(false);
+        if (user) {
+          setTraineeInfo({
+            name: `${user.firstname} ${user.lastname}`,
+            id: user.empid,
+            email: user.email,
+            program: user.designation || "Training Program",
+            startDate: user.createdAt || "2024-10-01", // or whatever
+          });
+        }
       } catch (err) {
-        console.error("Error loading dashboard:", err);
-        setIsLoading(false);
+        console.error("Failed to load trainee info", err);
       }
     };
 
-    fetchData();
+    loadTraineeInfo();
   }, []);
+
+
+
+  useEffect(() => {
+    const loadTraineeData = async () => {
+      try {
+        const empId = sessionStorage.getItem("empid");
+        if (!empId) return;
+
+
+
+        // 2️⃣ Fetch assessments
+        const assessmentRes = await fetchAssessmentsByTrainee(empId);
+        const list = Array.isArray(assessmentRes.data) ? assessmentRes.data : [];
+
+        const normalized = list.map((a, index) => ({
+          id: a.assessmentId,
+          week: index + 1, // Because API does not provide week number
+          date: a.assessmentDate,
+          step: a.assessmentType || "Weekly Assessment",
+
+          marks: Number(a.marks),
+          maxMarks: Number(a.maxMarks),
+          grade:
+            Number(a.marks) >= 85
+              ? "A"
+              : Number(a.marks) >= 70
+                ? "B"
+                : Number(a.marks) >= 55
+                  ? "C"
+                  : "D",
+
+          // Manager name from user object
+          managerName: `${a.user.firstname} ${a.user.lastname}`,
+
+          managerAvatar:
+            "https://ui-avatars.com/api/?background=random&name=" +
+            encodeURIComponent(`${a.user.firstname} ${a.user.lastname}`),
+
+          managerAvatarAlt: `Avatar of ${a.user.firstname} ${a.user.lastname}`,
+
+          remarks: a.remarks,
+          feedback: a.recommendations,
+          submittedAt: a.submittedAt,
+
+          status: Number(a.currentStep) >= 1 ? "completed" : "pending"
+        }));
+
+        setAssessments(normalized);
+
+      } catch (err) {
+        console.error("Error loading trainee dashboard data:", err);
+      }
+    };
+
+    loadTraineeData();
+  }, []);
+
+
 
 
   // Mock authentication check
@@ -145,11 +234,16 @@ const TraineeDashboard = () => {
                   <div className="flex items-center space-x-4 mt-3 text-sm text-muted-foreground">
                     <span className="flex items-center">
                       <Icon name="Calendar" size={14} className="mr-1" />
-                      Started: {new Date(traineeInfo.startDate)?.toLocaleDateString('en-US', {
-                        month: 'long',
-                        day: 'numeric',
-                        year: 'numeric'
-                      })}
+                      Started: {
+                        traineeInfo?.startDate
+                          ? new Date(traineeInfo.startDate).toLocaleDateString('en-US', {
+                            month: 'long',
+                            day: 'numeric',
+                            year: 'numeric'
+                          })
+                          : "Not Available"
+                      }
+
                     </span>
                     <span className="flex items-center">
                       <Icon name="User" size={14} className="mr-1" />
@@ -190,7 +284,7 @@ const TraineeDashboard = () => {
               />
 
               {/* Assessment History */}
-              <AssessmentHistory />
+              <AssessmentHistory assessments={assessments} />
             </div>
 
             {/* Right Column - Sidebar */}
