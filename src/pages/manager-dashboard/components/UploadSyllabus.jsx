@@ -26,7 +26,7 @@ const UploadSyllabus = ({ onCancel }) => {
     const loadAll = async () => {
         try {
             const res = await getAllSyllabusAPI();
-            setSyllabusList(res.data || []);
+            setSyllabusList(res.data?.data || []);
         } catch (err) {
             console.error("Failed to fetch syllabus", err);
         }
@@ -71,56 +71,107 @@ const UploadSyllabus = ({ onCancel }) => {
         return Object.keys(newErrors).length === 0;
     };
 
+    // const handleSubmit = async () => {
+    //     if (!validateForm()) return;
+    //     setLoading(true);
+
+    //     try {
+    //         const fd = new FormData();
+    //         fd.append("title", formData.title);
+    //         fd.append("topic", formData.topic);
+
+
+    //         formData.subTopics.forEach((sub, i) => {
+    //             console.log("Appending subtopic:", sub);
+    //             fd.append(`subTopics[${i}].name`, sub.name);
+    //             fd.append(`subTopics[${i}].description`, sub.description);
+
+    //             if (sub.file instanceof File) {
+    //                 fd.append(`subTopics[${i}].file`, sub.file, sub.file.name);
+    //             } else if (typeof sub.file === "string") {
+    //                 // send existing file path so backend knows to keep it
+    //                 fd.append(`subTopics[${i}].filePath`, sub.file);
+    //             }
+    //         });
+
+            
+    //         // console.log(fd);
+    //         // console.log(formData);
+    //         let res;
+    //         if (editingId) {
+    //             res = await updateSyllabusAPI(editingId, fd);
+    //             setSyllabusList(prev => prev.map(it => it.id === editingId ? res.data : it));
+    //             alert("Updated Successfully!");
+    //         } else {
+    //             console.log(formData);
+    //             res = await uploadSyllabusAPI(formData);
+    //             setSyllabusList(prev => [...prev, res.data]);
+    //             alert("Uploaded Successfully!");
+                
+    //         }
+            
+    //         // reset form
+    //         setEditingId(null);
+    //         // setFormData({
+    //         //     title: "",
+
+    //         //     topic: "",
+    //         //     subTopics: [{ name: "", description: "", file: null }],
+    //         // });
+    //     } catch (err) {
+    //         console.error("Upload error", err);
+    //         alert(err?.response?.data || err.message || "Upload failed");
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // };
+
+
     const handleSubmit = async () => {
-        if (!validateForm()) return;
-        setLoading(true);
+  if (!validateForm()) return;
+  setLoading(true);
 
-        try {
-            const fd = new FormData();
-            fd.append("title", formData.title);
-            fd.append("topic", formData.topic);
+  try {
+
+    const syllabusJson = {
+  title: formData.title,
+  topic: formData.topic,
+  subTopics: formData.subTopics.map(st => ({ name: st.name, description: st.description }))
+};
+
+const fd = new FormData();
+fd.append("syllabus", new Blob([JSON.stringify(syllabusJson)], { type: "application/json" }));
+
+formData.subTopics.forEach(st => {
+  if (st.file instanceof File) {
+    fd.append("files", st.file, st.file.name);
+  }
+});
 
 
-            formData.subTopics.forEach((sub, i) => {
-                fd.append(`subTopics[${i}].name`, sub.name);
-                fd.append(`subTopics[${i}].description`, sub.description);
 
-                if (sub.file instanceof File) {
-                    fd.append(`subTopics[${i}].file`, sub.file, sub.file.name);
-                } else if (typeof sub.file === "string") {
-                    // send existing file path so backend knows to keep it
-                    fd.append(`subTopics[${i}].filePath`, sub.file);
-                }
-            });
+    // Send to backend
+    const res = editingId
+      ? await updateSyllabusAPI(editingId, fd)
+      : await uploadSyllabusAPI(fd);
 
+    if (editingId) {
+      setSyllabusList(prev => prev.map(it => it.id === editingId ? res.data : it));
+      alert("Updated Successfully!");
+    } else {
+      setSyllabusList(prev => [...prev, res.data]);
+      alert("Uploaded Successfully!");
+    }
 
-            let res;
-            if (editingId) {
-                res = await updateSyllabusAPI(editingId, fd);
-                setSyllabusList(prev => prev.map(it => it.id === editingId ? res.data : it));
-                alert("Updated Successfully!");
-            } else {
-                res = await uploadSyllabusAPI(fd);
-                setSyllabusList(prev => [...prev, res.data]);
-                alert("Uploaded Successfully!");
-            }
+    setEditingId(null);
 
-            // reset form
-            setEditingId(null);
-            setFormData({
-                title: "",
-
-                topic: "",
-                subTopics: [{ name: "", description: "", file: null }],
-            });
-        } catch (err) {
-            console.error("Upload error", err);
-            alert(err?.response?.data || err.message || "Upload failed");
-        } finally {
-            setLoading(false);
-        }
-    };
-
+  } catch (err) {
+    console.error("Upload error", err);
+    alert(err?.response?.data || err.message || "Upload failed");
+  } finally {
+    setLoading(false);
+  }
+};
 
     const editSyllabus = (item) => {
         setEditingId(item.id);

@@ -112,7 +112,7 @@ const ContentDisplay = ({
     setShowCompletionModal(false);
     await saveProgressToBackend(100); // Step complete
     onStepComplete(currentStep?.id);
-    
+
   };
 
   // -----------------------------

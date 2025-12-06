@@ -141,7 +141,8 @@ export const getAllSchedules = async () => {
 };
 
 export const uploadSyllabusAPI = async (formData) => {
-  const res = await axios.post(`${API_URL}/syllabus/upload`, formData, {
+  // const res = await axios.post(`${API_URL}/syllabus/add`, formData);
+  const res = await axios.post(`${API_URL}/syllabus/add`, formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
   return res;
@@ -153,7 +154,7 @@ export const getAllSyllabusAPI = async () => {
 };
 
 export const updateSyllabusAPI = async (id, formData) => {
-  const res = await axios.post(`${API_URL}/syllabus/update/${id}`, formData, {
+  const res = await axios.put(`${API_URL}/syllabus/update/${id}`, formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
   return res;
