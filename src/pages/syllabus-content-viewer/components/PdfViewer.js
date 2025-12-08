@@ -48,7 +48,7 @@ export default function PdfViewer({ url }) {
         if (!url) return;
 
         pdfjsLib.GlobalWorkerOptions.workerSrc =
-            `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+            "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js";
 
         const renderPDF = async () => {
             const container = containerRef.current;

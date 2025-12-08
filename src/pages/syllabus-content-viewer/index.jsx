@@ -74,14 +74,14 @@ const SyllabusContentViewer = () => {
         setLoading(true);
         const response = await fetch("http://localhost:8080/api/syllabus/all");
         const data = await response.json();
-
+        
         // safe mapping to the structure ContentDisplay expects
         const formattedSteps = (Array.isArray(data) ? data : []).map((item, index) => ({
           id: `step-${index + 1}`,
           stepNumber: index + 1,
           title: item?.title ?? `Step ${index + 1}`,
           description: item?.topic ?? "",
-          isCompleted: false,
+          // isCompleted: item,
           isLocked: index !== 0, // only first open
           progress: 0,
           estimatedTime: "2 hours",
@@ -326,13 +326,13 @@ const SyllabusContentViewer = () => {
     //   enableRightClickDisable={true}>
 
     <div className="min-h-screen bg-background">
-      <SessionTimeoutHandler
+      {/* <SessionTimeoutHandler
         sessionDuration={30}
         warningTime={5}
         onSessionExpired={handleSessionExpired}
         onSessionExtended={() => setSessionActive(true)}
         isActive={sessionActive}
-      />
+      /> */}
 
 
       {/* Security Watermark */}
@@ -394,15 +394,17 @@ const SyllabusContentViewer = () => {
         />
       </div>
 
-      <div className="fixed bottom-4 left-4 bg-card border border-border rounded-lg p-3 text-xs z-30 max-w-xs">
-        <div className="flex items-center space-x-2">
-          <Icon name="Shield" size={14} className="text-warning" />
-          <span className="text-muted-foreground">This content is protected and monitored for security.</span>
+        <div className="fixed bottom-4 left-4 bg-card border border-border rounded-lg p-3 text-xs z-30 max-w-xs">
+          <div className="flex items-center space-x-2">
+            <Icon name="Shield" size={14} className="text-warning" />
+            <span className="text-muted-foreground">This content is protected and monitored for security.</span>
+          </div>
         </div>
       </div>
-    </div>
-    // </SecureContentWrapper>
-  );
+    //  </SecureContentWrapper>
+    );
+      
+  // );
 
 };
 
