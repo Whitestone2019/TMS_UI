@@ -66,15 +66,6 @@ export const fetchAssessmentsByTrainee = async (empId) => {
   }
 };
 
-// export const fetchAssessmentsByTrainee = async (empId) => {
-//   try {
-//     const response = await axios.get(`${API_URL}/assessments/trainee/${empId}`);
-//     return response.data?.data || [];   // <-- return array only
-//   } catch (error) {
-//     console.error("Error fetching assessments for trainee:", error);
-//     throw error;
-//   }
-// };
 
 
 export const fetchAllTraineeSummary = async () => {
