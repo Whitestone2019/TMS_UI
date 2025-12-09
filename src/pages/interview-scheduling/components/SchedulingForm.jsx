@@ -68,9 +68,9 @@ const SchedulingForm = ({
   // ✅ Build interviewer dropdown options
   const interviewerOptions = Array.isArray(trainerList)
     ? (trainerList).map((t) => ({
-        value: t.trainerId,
-        label: `${t.name}${t.title ? " - " + t.title : ""}`,
-      }))
+      value: t.trainerId,
+      label: `${t.name}${t.title ? " - " + t.title : ""}`,
+    }))
     : [];
 
   useEffect(() => {
@@ -137,7 +137,7 @@ const SchedulingForm = ({
         duration: parseInt(formData.duration),
       };
       console.log("Scheduling data:", scheduleData);
-      
+
       await onSchedule(scheduleData);
     } catch (error) {
       console.error("Scheduling error:", error);

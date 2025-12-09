@@ -4,25 +4,27 @@ import NavigationBreadcrumb from "../../../components/ui/NavigationBreadcrumb";
 import Button from "../../../components/ui/Button";
 import Input from "../../../components/ui/Input";
 import Icon from "../../../components/AppIcon";
-import { uploadSyllabusAPI, getAllSyllabusAPI, updateSyllabusAPI } from "../../../api_service";
+import { uploadSyllabusAPI, getAllSyllabusAPI, updateSyllabusAPI, getAllTrainers } from "../../../api_service";
 
 const UploadSyllabus = ({ onCancel }) => {
     const [formData, setFormData] = useState({
         title: "",
         description: "",
         topic: "",
-        subTopics: [{ name: "", description: "", file: null }],
+        subTopics: [{ name: "", description: "", file: null, trainerId: "" }],
     });
 
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
     const [syllabusList, setSyllabusList] = useState([]);
     const [editingId, setEditingId] = useState(null);
+    const [trainerList, setTrainerList] = useState([]);
+
+
 
     useEffect(() => {
-        loadAll();
-    }, []);
-
+        console.log("Updated Trainer List:", trainerList);
+    }, [trainerList]);
     const loadAll = async () => {
         try {
             const res = await getAllSyllabusAPI();
@@ -31,6 +33,23 @@ const UploadSyllabus = ({ onCancel }) => {
             console.error("Failed to fetch syllabus", err);
         }
     };
+
+    const loadTrainers = async () => {
+        try {
+            const res = await getAllTrainers();
+            console.log("Trainers", res.data);
+            setTrainerList(res.data || []);
+        } catch (err) {
+            console.error("Failed to fetch trainers", err);
+        }
+    };
+    useEffect(() => {
+        loadAll();
+        loadTrainers();
+    }, []);
+    useEffect(() => {
+        console.log("Updated Trainer List:", trainerList);
+    }, [trainerList]);
 
     const handleChange = (field, value) => {
         setFormData((prev) => ({ ...prev, [field]: value }));
@@ -46,7 +65,7 @@ const UploadSyllabus = ({ onCancel }) => {
     const addSubTopic = () => {
         setFormData((prev) => ({
             ...prev,
-            subTopics: [...prev.subTopics, { name: "", description: "", file: null }],
+            subTopics: [...prev.subTopics, { name: "", description: "", file: null, trainerId: "" }],
         }));
     };
 
@@ -94,7 +113,7 @@ const UploadSyllabus = ({ onCancel }) => {
     //             }
     //         });
 
-            
+
     //         // console.log(fd);
     //         // console.log(formData);
     //         let res;
@@ -107,9 +126,9 @@ const UploadSyllabus = ({ onCancel }) => {
     //             res = await uploadSyllabusAPI(formData);
     //             setSyllabusList(prev => [...prev, res.data]);
     //             alert("Uploaded Successfully!");
-                
+
     //         }
-            
+
     //         // reset form
     //         setEditingId(null);
     //         // setFormData({
@@ -128,61 +147,75 @@ const UploadSyllabus = ({ onCancel }) => {
 
 
     const handleSubmit = async () => {
-  if (!validateForm()) return;
-  setLoading(true);
+        if (!validateForm()) return;
+        setLoading(true);
 
-  try {
+        try {
 
-    const syllabusJson = {
-  title: formData.title,
-  topic: formData.topic,
-  subTopics: formData.subTopics.map(st => ({ name: st.name, description: st.description }))
-};
+            const syllabusJson = {
+                title: formData.title,
+                topic: formData.topic,
+                //subTopics: formData.subTopics.map(st => ({ name: st.name, description: st.description }))
+                subTopics: formData.subTopics.map(st => ({
+                    id: st.id || null,
+                    name: st.name,
+                    description: st.description,
+                    filePath: typeof st.file === "string" ? st.file : null,
+                    trainer_id: st.trainerId
+                }))
 
-const fd = new FormData();
-fd.append("syllabus", new Blob([JSON.stringify(syllabusJson)], { type: "application/json" }));
+            };
 
-// formData.subTopics.forEach((st, index) => {
-//   if (st.file instanceof File) {
-//     fd.append(`file_${index}`, st.file, st.file.name);
-//   }
-// });
+            // const fd = new FormData();
+            // fd.append("syllabus", new Blob([JSON.stringify(syllabusJson)], { type: "application/json" }));
 
-// formData.subTopics.forEach((st, index) => {
-//   if (st.file instanceof File) {
-//     fd.append(`file_${index}`, st.file);
-//   }
-// });
+            // formData.subTopics.forEach(st => {
+            //     if (st.file instanceof File) {
+            //         fd.append("files", st.file, st.file.name);
+            //     }
+            // });
+            const fd = new FormData();
+            fd.append("syllabus", JSON.stringify(syllabusJson));
+
+            // formData.subTopics.forEach((sub, i) => {
+            //     if (sub.file && sub.file instanceof File) {
+            //         fd.append("files", sub.file);
+            //     }
+            // });
+
+            formData.subTopics.forEach((sub) => {
+                if (sub.file instanceof File) {
+                    fd.append("files", sub.file);
+                } else {
+                    fd.append("files", new Blob(), "empty.txt");
+                }
+            });
 
 
-formData.subTopics.forEach(st => {
-  if (st.file instanceof File) {
-    fd.append("files", st.file); 
-  }
-});
 
-    // Send to backend
-    const res = editingId
-      ? await updateSyllabusAPI(editingId, fd)
-      : await uploadSyllabusAPI(fd);
 
-    if (editingId) {
-      setSyllabusList(prev => prev.map(it => it.id === editingId ? res.data : it));
-      alert("Updated Successfully!");
-    } else {
-      setSyllabusList(prev => [...prev, res.data]);
-      alert("Uploaded Successfully!");
-    }
+            // Send to backend
+            const res = editingId
+                ? await updateSyllabusAPI(editingId, fd)
+                : await uploadSyllabusAPI(fd);
 
-    setEditingId(null);
+            if (editingId) {
+                setSyllabusList(prev => prev.map(it => it.id === editingId ? res.data : it));
+                alert("Updated Successfully!");
+            } else {
+                setSyllabusList(prev => [...prev, res.data]);
+                alert("Uploaded Successfully!");
+            }
 
-  } catch (err) {
-    console.error("Upload error", err);
-    alert(err?.response?.data || err.message || "Upload failed");
-  } finally {
-    setLoading(false);
-  }
-};
+            setEditingId(null);
+
+        } catch (err) {
+            console.error("Upload error", err);
+            alert(err?.response?.data || err.message || "Upload failed");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const editSyllabus = (item) => {
         setEditingId(item.id);
@@ -194,9 +227,12 @@ formData.subTopics.forEach(st => {
                 ? item.subTopics.map(sub => ({
                     name: sub.name,
                     description: sub.description,
-                    file: sub.filePath || null, // store the existing file path
+                    file: sub.filePath || null,
+                    trainerId: sub.trainerId || sub.trainer_id || "",
+                    // store the existing file path
+
                 }))
-                : [{ name: "", description: "", file: null }]
+                : [{ name: "", description: "", file: null, trainerId: "" }]
         });
     };
 
@@ -237,7 +273,9 @@ formData.subTopics.forEach(st => {
                             </div>
 
                             {/* SUBTOPICS */}
-                            <div className="space-y-6">
+                            <div className="space-y-6 h-[500px] overflow-y-scroll pr-3 custom-scroll">
+
+
                                 <h3 className="text-xl font-semibold text-blue-700">Subtopics</h3>
 
                                 {formData.subTopics.map((sub, index) => (
@@ -294,6 +332,7 @@ formData.subTopics.forEach(st => {
                                                 )}
                                             </div>
 
+
                                         </div>
 
                                         <div className="mt-5">
@@ -309,6 +348,31 @@ formData.subTopics.forEach(st => {
                                                     handleSubTopicChange(index, "description", e.target.value)
                                                 }
                                             />
+                                            <div>
+                                                <label className="text-sm font-medium text-gray-700 mb-1 block">
+                                                    Select Trainer *
+                                                </label>
+
+                                                <select
+                                                    className="w-full h-12 px-4 rounded-xl border border-blue-300 bg-white shadow-sm text-gray-800"
+                                                    value={sub.trainerId}
+                                                    onChange={(e) => handleSubTopicChange(index, "trainerId", e.target.value)}
+                                                >
+                                                    <option value="">Select Trainer</option>
+
+                                                    {trainerList?.map((t) => (
+                                                        <option key={t.trainerId} value={t.trainerId}>
+                                                            {t.name}
+                                                        </option>
+                                                    ))}
+
+                                                </select>
+
+                                            </div>
+
+
+
+
 
                                             {errors[`subdesc${index}`] && (
                                                 <p className="text-sm text-red-500 mt-1">
@@ -387,3 +451,5 @@ formData.subTopics.forEach(st => {
 };
 
 export default UploadSyllabus;
+
+

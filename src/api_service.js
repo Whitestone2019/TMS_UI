@@ -66,15 +66,6 @@ export const fetchAssessmentsByTrainee = async (empId) => {
   }
 };
 
-// export const fetchAssessmentsByTrainee = async (empId) => {
-//   try {
-//     const response = await axios.get(`${API_URL}/assessments/trainee/${empId}`);
-//     return response.data?.data || [];   // <-- return array only
-//   } catch (error) {
-//     console.error("Error fetching assessments for trainee:", error);
-//     throw error;
-//   }
-// };
 
 
 export const fetchAllTraineeSummary = async () => {
@@ -233,5 +224,46 @@ export const fetchUserByEmpId = async (empId) => {
   } catch (error) {
     console.error("Error fetching user by empId:", error);
     throw error;
+  }
+};
+
+// export const fetchInterviewScheduleByEmpId = async (empId) => {
+//   try {
+//     const res = await axios.get(`${API_URL}/schedule/user/${empId}`);
+//     return res.data; // return list of interviews
+//   } catch (error) {
+//     console.error("Error fetching interview schedule:", error);
+//     throw error;
+//   }
+// };
+
+export const fetchInterviewScheduleByEmpId = async (empId) => {
+  try {
+    const res = await axios.get(`${API_URL}/schedule/user/${empId}`);
+
+    // ---- Always return an array ----
+    if (Array.isArray(res.data)) {
+      return res.data;
+    }
+
+    // If backend returns object, find array inside it
+    if (res.data.interviews) {
+      return res.data.interviews;
+    }
+
+    if (res.data.trainerSchedules) {
+      return res.data.trainerSchedules;
+    }
+
+    if (res.data.traineeSchedules) {
+      return res.data.traineeSchedules;
+    }
+
+    // Last fallback — return empty array (avoid crash)
+    return [];
+
+  } catch (error) {
+    console.error("Error fetching interview schedule:", error);
+    return [];
   }
 };
