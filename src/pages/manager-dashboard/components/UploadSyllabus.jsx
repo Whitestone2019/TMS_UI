@@ -161,7 +161,9 @@ const UploadSyllabus = ({ onCancel }) => {
                     name: st.name,
                     description: st.description,
                     filePath: typeof st.file === "string" ? st.file : null,
-                    trainer_id: st.trainerId
+                    trainer: {
+                        trainerId: Number(st.trainerId)
+                    }
                 }))
 
             };
@@ -228,7 +230,8 @@ const UploadSyllabus = ({ onCancel }) => {
                     name: sub.name,
                     description: sub.description,
                     file: sub.filePath || null,
-                    trainerId: sub.trainerId || sub.trainer_id || "",
+                    trainerId: sub.trainer?.trainerId || ""
+
                     // store the existing file path
 
                 }))
