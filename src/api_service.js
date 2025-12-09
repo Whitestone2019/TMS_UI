@@ -224,7 +224,7 @@ export const getOverallProgressTime = async (empId) => {
 
 export const fetchUserByEmpId = async (empId) => {
   try {
-    const res = await axios.get(`${API_URL}/users/emp/${empId}`);
+    const res = await axios.get(`${API_URL}/users/${empId}`);
 
     // API response format:
     // { status: 200, success: true, message: "...", data: {...user} }

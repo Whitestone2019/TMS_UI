@@ -142,13 +142,24 @@ const UploadSyllabus = ({ onCancel }) => {
 const fd = new FormData();
 fd.append("syllabus", new Blob([JSON.stringify(syllabusJson)], { type: "application/json" }));
 
+// formData.subTopics.forEach((st, index) => {
+//   if (st.file instanceof File) {
+//     fd.append(`file_${index}`, st.file, st.file.name);
+//   }
+// });
+
+// formData.subTopics.forEach((st, index) => {
+//   if (st.file instanceof File) {
+//     fd.append(`file_${index}`, st.file);
+//   }
+// });
+
+
 formData.subTopics.forEach(st => {
   if (st.file instanceof File) {
-    fd.append("files", st.file, st.file.name);
+    fd.append("files", st.file); 
   }
 });
-
-
 
     // Send to backend
     const res = editingId
@@ -358,6 +369,12 @@ formData.subTopics.forEach(st => {
                                     >
                                         <h4 className="font-semibold text-blue-900">{item.title}</h4>
                                         <p className="text-sm text-gray-600">{item.topic}</p>
+                                        <p className="text-sm text-gray-500 mt-1">
+                                            {item.subTopics.length} 
+                                            {item.subTopics.map((i)=>(
+                                                    i.filePath
+                                            ))} Subtopics
+                                        </p>
                                     </li>
                                 ))}
                             </ul>
