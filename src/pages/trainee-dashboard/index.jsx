@@ -12,6 +12,7 @@ import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
 import { fetchAssessmentsByTrainee } from '../../api_service';
 import { fetchUserByEmpId } from "../../api_service";
+import { fetchInterviewScheduleByEmpId } from "../../api_service"
 
 const TraineeDashboard = () => {
   const navigate = useNavigate();
@@ -23,6 +24,7 @@ const TraineeDashboard = () => {
   const [overall, setOverall] = useState(0);
   const [assessments, setAssessments] = useState([]);
   const [traineeInfo, setTraineeInfo] = useState(null);
+  const [interviews, setInterviews] = useState([]);
 
   const empId = sessionStorage.setItem("empid", "TRN001");
 
@@ -88,7 +90,22 @@ const TraineeDashboard = () => {
 
     loadTraineeInfo();
   }, []);
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const empId = sessionStorage.getItem("empid") || "TRN001";
 
+        // 🔥 Interview schedule API call
+        const schedule = await fetchInterviewScheduleByEmpId(empId);
+        setInterviews(schedule);
+
+      } catch (err) {
+        console.error("Error loading dashboard:", err);
+      }
+    };
+
+    loadData();
+  }, []);
 
 
   useEffect(() => {
@@ -293,7 +310,7 @@ const TraineeDashboard = () => {
               <QuickActions />
 
               {/* Interview Schedule */}
-              <InterviewSchedule />
+              <InterviewSchedule interviews={interviews} />
 
               {/* Progress Summary Card */}
               <div className="bg-card rounded-lg border border-border p-6">

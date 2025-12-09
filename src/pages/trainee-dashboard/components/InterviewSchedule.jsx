@@ -2,101 +2,101 @@ import React, { useState } from 'react';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 
-const InterviewSchedule = ({ className = '' }) => {
+const InterviewSchedule = ({ className = '', interviews = [] }) => {
   const [selectedInterview, setSelectedInterview] = useState(null);
 
-  const interviews = [
-  {
-    id: 1,
-    title: "Technical Assessment - Programming Fundamentals",
-    date: "2024-11-05",
-    time: "10:00 AM",
-    duration: "45 minutes",
-    interviewer: "Dr. Michael Chen",
-    interviewerRole: "Senior Technical Lead",
-    interviewerAvatar: "https://images.unsplash.com/photo-1676989880361-091e12efc056",
-    interviewerAvatarAlt: "Professional headshot of Asian man with glasses in dark suit smiling confidently",
-    location: "Conference Room A",
-    meetingLink: "https://meet.company.com/tech-assessment-001",
-    status: "scheduled",
-    type: "technical",
-    description: `This technical interview will assess your understanding of programming fundamentals covered in the first month of training.
+  //   const interviews = [
+  //   {
+  //     id: 1,
+  //     title: "Technical Assessment - Programming Fundamentals",
+  //     date: "2024-11-05",
+  //     time: "10:00 AM",
+  //     duration: "45 minutes",
+  //     interviewer: "Dr. Michael Chen",
+  //     interviewerRole: "Senior Technical Lead",
+  //     interviewerAvatar: "https://images.unsplash.com/photo-1676989880361-091e12efc056",
+  //     interviewerAvatarAlt: "Professional headshot of Asian man with glasses in dark suit smiling confidently",
+  //     location: "Conference Room A",
+  //     meetingLink: "https://meet.company.com/tech-assessment-001",
+  //     status: "scheduled",
+  //     type: "technical",
+  //     description: `This technical interview will assess your understanding of programming fundamentals covered in the first month of training.
 
-Topics to be covered:
-• Basic programming concepts and terminology
-• Data structures and their applications
-• Problem-solving approaches
-• Code reading and logic analysis
+  // Topics to be covered:
+  // • Basic programming concepts and terminology
+  // • Data structures and their applications
+  // • Problem-solving approaches
+  // • Code reading and logic analysis
 
-Preparation tips:
-• Review your completed training modules
-• Practice explaining concepts clearly
-• Prepare questions about the training program
-• Ensure stable internet connection for video call`,
-    feedback: null,
-    completedAt: null
-  },
-  {
-    id: 2,
-    title: "Progress Review - Mid-Training Evaluation",
-    date: "2024-10-28",
-    time: "2:30 PM",
-    duration: "30 minutes",
-    interviewer: "Sarah Johnson",
-    interviewerRole: "Training Manager",
-    interviewerAvatar: "https://images.unsplash.com/photo-1734456611474-13245d164868",
-    interviewerAvatarAlt: "Professional headshot of woman with brown hair in business attire smiling at camera",
-    location: "Virtual Meeting",
-    meetingLink: "https://meet.company.com/progress-review-002",
-    status: "completed",
-    type: "progress",
-    description: "Mid-training progress evaluation to discuss learning outcomes and address any challenges.",
-    feedback: `Excellent progress demonstrated throughout the training program. John shows strong analytical thinking and consistent improvement in technical skills.
+  // Preparation tips:
+  // • Review your completed training modules
+  // • Practice explaining concepts clearly
+  // • Prepare questions about the training program
+  // • Ensure stable internet connection for video call`,
+  //     feedback: null,
+  //     completedAt: null
+  //   },
+  //   {
+  //     id: 2,
+  //     title: "Progress Review - Mid-Training Evaluation",
+  //     date: "2024-10-28",
+  //     time: "2:30 PM",
+  //     duration: "30 minutes",
+  //     interviewer: "Sarah Johnson",
+  //     interviewerRole: "Training Manager",
+  //     interviewerAvatar: "https://images.unsplash.com/photo-1734456611474-13245d164868",
+  //     interviewerAvatarAlt: "Professional headshot of woman with brown hair in business attire smiling at camera",
+  //     location: "Virtual Meeting",
+  //     meetingLink: "https://meet.company.com/progress-review-002",
+  //     status: "completed",
+  //     type: "progress",
+  //     description: "Mid-training progress evaluation to discuss learning outcomes and address any challenges.",
+  //     feedback: `Excellent progress demonstrated throughout the training program. John shows strong analytical thinking and consistent improvement in technical skills.
 
-Strengths observed:
-• Consistent attendance and engagement
-• Strong problem-solving approach
-• Good communication of technical concepts
-• Proactive in seeking help when needed
+  // Strengths observed:
+  // • Consistent attendance and engagement
+  // • Strong problem-solving approach
+  // • Good communication of technical concepts
+  // • Proactive in seeking help when needed
 
-Areas for continued focus:
-• Continue practicing coding exercises
-• Prepare for upcoming technical assessments
-• Consider additional reading on advanced topics
+  // Areas for continued focus:
+  // • Continue practicing coding exercises
+  // • Prepare for upcoming technical assessments
+  // • Consider additional reading on advanced topics
 
-Overall assessment: Exceeding expectations. Well-prepared for the next phase of training.`,
-    completedAt: "2024-10-28T14:30:00Z"
-  },
-  {
-    id: 3,
-    title: "Final Project Presentation",
-    date: "2024-11-20",
-    time: "11:00 AM",
-    duration: "60 minutes",
-    interviewer: "Panel Interview",
-    interviewerRole: "Technical Review Board",
-    interviewerAvatar: "https://images.unsplash.com/photo-1493882552576-fce827c6161e",
-    interviewerAvatarAlt: "Professional group photo of diverse team members in business attire in modern office setting",
-    location: "Main Conference Hall",
-    meetingLink: null,
-    status: "pending",
-    type: "presentation",
-    description: `Final capstone project presentation to demonstrate comprehensive understanding of all training modules.
+  // Overall assessment: Exceeding expectations. Well-prepared for the next phase of training.`,
+  //     completedAt: "2024-10-28T14:30:00Z"
+  //   },
+  //   {
+  //     id: 3,
+  //     title: "Final Project Presentation",
+  //     date: "2024-11-20",
+  //     time: "11:00 AM",
+  //     duration: "60 minutes",
+  //     interviewer: "Panel Interview",
+  //     interviewerRole: "Technical Review Board",
+  //     interviewerAvatar: "https://images.unsplash.com/photo-1493882552576-fce827c6161e",
+  //     interviewerAvatarAlt: "Professional group photo of diverse team members in business attire in modern office setting",
+  //     location: "Main Conference Hall",
+  //     meetingLink: null,
+  //     status: "pending",
+  //     type: "presentation",
+  //     description: `Final capstone project presentation to demonstrate comprehensive understanding of all training modules.
 
-Presentation requirements:
-• 20-minute project demonstration
-• 10-minute Q&A session
-• Technical documentation review
-• Code walkthrough and explanation
+  // Presentation requirements:
+  // • 20-minute project demonstration
+  // • 10-minute Q&A session
+  // • Technical documentation review
+  // • Code walkthrough and explanation
 
-Panel members:
-• Dr. Michael Chen (Technical Lead)
-• Sarah Johnson (Training Manager)
-• Alex Rodriguez (Senior Developer)
-• Lisa Wang (Product Manager)`,
-    feedback: null,
-    completedAt: null
-  }];
+  // Panel members:
+  // • Dr. Michael Chen (Technical Lead)
+  // • Sarah Johnson (Training Manager)
+  // • Alex Rodriguez (Senior Developer)
+  // • Lisa Wang (Product Manager)`,
+  //     feedback: null,
+  //     completedAt: null
+  //   }];
 
 
   const getStatusColor = (status) => {
@@ -171,7 +171,7 @@ Panel members:
   };
 
   const upcomingInterviews = interviews?.filter((interview) =>
-  interview?.status === 'scheduled' && isUpcoming(interview?.date)
+    interview?.status === 'scheduled' && isUpcoming(interview?.date)
   );
 
   return (
@@ -198,20 +198,19 @@ Panel members:
       <div className="p-6">
         <div className="space-y-4">
           {interviews?.map((interview) =>
-          <div
-            key={interview?.id}
-            className={`border border-border rounded-lg p-4 transition-all duration-200 hover:shadow-sm ${
-            selectedInterview === interview?.id ? 'border-primary bg-primary/5' : ''}`
-            }>
+            <div
+              key={interview?.id}
+              className={`border border-border rounded-lg p-4 transition-all duration-200 hover:shadow-sm ${selectedInterview === interview?.id ? 'border-primary bg-primary/5' : ''}`
+              }>
 
               {/* Interview Header */}
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-start space-x-4">
                   <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${getStatusBg(interview?.status)}`}>
                     <Icon
-                    name={getTypeIcon(interview?.type)}
-                    size={20}
-                    className={getStatusColor(interview?.status)} />
+                      name={getTypeIcon(interview?.type)}
+                      size={20}
+                      className={getStatusColor(interview?.status)} />
 
                   </div>
                   <div className="flex-1">
@@ -238,9 +237,9 @@ Panel members:
               <div className="flex items-center space-x-3 mb-4">
                 <div className="w-8 h-8 rounded-full overflow-hidden">
                   <img
-                  src={interview?.interviewerAvatar}
-                  alt={interview?.interviewerAvatarAlt}
-                  className="w-full h-full object-cover" />
+                    src={interview?.interviewerAvatar}
+                    alt={interview?.interviewerAvatarAlt}
+                    className="w-full h-full object-cover" />
 
                 </div>
                 <div>
@@ -257,17 +256,17 @@ Panel members:
                     {interview?.location}
                   </span>
                   {interview?.meetingLink &&
-                <Button
-                  variant="outline"
-                  size="xs"
-                  iconName="ExternalLink"
-                  iconPosition="right"
-                  iconSize={12}
-                  onClick={() => window.open(interview?.meetingLink, '_blank')}>
+                    <Button
+                      variant="outline"
+                      size="xs"
+                      iconName="ExternalLink"
+                      iconPosition="right"
+                      iconSize={12}
+                      onClick={() => window.open(interview?.meetingLink, '_blank')}>
 
                       Join Meeting
                     </Button>
-                }
+                  }
                 </div>
               </div>
 
@@ -275,21 +274,21 @@ Panel members:
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   {interview?.status === 'scheduled' && isUpcoming(interview?.date) &&
-                <div className="flex items-center space-x-1 text-xs text-primary">
+                    <div className="flex items-center space-x-1 text-xs text-primary">
                       <Icon name="Bell" size={14} />
                       <span>Reminder set</span>
                     </div>
-                }
+                  }
                 </div>
                 <Button
-                variant="outline"
-                size="sm"
-                iconName={selectedInterview === interview?.id ? "ChevronUp" : "ChevronDown"}
-                iconPosition="right"
-                iconSize={14}
-                onClick={() => setSelectedInterview(
-                  selectedInterview === interview?.id ? null : interview?.id
-                )}>
+                  variant="outline"
+                  size="sm"
+                  iconName={selectedInterview === interview?.id ? "ChevronUp" : "ChevronDown"}
+                  iconPosition="right"
+                  iconSize={14}
+                  onClick={() => setSelectedInterview(
+                    selectedInterview === interview?.id ? null : interview?.id
+                  )}>
 
                   {selectedInterview === interview?.id ? 'Hide Details' : 'View Details'}
                 </Button>
@@ -297,7 +296,7 @@ Panel members:
 
               {/* Expanded Details */}
               {selectedInterview === interview?.id &&
-            <div className="mt-4 pt-4 border-t border-border">
+                <div className="mt-4 pt-4 border-t border-border">
                   <div className="space-y-4">
                     {/* Description */}
                     <div>
@@ -311,53 +310,53 @@ Panel members:
 
                     {/* Feedback (if completed) */}
                     {interview?.feedback &&
-                <div>
+                      <div>
                         <h4 className="font-medium text-foreground mb-2">Interview Feedback:</h4>
                         <div className="bg-success/5 border border-success/20 rounded-lg p-4">
                           <p className="text-sm text-foreground whitespace-pre-line">
                             {interview?.feedback}
                           </p>
                           {interview?.completedAt &&
-                    <p className="text-xs text-muted-foreground mt-2">
+                            <p className="text-xs text-muted-foreground mt-2">
                               Completed on {new Date(interview.completedAt)?.toLocaleDateString('en-US', {
-                        month: 'long',
-                        day: 'numeric',
-                        year: 'numeric',
-                        hour: 'numeric',
-                        minute: '2-digit'
-                      })}
+                                month: 'long',
+                                day: 'numeric',
+                                year: 'numeric',
+                                hour: 'numeric',
+                                minute: '2-digit'
+                              })}
                             </p>
-                    }
+                          }
                         </div>
                       </div>
-                }
+                    }
 
                     {/* Action Buttons */}
                     {interview?.status === 'scheduled' &&
-                <div className="flex space-x-3">
+                      <div className="flex space-x-3">
                         <Button
-                    variant="outline"
-                    size="sm"
-                    iconName="Calendar"
-                    iconPosition="left"
-                    iconSize={14}>
+                          variant="outline"
+                          size="sm"
+                          iconName="Calendar"
+                          iconPosition="left"
+                          iconSize={14}>
 
                           Add to Calendar
                         </Button>
                         <Button
-                    variant="outline"
-                    size="sm"
-                    iconName="MessageSquare"
-                    iconPosition="left"
-                    iconSize={14}>
+                          variant="outline"
+                          size="sm"
+                          iconName="MessageSquare"
+                          iconPosition="left"
+                          iconSize={14}>
 
                           Contact Interviewer
                         </Button>
                       </div>
-                }
+                    }
                   </div>
                 </div>
-            }
+              }
             </div>
           )}
         </div>

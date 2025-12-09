@@ -74,7 +74,7 @@ const SyllabusContentViewer = () => {
         setLoading(true);
         const response = await fetch("http://localhost:8080/api/syllabus/all");
         const data = await response.json();
-        
+
         // safe mapping to the structure ContentDisplay expects
         const formattedSteps = (Array.isArray(data) ? data : []).map((item, index) => ({
           id: `step-${index + 1}`,
@@ -134,25 +134,25 @@ const SyllabusContentViewer = () => {
     fetchData();
   }, []);
 
-  useEffect(() => {
-    const fetchSteps = async () => {
-      const res = await fetch(`http://localhost:8080/api/progress/steps/${empid}`);
-      const data = await res.json();
+  // useEffect(() => {
+  //   const fetchSteps = async () => {
+  //     const res = await fetch(`http://localhost:8080/api/progress/steps/${empid}`);
+  //     const data = await res.json();
 
-      setSyllabusSteps(prevSteps =>
-        prevSteps.map(step => {
-          const saved = data.find(s => s.stepId === step.id);
-          return saved ? {
-            ...step,
-            isCompleted: saved.completed,
-            progress: saved.progress,
-            durationTime: saved.durationTime
-          } : step;
-        })
-      );
-    };
-    fetchSteps();
-  }, []);
+  //     setSyllabusSteps(prevSteps =>
+  //       prevSteps.map(step => {
+  //         const saved = data.find(s => s.stepId === step.id);
+  //         return saved ? {
+  //           ...step,
+  //           isCompleted: saved.completed,
+  //           progress: saved.progress,
+  //           durationTime: saved.durationTime
+  //         } : step;
+  //       })
+  //     );
+  //   };
+  //   fetchSteps();
+  // }, []);
 
 
 
@@ -219,53 +219,53 @@ const SyllabusContentViewer = () => {
   //   );
   // };
 
-  // const handleCompleteStep = (stepId) => {
-  //   setSyllabusSteps(prevSteps =>
-  //     prevSteps.map((step, index) => {
-  //       // complete current step
-  //       if (step.id === stepId) {
-  //         return {
-  //           ...step,
-  //           isCompleted: true,
-  //           progress: 100,
-  //           completedAt: new Date().toISOString()
-  //         };
-  //       }
-
-  //       // unlock next step
-  //       const prevIndex = prevSteps.findIndex(s => s.id === stepId);
-  //       if (index === prevIndex + 1) {
-  //         return { ...step, isLocked: false };
-  //       }
-
-  //       return step;
-  //     })
-  //   );
-  // };
-  const handleCompleteStep = async (stepId) => {
-    setSyllabusSteps((prevSteps) => {
-      const updated = [...prevSteps];
-      const idx = updated.findIndex((s) => s.id === stepId);
-      if (idx !== -1) {
-        updated[idx] = {
-          ...updated[idx],
-          isCompleted: true,
-          progress: 100,
-          completedAt: new Date().toISOString(),
-        };
-        if (idx + 1 < updated.length) {
-          updated[idx + 1] = { ...updated[idx + 1], isLocked: false };
+  const handleCompleteStep = (stepId) => {
+    setSyllabusSteps(prevSteps =>
+      prevSteps.map((step, index) => {
+        // complete current step
+        if (step.id === stepId) {
+          return {
+            ...step,
+            isCompleted: true,
+            progress: 100,
+            completedAt: new Date().toISOString()
+          };
         }
-      }
-      return updated;
-    });
 
-    try {
-      await updateStepProgress(empid, stepId, 100, timeSpent); // send duration
-    } catch (err) {
-      console.error("Error updating step progress:", err);
-    }
+        // unlock next step
+        const prevIndex = prevSteps.findIndex(s => s.id === stepId);
+        if (index === prevIndex + 1) {
+          return { ...step, isLocked: false };
+        }
+
+        return step;
+      })
+    );
   };
+  // const handleCompleteStep = async (stepId) => {
+  //   setSyllabusSteps((prevSteps) => {
+  //     const updated = [...prevSteps];
+  //     const idx = updated.findIndex((s) => s.id === stepId);
+  //     if (idx !== -1) {
+  //       updated[idx] = {
+  //         ...updated[idx],
+  //         isCompleted: true,
+  //         progress: 100,
+  //         completedAt: new Date().toISOString(),
+  //       };
+  //       if (idx + 1 < updated.length) {
+  //         updated[idx + 1] = { ...updated[idx + 1], isLocked: false };
+  //       }
+  //     }
+  //     return updated;
+  //   });
+
+  //   try {
+  //     await updateStepProgress(empid, stepId, 100, timeSpent); // send duration
+  //   } catch (err) {
+  //     console.error("Error updating step progress:", err);
+  //   }
+  // };
 
 
 
@@ -394,16 +394,16 @@ const SyllabusContentViewer = () => {
         />
       </div>
 
-        <div className="fixed bottom-4 left-4 bg-card border border-border rounded-lg p-3 text-xs z-30 max-w-xs">
-          <div className="flex items-center space-x-2">
-            <Icon name="Shield" size={14} className="text-warning" />
-            <span className="text-muted-foreground">This content is protected and monitored for security.</span>
-          </div>
+      <div className="fixed bottom-4 left-4 bg-card border border-border rounded-lg p-3 text-xs z-30 max-w-xs">
+        <div className="flex items-center space-x-2">
+          <Icon name="Shield" size={14} className="text-warning" />
+          <span className="text-muted-foreground">This content is protected and monitored for security.</span>
         </div>
       </div>
+    </div>
     //  </SecureContentWrapper>
-    );
-      
+  );
+
   // );
 
 };
