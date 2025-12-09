@@ -90,14 +90,70 @@ const TraineeDashboard = () => {
 
     loadTraineeInfo();
   }, []);
+  // useEffect(() => {
+  //   const loadData = async () => {
+  //     try {
+  //       const empId = sessionStorage.getItem("empid") || "TRN001";
+
+  //       // 🔥 Interview schedule API call
+  //       const schedule = await fetchInterviewScheduleByEmpId(empId);
+  //       setInterviews(schedule);
+
+  //     } catch (err) {
+  //       console.error("Error loading dashboard:", err);
+  //     }
+  //   };
+
+  //   loadData();
+  // }, []);
+
+
   useEffect(() => {
     const loadData = async () => {
       try {
         const empId = sessionStorage.getItem("empid") || "TRN001";
 
         // 🔥 Interview schedule API call
-        const schedule = await fetchInterviewScheduleByEmpId(empId);
-        setInterviews(schedule);
+        const response = await fetchInterviewScheduleByEmpId(empId);
+
+        if (response?.data) {
+          // API returns: { status, success, message, data:[ ... ] }
+
+          const cleanData = response.data.map(item => {
+            const schedule = item.interviewSchedule;
+            const trainee = item.user;
+            const trainer = schedule?.trainer;
+
+            return {
+              id: item.id,
+              scheduleId: schedule?.scheduleId,
+              date: schedule?.date,
+              time: schedule?.time,
+              interviewType: schedule?.interviewType,
+              location: schedule?.location,
+              duration: schedule?.duration,
+              notes: schedule?.notes,
+              meetingLink: schedule?.meetingLink,
+              eventId: item?.eventId,
+              rsvpStatus: item?.rsvpStatus?.trim(),
+
+              // Trainer Info
+              trainerName: trainer?.name,
+              trainerEmail: trainer?.email,
+              trainerTitle: trainer?.title,
+
+              // Trainee Info
+              traineeName: `${trainee?.firstname} ${trainee?.lastname}`,
+              traineeEmail: trainee?.email,
+              traineeEmpId: trainee?.empid,
+
+              traineeApproval: item?.traineeApproval,
+              trainerApproval: item?.trainerApproval
+            };
+          });
+
+          setInterviews(cleanData);
+        }
 
       } catch (err) {
         console.error("Error loading dashboard:", err);
