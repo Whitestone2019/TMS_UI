@@ -436,6 +436,12 @@ const UploadSyllabus = ({ onCancel }) => {
                                     >
                                         <h4 className="font-semibold text-blue-900">{item.title}</h4>
                                         <p className="text-sm text-gray-600">{item.topic}</p>
+                                        <p className="text-sm text-gray-500 mt-1">
+                                            {item.subTopics.length} 
+                                            {item.subTopics.map((i)=>(
+                                                    i.filePath
+                                            ))} Subtopics
+                                        </p>
                                     </li>
                                 ))}
                             </ul>
