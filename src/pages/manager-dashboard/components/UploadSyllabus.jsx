@@ -9,8 +9,8 @@ import { uploadSyllabusAPI, getAllSyllabusAPI, updateSyllabusAPI, getAllTrainers
 const UploadSyllabus = ({ onCancel }) => {
     const [formData, setFormData] = useState({
         title: "",
-        description: "",
         topic: "",
+        durationInDays: "",
         subTopics: [{ name: "", description: "", file: null, trainerId: "" }],
     });
 
@@ -155,6 +155,7 @@ const UploadSyllabus = ({ onCancel }) => {
             const syllabusJson = {
                 title: formData.title,
                 topic: formData.topic,
+                durationInDays: Number(formData.durationInDays),
                 //subTopics: formData.subTopics.map(st => ({ name: st.name, description: st.description }))
                 subTopics: formData.subTopics.map(st => ({
                     id: st.id || null,
@@ -225,6 +226,7 @@ const UploadSyllabus = ({ onCancel }) => {
         setFormData({
             title: item.title,
             topic: item.topic,
+            durationInDays: item.durationInDays,
             subTopics: (item.subTopics && item.subTopics.length > 0)
                 ? item.subTopics.map(sub => ({
                     name: sub.name,
@@ -273,6 +275,28 @@ const UploadSyllabus = ({ onCancel }) => {
                                     onChange={(e) => handleChange("topic", e.target.value)}
                                     error={errors.topic}
                                 />
+                                <Input
+                                    label="Duration (in Days)"
+                                    placeholder="Enter number of days e.g. 1, 2, 3"
+                                    value={formData.durationInDays}
+                                    onChange={(e) => handleChange("durationInDays", e.target.value)}
+                                />
+                                {/* <Input
+                                    label="Duration"
+                                    placeholder="Enter number of days"
+                                    value={
+                                        formData.durationInDays
+                                            ? `${formData.durationInDays} ${formData.durationInDays > 1 ? "Days" : "Day"}`
+                                            : ""
+                                    }
+                                    onChange={(e) => {
+                                        // Only number store karo
+                                        const val = e.target.value.replace(/\D/g, "");
+                                        handleChange("durationInDays", val);
+                                    }}
+                                />
+ */}
+
                             </div>
 
                             {/* SUBTOPICS */}
@@ -436,12 +460,12 @@ const UploadSyllabus = ({ onCancel }) => {
                                     >
                                         <h4 className="font-semibold text-blue-900">{item.title}</h4>
                                         <p className="text-sm text-gray-600">{item.topic}</p>
-                                        <p className="text-sm text-gray-500 mt-1">
+                                        {/* <p className="text-sm text-gray-500 mt-1">
                                             {item.subTopics.length} 
                                             {item.subTopics.map((i)=>(
                                                     i.filePath
                                             ))} Subtopics
-                                        </p>
+                                        </p> */}
                                     </li>
                                 ))}
                             </ul>

@@ -61,12 +61,12 @@ const InterviewSchedule = ({ className = '', interviews = [] }) => {
               Interview Schedule
             </h2>
             <p className="text-sm text-muted-foreground mt-1">
-              Upcoming interviews and evaluation sessions
+              {/* //Upcoming interviews and evaluation sessions */}
             </p>
           </div>
           <div className="text-right">
-            <div className="text-2xl font-bold text-primary">{upcomingInterviews?.length}</div>
-            <div className="text-xs text-muted-foreground">Upcoming</div>
+            {/* <div className="text-2xl font-bold text-primary">{upcomingInterviews?.length}</div>
+            <div className="text-xs text-muted-foreground">Upcoming</div> */}
           </div>
         </div>
       </div>
