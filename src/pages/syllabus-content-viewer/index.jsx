@@ -72,57 +72,41 @@ const SyllabusContentViewer = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await fetch("http://localhost:8080/api/syllabus/all");
-        const data = await response.json();
 
-        // safe mapping to the structure ContentDisplay expects
-        const formattedSteps = (Array.isArray(data) ? data : []).map((item, index) => ({
-          id: `step-${index + 1}`,
+        const response = await fetch("http://localhost:8080/api/syllabus/all");
+        const result = await response.json();
+
+        const apiData = result?.data || [];
+
+        const formattedSteps = apiData.map((item, index) => ({
+          id: item?.id,
           stepNumber: index + 1,
-          title: item?.title ?? `Step ${index + 1}`,
-          description: item?.topic ?? "",
-          // isCompleted: item,
-          isLocked: index !== 0, // only first open
+          title: item?.title || `Step ${index + 1}`,
+          description: item?.topic || "",
+          isLocked: index !== 0, // first step unlocked
+          isCompleted: false,
           progress: 0,
-          estimatedTime: "2 hours",
           topics: [
             {
-              title: item?.title ?? item?.topic ?? `Topic ${index + 1}`,
-              subTopics: Array.isArray(item?.subTopics)
-                ? item.subTopics.map((sub) => ({
-                  // keep both name/title keys so both legacy and new code work
-                  title: sub?.name ?? sub?.title ?? "",
-                  name: sub?.name ?? sub?.title ?? "",
-                  description: sub?.description ?? "",
-                  filePath: sub?.filePath ?? null,
-                }))
-                : []
+              title: item?.title || item?.topic,
+              subTopics: item?.subTopics?.map(sub => ({
+                id: sub.id,
+                title: sub.name,
+                name: sub.name,
+                description: sub.description,
+                filePath: sub.filePath,
+                stepNumber: sub.stepNumber,
+              })) || []
             }
           ]
         }));
 
         setSyllabusSteps(formattedSteps);
 
-        //     // set current step to first if available
-        //     if (formattedSteps.length > 0) setCurrentStepId(formattedSteps[0].id);
-
-        //     // trainee info (mock or fetch if required)
-        //     setTraineeInfo({
-        //       id: "TRN-1001",
-        //       name: "John Doe",
-        //       email: "john@example.com"
-        //     });
-
-        //     setLoading(false);
-        //   } catch (err) {
-        //     console.error("Error fetching syllabus:", err);
-        //     setLoading(false);
-        //   }
-        // };
-
-
-
-
+        // Set first step as current
+        if (formattedSteps.length > 0) {
+          setCurrentStepId(formattedSteps[0].id);
+        }
 
         setLoading(false);
       } catch (error) {
@@ -133,6 +117,7 @@ const SyllabusContentViewer = () => {
 
     fetchData();
   }, []);
+
 
   // useEffect(() => {
   //   const fetchSteps = async () => {

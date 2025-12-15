@@ -238,32 +238,15 @@ export const fetchUserByEmpId = async (empId) => {
 // };
 
 export const fetchInterviewScheduleByEmpId = async (empId) => {
+
   try {
-    const res = await axios.get(`${API_URL}/schedule/user/${empId}`);
+    const response = await axios.get(`${API_URL}/schedule/user-interview/${empId}`);
 
-    // ---- Always return an array ----
-    if (Array.isArray(res.data)) {
-      return res.data;
-    }
-
-    // If backend returns object, find array inside it
-    if (res.data.interviews) {
-      return res.data.interviews;
-    }
-
-    if (res.data.trainerSchedules) {
-      return res.data.trainerSchedules;
-    }
-
-    if (res.data.traineeSchedules) {
-      return res.data.traineeSchedules;
-    }
-
-    // Last fallback — return empty array (avoid crash)
-    return [];
-
+    // Pure accurate data return karenge
+    return response.data;
   } catch (error) {
-    console.error("Error fetching interview schedule:", error);
-    return [];
+    console.error("Error fetching schedules:", error);
+    throw error;
   }
 };
+
