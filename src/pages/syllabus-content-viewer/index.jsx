@@ -10,7 +10,7 @@ import SecurityWatermark from './components/SecurityWatermark';
 import ProgressTracker from './components/ProgressTracker';
 import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
-import { updateStepProgress, fetchUserByEmpId } from '../../api_service';
+import { updateStepProgress, fetchUserByEmpId,fetchStepByEmpId, startSubTopic } from '../../api_service';
 
 const SyllabusContentViewer = () => {
   const navigate = useNavigate();
@@ -23,17 +23,17 @@ const SyllabusContentViewer = () => {
   const [loading, setLoading] = useState(true);
   const [subTopicIndex, setSubTopicIndex] = useState(0);
 
+
   const currentStep = syllabusSteps?.find((step) => step?.id === currentStepId);
   const currentStepIndex = syllabusSteps?.findIndex((step) => step?.id === currentStepId);
   const completedSteps = syllabusSteps?.filter((step) => step?.isCompleted)?.length;
 
   const [timeSpent, setTimeSpent] = useState(currentStep?.durationSeconds || 0);
 
-
-
   const contentRef = useRef(null);
   sessionStorage.setItem("empid", "TRN001");
   const empid = sessionStorage.getItem("empid");
+
 
   useEffect(() => {
     setSubTopicIndex(0);
@@ -44,9 +44,7 @@ const SyllabusContentViewer = () => {
     const loadTraineeInfo = async () => {
       try {
         const empId = sessionStorage.getItem("empid");
-
         const user = await fetchUserByEmpId(empId);
-
         if (user) {
           setTraineeInfo({
             name: `${user.firstname} ${user.lastname}`,
@@ -56,6 +54,7 @@ const SyllabusContentViewer = () => {
             startDate: user.createdAt || "2024-10-01", // or whatever
           });
         }
+        // console.log("Trainee Info:", user); 
       } catch (err) {
         console.error("Failed to load trainee info", err);
       }
@@ -68,104 +67,139 @@ const SyllabusContentViewer = () => {
 
 
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-
-        const response = await fetch("http://localhost:8080/api/syllabus/all");
-        const result = await response.json();
-
-        const apiData = result?.data || [];
-
-        const formattedSteps = apiData.map((item, index) => ({
-          id: item?.id,
-          stepNumber: index + 1,
-          title: item?.title || `Step ${index + 1}`,
-          description: item?.topic || "",
-          isLocked: index !== 0, // first step unlocked
-          isCompleted: false,
-          progress: 0,
-          topics: [
-            {
-              title: item?.title || item?.topic,
-              subTopics: item?.subTopics?.map(sub => ({
-                id: sub.id,
-                title: sub.name,
-                name: sub.name,
-                description: sub.description,
-                filePath: sub.filePath,
-                stepNumber: sub.stepNumber,
-              })) || []
-            }
-          ]
-        }));
-
-        setSyllabusSteps(formattedSteps);
-
-        // Set first step as current
-        if (formattedSteps.length > 0) {
-          setCurrentStepId(formattedSteps[0].id);
-        }
-
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-
   // useEffect(() => {
-  //   const fetchSteps = async () => {
-  //     const res = await fetch(`http://localhost:8080/api/progress/steps/${empid}`);
-  //     const data = await res.json();
+  //   const fetchData = async () => {
+  //     try {
+  //       setLoading(true);
 
-  //     setSyllabusSteps(prevSteps =>
-  //       prevSteps.map(step => {
-  //         const saved = data.find(s => s.stepId === step.id);
-  //         return saved ? {
-  //           ...step,
-  //           isCompleted: saved.completed,
-  //           progress: saved.progress,
-  //           durationTime: saved.durationTime
-  //         } : step;
-  //       })
-  //     );
+  //       const response = await fetch("http://localhost:8080/api/syllabus/all");
+  //       const result = await response.json();
+
+  //       const apiData = result?.data || [];
+
+  //       // console.log("Hisii"+JSON.stringify(apiData));
+  //       const formattedSteps = apiData.map((item, index) => ({
+  //         id: item?.id,
+  //         stepNumber: index + 1,
+  //         title: item?.title,
+  //         description: item?.topic || "",
+  //         isLocked: index !== 0,
+  //         isCompleted: false,
+  //         progress: 0,
+  //         topics: [
+  //           {
+  //             title: item?.title || item?.topic,
+  //             subTopics: item?.subTopics?.map(sub => ({
+  //               id: sub.id,
+  //               title: sub.name,
+  //               name: sub.name,
+  //               description: sub.description,
+  //               filePath: sub.filePath,
+  //               stepNumber: sub.stepNumber,
+  //             })) || []
+  //           }
+  //         ]
+  //       }));
+
+  //       // console.log("Formatted Steps:", JSON.stringify(formattedSteps));
+
+  //       setSyllabusSteps(formattedSteps);
+
+  //       // Set first step as current
+  //       if (formattedSteps.length > 0) {
+  //         setCurrentStepId(formattedSteps[0].id);
+  //       }
+  //       setLoading(false);
+  //     } catch (error) {
+  //       console.error("Error fetching data:", error);
+  //       setLoading(false);
+  //     }
   //   };
-  //   fetchSteps();
+
+  //   fetchData();
   // }, []);
 
 
+  useEffect(() => {
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+
+      // 1️⃣ Fetch syllabus
+      const response = await fetch("http://localhost:8080/api/syllabus/all");
+      const result = await response.json();
+      const apiData = result?.data || [];
+
+      // 2️⃣ Fetch completed steps/subtopics for this emp
+      // const empId = sessionStorage.getItem("empid");
+      const completedData = await fetchStepByEmpId(empid);
+      // const completedData = progressResponse?.data || [];
+
+      console.log("Completed Data:", JSON.stringify(completedData));
+
+      // 3️⃣ Map and merge progress
+      const formattedSteps = apiData.map((item, index) => {
+        const stepProgress = completedData.find(s => s.stepId === item.id);
+        console.log("Step Progress for stepId " + item.id + ": " + JSON.stringify(stepProgress));
+        return {
+          id: item?.id,
+          stepNumber: index + 1,
+          title: item?.title,
+          description: item?.topic || "",
+          isLocked: index !== 0 && !(stepProgress?.completed), // unlock if completed
+          isCompleted: stepProgress?.completed || false,
+          progress: stepProgress?.progress || 0,
+          topics: [
+            {
+              title: item?.title || item?.topic,
+              subTopics: item?.subTopics?.map(sub => {
+                const subProgress = stepProgress?.subTopics?.find(st => st.subtopicId === sub.id);
+                return {
+                  id: sub.id,
+                  title: sub.name,
+                  name: sub.name,
+                  description: sub.description,
+                  filePath: sub.filePath,
+                  stepNumber: sub.stepNumber,
+                  completed: subProgress?.completed || false
+                };
+              }) || []
+            }
+          ]
+        };
+      });
 
 
+      console.log("Formatted Steps with Progress:", JSON.stringify(formattedSteps));
+      setSyllabusSteps(formattedSteps);
 
+      // Set first incomplete step as current
+      const firstIncompleteStep = formattedSteps.find(step => !step.isCompleted);
+      setCurrentStepId(firstIncompleteStep?.id || formattedSteps[0]?.id);
 
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setLoading(false);
+    }
+  };
 
-  // const totalSubs =
-  //   currentStep?.topics?.[0]?.subTopics?.length || 0;
+  fetchData();
+}, []);
 
-  // const completedSubs =
-  //   currentStep?.topics?.[0]?.subTopics?.filter(s => s.completed)?.length || 0;
-
-  // const calcProgress =
-  //   totalSubs > 0 ? Math.round((completedSubs / totalSubs) * 100) : 0;
-
+  
   // SECURITY EVENT HANDLERS (kept same)
   const handleContextMenu = (e) => { e?.preventDefault(); return false; };
   const handleSelectStart = (e) => { e?.preventDefault(); return false; };
   const handleKeyDown = (e) => {
-    if (
-      e?.ctrlKey && (e?.key === 's' || e?.key === 'p' || e?.key === 'c' || e?.key === 'a') ||
-      e?.key === 'F12' ||
-      e?.key === 'PrintScreen'
-    ) {
-      e?.preventDefault();
-      return false;
-    }
+    // if (
+    //   e?.ctrlKey && (e?.key === 's' || e?.key === 'p' || e?.key === 'c' || e?.key === 'a') ||
+    //   e?.key === 'F12' ||
+    //   e?.key === 'PrintScreen'
+    // ) {
+    //   e?.preventDefault();
+    //   return false;
+    // }
   };
 
   useEffect(() => {
@@ -181,30 +215,43 @@ const SyllabusContentViewer = () => {
 
   const handleStepSelect = (stepId) => {
     const step = syllabusSteps?.find((s) => s?.id === stepId);
+    console.log("Selected Step:", step);
+
     if (step && !step?.isLocked) {
       setCurrentStepId(stepId);
     }
   };
 
-  // const handleStepComplete = (stepId) => {
-  //   // same behavior: mark complete + unlock next
-  //   setSyllabusSteps((prev) =>
-  //     prev.map((s, idx) =>
-  //       s.id === stepId
-  //         ? { ...s, isCompleted: true, progress: 100, completedAt: new Date().toISOString() }
-  //         : s
-  //     ).map((s, idx, arr) => {
-  //       // unlock next one
-  //       if (s.id === stepId) {
-  //         const next = arr.find((_, i) => i === idx + 1);
-  //         if (next) next.isLocked = false;
-  //       }
-  //       return s;
-  //     })
-  //   );
+  // const handleStepSelect = async (stepId) => {
+  //   console.log("Attempting to select step:", stepId);
+
+  //   const step = syllabusSteps.find((s) => s.id === stepId);
+  //   if (!step || step.isLocked) return;
+
+  //   console.log("Starting step:", step);
+  //   const firstSubTopic = step.topics?.[0]?.subTopics?.[0];
+  //   if (!firstSubTopic) return;
+
+  //   const payload = {
+  //     empid:  empid,
+  //     subtopicId: firstSubTopic.id,
+  //     starttimeSeconds: Math.floor(Date.now() / 1000),
+  //     complete: false,
+  //     checker: false
+  //   };
+
+  //   console.log("Starting Subtopic with payload:", payload);
+  //   try {
+  //     await startSubTopic(payload);   // ✅ CORRECT
+  //     setCurrentStepId(stepId);
+  //   } catch (err) {
+  //     console.error("Error starting subtopic:", err);
+  //   }
   // };
 
+
   const handleCompleteStep = (stepId) => {
+
     setSyllabusSteps(prevSteps =>
       prevSteps.map((step, index) => {
         // complete current step
@@ -217,6 +264,9 @@ const SyllabusContentViewer = () => {
           };
         }
 
+
+        console.log(syllabusSteps.find(s => s.id === stepId));
+
         // unlock next step
         const prevIndex = prevSteps.findIndex(s => s.id === stepId);
         if (index === prevIndex + 1) {
@@ -227,37 +277,11 @@ const SyllabusContentViewer = () => {
       })
     );
   };
-  // const handleCompleteStep = async (stepId) => {
-  //   setSyllabusSteps((prevSteps) => {
-  //     const updated = [...prevSteps];
-  //     const idx = updated.findIndex((s) => s.id === stepId);
-  //     if (idx !== -1) {
-  //       updated[idx] = {
-  //         ...updated[idx],
-  //         isCompleted: true,
-  //         progress: 100,
-  //         completedAt: new Date().toISOString(),
-  //       };
-  //       if (idx + 1 < updated.length) {
-  //         updated[idx + 1] = { ...updated[idx + 1], isLocked: false };
-  //       }
-  //     }
-  //     return updated;
-  //   });
-
-  //   try {
-  //     await updateStepProgress(empid, stepId, 100, timeSpent); // send duration
-  //   } catch (err) {
-  //     console.error("Error updating step progress:", err);
-  //   }
-  // };
-
-
-
 
 
 
   const handleNextStep = () => {
+
     if (currentStepIndex < syllabusSteps?.length - 1) {
       const nextStep = syllabusSteps?.[currentStepIndex + 1];
       if (!nextStep?.isLocked) {
@@ -326,6 +350,7 @@ const SyllabusContentViewer = () => {
       <Header userRole="trainee" userName={traineeInfo?.name} onLogout={handleLogout} />
 
       <div className="pt-16 flex h-screen">
+        {/* {currentStepId} */}
         <StepNavigationSidebar
           steps={syllabusSteps}
           currentStepId={currentStepId}
@@ -333,6 +358,7 @@ const SyllabusContentViewer = () => {
           isCollapsed={isSidebarCollapsed}
           onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
         />
+
 
         <div className="flex-1 flex flex-col overflow-hidden">
           <div className="bg-surface border-b border-border px-6 py-3">

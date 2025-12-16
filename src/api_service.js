@@ -250,3 +250,36 @@ export const fetchInterviewScheduleByEmpId = async (empId) => {
   }
 };
 
+export const fetchStepByEmpId = async (empId) => {
+  try {
+    const response = await axios.get(
+      `${API_URL}/step-progress/emp/${empId}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching schedules:", error);
+    throw error;
+  }
+};
+
+
+export const startSubTopic = async (formData) => {
+  try {
+    const response = await axios.post(`${API_URL}/step-progress/start`, formData);
+    return response.data;
+  } catch (error) {
+    console.error("Error starting subtopic:", error);
+    throw error;
+  }
+}
+
+
+export const completeSubTopic = async (formData) => {
+  try {
+    const response = await axios.post(`${API_URL}/step-progress/complete`, formData); 
+    return response.data;
+  } catch (error) {
+    console.error("Error completing subtopic:", error);
+    throw error;
+  }
+}

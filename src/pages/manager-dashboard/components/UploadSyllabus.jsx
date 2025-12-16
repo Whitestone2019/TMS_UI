@@ -71,6 +71,8 @@ const UploadSyllabus = ({ onCancel }) => {
     };
 
     const deleteSubTopic = (index) => {
+        
+    if (!window.confirm("This will permanently delete this subtopic. Continue?")) return;
         const updated = [...formData.subTopics];
         updated.splice(index, 1);
         setFormData((prev) => ({ ...prev, subTopics: updated }));
@@ -112,7 +114,7 @@ const UploadSyllabus = ({ onCancel }) => {
                 durationInDays: Number(formData.durationInDays),
                 //subTopics: formData.subTopics.map(st => ({ name: st.name, description: st.description }))
                 subTopics: formData.subTopics.map(st => ({
-                    id: st.id || null,
+                    id: st.id,
                     name: st.name,
                     description: st.description,
                     filePath: typeof st.file === "string" ? st.file : null,
@@ -181,6 +183,7 @@ const UploadSyllabus = ({ onCancel }) => {
             durationInDays: item.durationInDays,
             subTopics: (item.subTopics && item.subTopics.length > 0)
                 ? item.subTopics.map(sub => ({
+                    id: sub.id,
                     name: sub.name,
                     description: sub.description,
                     file: sub.filePath || null,
@@ -405,20 +408,12 @@ const UploadSyllabus = ({ onCancel }) => {
                                     >
                                         <h4 className="font-semibold text-blue-900">{item.title}</h4>
                                         <p className="text-sm text-gray-600">{item.topic}</p>
-<<<<<<< HEAD
-                                        <p className="text-sm text-gray-500 mt-1">
-
-                                            {(item.subTopics?.length) || 0} Subtopics -
-
-                                        </p>
-=======
                                         {/* <p className="text-sm text-gray-500 mt-1">
                                             {item.subTopics.length} 
                                             {item.subTopics.map((i)=>(
                                                     i.filePath
                                             ))} Subtopics
                                         </p> */}
->>>>>>> bfa63fd822882c05f0e0c531ca0c2817320baf06
                                     </li>
                                 ))}
                             </ul>
