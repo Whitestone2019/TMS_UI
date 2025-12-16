@@ -314,6 +314,8 @@ const ContentDisplay = ({
   const isLastStep = currentIndex === allSteps.length - 1;
   const isLastSubOfLastStep = isLastStep && isLastSub;
 
+
+
   // Reset subtopic when step changes
   useEffect(() => setCurrentSubIndex(0), [currentStep?.id]);
 
@@ -501,7 +503,7 @@ const ContentDisplay = ({
               <p className="text-gray-700 whitespace-pre-line mt-2">{sub.description}</p>
 
               {sub?.filePath && fileData && !fileData.error && (
-                <div className="bg-gray-50 mt-6 border rounded-xl shadow-lg p-4 max-h-[600px] overflow-auto custom-scrollbar">
+                <div className="bg-gray-50 mt-6 border rounded-xl shadow-lg p-4 max-h-[600px] ">
                   <div className="flex justify-between items-center mb-3">
                     <h3 className="text-sm font-semibold text-gray-800">
                       {fileData.name}
@@ -609,6 +611,8 @@ const ContentDisplay = ({
                 ? (isLastStep ? "Next Step" : "Next Step")
                 : "Next Topic"}
             </Button>
+
+
 
 
           </div>

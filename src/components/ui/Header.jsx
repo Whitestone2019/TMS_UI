@@ -45,16 +45,22 @@ const Header = ({ userRole = 'trainee', userName = 'User', onLogout }) => {
       path: '/upload-syllabus',
       icon: 'BookOpen',
       roles: ['manager']
+    },
+    {
+      label: 'Approval',
+      path: '/trainee-steps',
+      icon: 'BookOpen',
+      roles: ['manager']
     }
   ];
 
   const visibleNavItems = navigationItems?.filter(item =>
     item?.roles?.includes(userRole)
-  )?.slice(0, 5);
+  )?.slice(0, 6);
 
   const moreItems = navigationItems?.filter(item =>
     item?.roles?.includes(userRole)
-  )?.slice(5);
+  )?.slice(6);
 
   const handleNavigation = (path) => {
     navigate(path);
