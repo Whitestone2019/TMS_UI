@@ -892,6 +892,8 @@ const ContentDisplay = ({
   // Complete subtopic
   // -----------------------------
   const markSubtopicCompleted = async () => {
+
+    console.log("Marking subtopic completed"+sub?.id);
     if (!sub?.id || sub.completed) return;
 
     try {
