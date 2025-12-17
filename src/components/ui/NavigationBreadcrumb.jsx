@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import Icon from '../AppIcon';
 import Button from './Button';
 
-const NavigationBreadcrumb = ({ 
+const NavigationBreadcrumb = ({
   userRole = 'trainee',
   customBreadcrumbs = null,
   showHomeIcon = true,
@@ -20,7 +20,7 @@ const NavigationBreadcrumb = ({
       roles: ['manager']
     },
     '/trainee-dashboard': {
-      label: 'Trainee Dashboard', 
+      label: 'Trainee Dashboard',
       parent: null,
       roles: ['trainee']
     },
@@ -31,7 +31,7 @@ const NavigationBreadcrumb = ({
     },
     '/interview-scheduling': {
       label: 'Interview Scheduling',
-      parent: '/manager-dashboard', 
+      parent: '/manager-dashboard',
       roles: ['manager']
     },
     '/syllabus-content-viewer': {
@@ -39,11 +39,11 @@ const NavigationBreadcrumb = ({
       parent: '/trainee-dashboard',
       roles: ['trainee']
     },
-    '/progress-reports': {
-      label: 'Progress Reports',
-      parent: userRole === 'manager' ? '/manager-dashboard' : '/trainee-dashboard',
-      roles: ['trainee', 'manager']
-    }
+    // '/progress-reports': {
+    //   label: 'Progress Reports',
+    //   parent: userRole === 'manager' ? '/manager-dashboard' : '/trainee-dashboard',
+    //   roles: ['trainee', 'manager']
+    // }
   };
 
   // Generate breadcrumb trail
@@ -54,14 +54,14 @@ const NavigationBreadcrumb = ({
 
     const currentPath = location?.pathname;
     const currentRoute = routeConfig?.[currentPath];
-    
+
     if (!currentRoute || !currentRoute?.roles?.includes(userRole)) {
       return [];
     }
 
     const breadcrumbs = [];
     let path = currentPath;
-    
+
     // Build breadcrumb chain by following parent relationships
     while (path && routeConfig?.[path]) {
       const route = routeConfig?.[path];
@@ -121,7 +121,7 @@ const NavigationBreadcrumb = ({
             {index > 0 && (
               <Icon name="ChevronRight" size={14} className="text-muted-foreground" />
             )}
-            
+
             {/* Breadcrumb Link/Text */}
             {crumb?.isActive ? (
               <span className="font-medium text-foreground px-2 py-1">

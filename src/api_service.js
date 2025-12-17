@@ -250,3 +250,93 @@ export const fetchInterviewScheduleByEmpId = async (empId) => {
   }
 };
 
+export const fetchStepByEmpId = async (empId) => {
+  try {
+    const response = await axios.get(
+      `${API_URL}/step-progress/emp/${empId}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching schedules:", error);
+    throw error;
+  }
+};
+
+
+export const startSubTopic = async (formData) => {
+  try {
+    const response = await axios.post(`${API_URL}/step-progress/start`, formData);
+    return response.data;
+  } catch (error) {
+    console.error("Error starting subtopic:", error);
+    throw error;
+  }
+}
+
+
+export const completeSubTopic = async (formData) => {
+  try {
+    const response = await axios.post(`${API_URL}/step-progress/complete`, formData);
+    return response.data;
+  } catch (error) {
+    console.error("Error completing subtopic:", error);
+    throw error;
+  }
+}
+
+export const fetchCompletedSubTopics = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/syllabus/all-progress`);
+    return response;
+  } catch (error) {
+    console.error("Error fetching completed subtopics:", error);
+    throw error;
+  }
+}
+
+
+export const approveSubTopicAPI = async (progressId) => {
+  try {
+    const response = await fetch(
+      `${API_URL}/step-progress/approve/${progressId}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to approve subtopic");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Approve API error:", error);
+    throw error;
+  }
+};
+
+export const rejectSubTopicAPI = async (progressId, review) => {
+  try {
+    const response = await fetch(
+      `${API_URL}/step-progress/reject/${progressId}?review=${encodeURIComponent(review)}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to reject subtopic");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Reject API error:", error);
+    throw error;
+  }
+};

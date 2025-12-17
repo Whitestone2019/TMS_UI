@@ -275,10 +275,11 @@
 
 
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Icon from "../../../components/AppIcon";
 import Button from "../../../components/ui/Button";
 import PdfViewer from "./PdfViewer";
+import { startSubTopic, completeSubTopic } from "../../../api_service";
 
 const ContentDisplay = ({
   currentStep,
@@ -313,8 +314,8 @@ const ContentDisplay = ({
 
   const isLastStep = currentIndex === allSteps.length - 1;
   const isLastSubOfLastStep = isLastStep && isLastSub;
-
-
+  const startedSubRef = useRef(null);
+  const empid = sessionStorage.getItem("empid");
 
   // Reset subtopic when step changes
   useEffect(() => setCurrentSubIndex(0), [currentStep?.id]);
@@ -402,7 +403,30 @@ const ContentDisplay = ({
       });
   }, [sub]);
 
-  const markSubtopicCompleted = () => {
+  useEffect(() => {
+    if (!currentStep || !empid) return;
+
+    const currentSub = subTopics[currentSubIndex];
+    if (!currentSub?.id) return;
+
+    if (startedSubRef.current === currentSub.id) return;
+    startedSubRef.current = currentSub.id;
+
+    //setStartTime(Date.now());
+    let payload = {
+      empid,
+      subtopicId: currentSub.id,
+      starttimeSeconds: Date.now(),
+      complete: false,
+      checker: false,
+    };
+    console.log("Starting subtopic with payload:", payload);
+    startSubTopic(payload).catch(err => {
+      console.error("Start subtopic failed:", err);
+    });
+  }, [currentSubIndex, currentStep?.id, subTopics, empid]);
+
+  const markSubtopicCompleted = async () => {
     if (!sub) return;
     const updated = [...subTopics];
     updated[currentSubIndex] = {
@@ -410,6 +434,24 @@ const ContentDisplay = ({
       completed: true,
     };
     currentStep.topics[0].subTopics = updated;
+    try {
+      await completeSubTopic({
+        empid,
+        subtopicId: sub.id,
+        endtimeSeconds: Math.floor(Date.now() / 1000),
+        complete: true,
+        checker: false,
+      });
+
+      // immutably update completion flag
+      const updated = subTopics.map((s, i) =>
+        i === currentSubIndex ? { ...s, completed: true } : s
+      );
+
+      topic.subTopics = updated; // source of truth is parent payload
+    } catch (err) {
+      console.error("Complete subtopic failed:", err);
+    }
   };
 
   const nextSub = () => {

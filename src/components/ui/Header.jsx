@@ -22,12 +22,12 @@ const Header = ({ userRole = 'trainee', userName = 'User', onLogout }) => {
       icon: 'BookOpen',
       roles: ['trainee']
     },
-    {
-      label: 'Progress',
-      path: '/progress-reports',
-      icon: 'TrendingUp',
-      roles: ['trainee', 'manager']
-    },
+    // {
+    //   label: 'Progress',
+    //   path: '/progress-reports',
+    //   icon: 'TrendingUp',
+    //   roles: ['trainee', 'manager']
+    // },
     {
       label: 'Assessment',
       path: '/assessment-entry',
