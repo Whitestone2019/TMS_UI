@@ -14,7 +14,7 @@ export default function TraineeStepsPage() {
     const [selectedTrainee, setSelectedTrainee] = useState(null);
     const [expandedSyllabus, setExpandedSyllabus] = useState({});
     const [decision, setDecision] = useState({});
-    const [reviewInput, setReviewInput] = useState();
+    const [reviewInput, setReviewInput] = useState({});
 
     // ----------------------------------------------------
     // BUILD TRAINEE STRUCTURE: SYLLABUS -> SUBTOPICS
@@ -45,17 +45,38 @@ export default function TraineeStepsPage() {
                     }
 
                     // SUBTOPIC
+                    // traineeMap[user.empid].syllabi[syllabus.title].subTopics.push({
+                    //     id: sub.subTopicId,
+                    //     progressId: progress.stepProgressId,
+                    //     name: sub.name,
+                    //     status: progress.complete ? "COMPLETED" : "PENDING",
+                    //     managerDecision:
+                    //         typeof progress.checker === "boolean"
+                    //             ? progress.checker
+                    //             : null, // boolean: true = accept, false = reject
+                    //     time: `${progress.timeSpentSeconds || 0}s`,
+                    //     review: progress.review || "",
+                    // });
+                    // ✅ FIX: decide managerDecision correctly
+                    let managerDecision = null;
+
+                    if (progress.checker === true) {
+                        managerDecision = true;          // ACCEPT
+                    } else if (progress.checker === false && progress.review) {
+                        managerDecision = false;         // REJECT only if review exists
+                    }
+
+                    // SUBTOPIC
                     traineeMap[user.empid].syllabi[syllabus.title].subTopics.push({
                         id: sub.subTopicId,
                         progressId: progress.stepProgressId,
                         name: sub.name,
                         status: progress.complete ? "COMPLETED" : "PENDING",
-                        managerDecision:
-                            typeof progress.checker === "boolean"
-                                ? progress.checker
-                                : null, // boolean: true = accept, false = reject
+                        managerDecision,                 // ✅ FIXED
                         time: `${progress.timeSpentSeconds || 0}s`,
+                        review: progress.review || "",
                     });
+
                 });
             });
         });
@@ -81,6 +102,18 @@ export default function TraineeStepsPage() {
                         : [];
 
                 const structured = buildTraineeStructure(list);
+                const reviewMap = {};
+                structured.forEach((trainee) => {
+                    trainee.syllabi.forEach((syllabus) => {
+                        const syllabusKey = `syllabus-${syllabus.title}`;
+                        syllabus.subTopics.forEach((st) => {
+                            const subKey = `${syllabusKey}-${st.id}`;
+                            reviewMap[subKey] = st.review || "";
+                        });
+                    });
+                });
+
+                setReviewInput(reviewMap);
                 console.log("Structure", structured);
                 setTrainees(structured);
                 setSelectedTrainee(structured[-1] || null);
@@ -94,31 +127,59 @@ export default function TraineeStepsPage() {
     // ----------------------------------------------------
     // APPROVE / REJECT HANDLER
     // ----------------------------------------------------
+    // const handleDecision = async (subKey, value, progressId) => {
+    //     setDecision((prev) => ({ ...prev, [subKey]: value }));
+    //     try {
+    //         if (value === "ACCEPT") {
+    //             await approveSubTopicAPI(progressId, reviewInput);
+    //             alert("Approved successfully");
+    //         } else {
+    //             await rejectSubTopicAPI(progressId, reviewInput);
+    //             alert("Rejected successfully");
+    //         }
+
+    //         // Update local state after decision
+    //         setSelectedTrainee((prev) => {
+    //             const newTrainees = { ...prev };
+    //             newTrainees.syllabi = newTrainees.syllabi.map((syllabus) => {
+    //                 syllabus.subTopics = syllabus.subTopics.map((st) => {
+    //                     if (`syllabus-${syllabus.title}-${st.id}` === subKey) {
+    //                         return { ...st, managerDecision: value === "ACCEPT" };
+    //                     }
+    //                     return st;
+    //                 });
+    //                 return syllabus;
+    //             });
+    //             return newTrainees;
+    //         });
+    //     } catch (err) {
+    //         console.error("Decision error", err);
+    //         alert("Something went wrong");
+    //     }
+    // };
+
     const handleDecision = async (subKey, value, progressId) => {
-        setDecision((prev) => ({ ...prev, [subKey]: value }));
+        const review = String(reviewInput[subKey] || "");
+
+
+        if (!progressId) {
+            alert("Invalid progress ID");
+            return;
+        }
+
+        if (value === "REJECT" && (!review || review.trim() === "")) {
+            alert("Review is mandatory for rejection");
+            return;
+        }
+
         try {
             if (value === "ACCEPT") {
-                await approveSubTopicAPI(progressId, reviewInput);
+                await approveSubTopicAPI(progressId, review); // review optional
                 alert("Approved successfully");
             } else {
-                await rejectSubTopicAPI(progressId, reviewInput);
+                await rejectSubTopicAPI(progressId, review); // review mandatory
                 alert("Rejected successfully");
             }
-
-            // Update local state after decision
-            setSelectedTrainee((prev) => {
-                const newTrainees = { ...prev };
-                newTrainees.syllabi = newTrainees.syllabi.map((syllabus) => {
-                    syllabus.subTopics = syllabus.subTopics.map((st) => {
-                        if (`syllabus-${syllabus.title}-${st.id}` === subKey) {
-                            return { ...st, managerDecision: value === "ACCEPT" };
-                        }
-                        return st;
-                    });
-                    return syllabus;
-                });
-                return newTrainees;
-            });
         } catch (err) {
             console.error("Decision error", err);
             alert("Something went wrong");
@@ -234,8 +295,14 @@ export default function TraineeStepsPage() {
                                                                         type="text"
                                                                         className="border px-2 py-1 rounded w-full"
                                                                         placeholder="Enter review"
-                                                                        value={reviewInput || ""}
-                                                                        onChange={(e) => setReviewInput(e.target.value)}
+                                                                        value={reviewInput[subKey] || ""}
+                                                                        onChange={(e) =>
+                                                                            setReviewInput((prev) => ({
+                                                                                ...prev,
+                                                                                [subKey]: e.target.value,   // ✅ string only
+                                                                            }))
+                                                                        }
+
 
 
                                                                     // onKeyDown={(e) => {

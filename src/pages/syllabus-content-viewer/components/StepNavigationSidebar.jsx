@@ -2,12 +2,12 @@ import React from 'react';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 
-const StepNavigationSidebar = ({ 
-  steps, 
-  currentStepId, 
-  onStepSelect, 
+const StepNavigationSidebar = ({
+  steps,
+  currentStepId,
+  onStepSelect,
   isCollapsed = false,
-  onToggleCollapse 
+  onToggleCollapse
 }) => {
   const getStepStatus = (step) => {
     if (step?.isCompleted) return 'completed';
@@ -50,10 +50,15 @@ const StepNavigationSidebar = ({
     }
   };
 
+  // const handleStepClick = (step) => {
+  //   if (step.isLocked) return; // ❌ prevent navigation
+  //   onStepSelect(step.id);
+  // };
+
+
   return (
-    <div className={`bg-surface border-r border-border transition-all duration-300 ${
-      isCollapsed ? 'w-16' : 'w-80'
-    }`}>
+    <div className={`bg-surface border-r border-border transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-80'
+      }`}>
       {/* Sidebar Header */}
       <div className="flex items-center justify-between p-4 border-b border-border">
         {!isCollapsed && (
@@ -77,7 +82,7 @@ const StepNavigationSidebar = ({
           {steps?.map((step, index) => {
             const status = getStepStatus(step);
             const isClickable = !step?.isLocked;
-            
+
             return (
               <div
                 key={step?.id}
@@ -90,18 +95,16 @@ const StepNavigationSidebar = ({
                 {/* Step Item */}
                 <div
                   onClick={() => handleStepClick(step)}
-                  className={`flex items-center p-3 rounded-lg transition-all duration-150 ${
-                    isClickable 
-                      ? 'cursor-pointer hover:bg-muted' :'cursor-not-allowed opacity-60'
-                  } ${
-                    status === 'current' ?'bg-primary/10 border border-primary/20' :'border border-transparent'
-                  }`}
+                  className={`flex items-center p-3 rounded-lg transition-all duration-150 ${isClickable
+                    ? 'cursor-pointer hover:bg-muted' : 'cursor-not-allowed opacity-60'
+                    } ${status === 'current' ? 'bg-primary/10 border border-primary/20' : 'border border-transparent'
+                    }`}
                 >
                   {/* Step Icon */}
                   <div className={`flex-shrink-0 ${!isCollapsed ? 'mr-3' : ''}`}>
-                    <Icon 
-                      name={getStepIcon(step)} 
-                      size={20} 
+                    <Icon
+                      name={getStepIcon(step)}
+                      size={20}
                       className={getStepIconColor(step)}
                     />
                   </div>
@@ -110,20 +113,19 @@ const StepNavigationSidebar = ({
                   {!isCollapsed && (
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
-                        <h3 className={`text-sm font-medium truncate ${
-                          status === 'current' ? 'text-primary' : 'text-foreground'
-                        }`}>
+                        <h3 className={`text-sm font-medium truncate ${status === 'current' ? 'text-primary' : 'text-foreground'
+                          }`}>
                           Step {step?.stepNumber}: {step?.title}
                         </h3>
                         {step?.isLocked && (
                           <Icon name="Lock" size={14} className="text-muted-foreground ml-2" />
                         )}
                       </div>
-                      
+
                       <p className="text-xs text-muted-foreground mt-1 truncate">
                         {step?.description}
                       </p>
-                      
+
                       {/* Step Progress */}
                       {status === 'current' && step?.progress !== undefined && (
                         <div className="mt-2">
@@ -132,14 +134,14 @@ const StepNavigationSidebar = ({
                             <span>{step?.progress}%</span>
                           </div>
                           <div className="w-full bg-muted rounded-full h-1.5">
-                            <div 
+                            <div
                               className="bg-primary h-1.5 rounded-full transition-all duration-300"
                               style={{ width: `${step?.progress}%` }}
                             />
                           </div>
                         </div>
                       )}
-                      
+
                       {/* Completion Info */}
                       {step?.isCompleted && step?.completedAt && (
                         <div className="mt-2 text-xs text-success">
@@ -147,7 +149,7 @@ const StepNavigationSidebar = ({
                           Completed {new Date(step.completedAt)?.toLocaleDateString()}
                         </div>
                       )}
-                      
+
                       {/* Lock Reason */}
                       {step?.isLocked && step?.lockReason && (
                         <div className="mt-2 text-xs text-muted-foreground">
@@ -174,10 +176,10 @@ const StepNavigationSidebar = ({
               {Math.round((steps?.filter(s => s?.isCompleted)?.length / steps?.length) * 100)}%
             </div>
             <div className="w-full bg-muted rounded-full h-2">
-              <div 
+              <div
                 className="bg-primary h-2 rounded-full transition-all duration-300"
-                style={{ 
-                  width: `${(steps?.filter(s => s?.isCompleted)?.length / steps?.length) * 100}%` 
+                style={{
+                  width: `${(steps?.filter(s => s?.isCompleted)?.length / steps?.length) * 100}%`
                 }}
               />
             </div>

@@ -295,48 +295,93 @@ export const fetchCompletedSubTopics = async () => {
 }
 
 
-export const approveSubTopicAPI = async (progressId) => {
-  try {
-    const response = await fetch(
-      `${API_URL}/step-progress/approve/${progressId}`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+// export const approveSubTopicAPI = async (progressId) => {
+//   try {
+//     const response = await fetch(
+//       `${API_URL}/step-progress/approve/${progressId}`,
+//       {
+//         method: "PUT",
+//         headers: {
+//           "Content-Type": "application/json",
+//         },
+//       }
+//     );
 
-    if (!response.ok) {
-      throw new Error("Failed to approve subtopic");
-    }
+//     if (!response.ok) {
+//       throw new Error("Failed to approve subtopic");
+//     }
 
-    return await response.json();
-  } catch (error) {
-    console.error("Approve API error:", error);
-    throw error;
+//     return await response.json();
+//   } catch (error) {
+//     console.error("Approve API error:", error);
+//     throw error;
+//   }
+// };
+
+export const approveSubTopicAPI = async (progressId, review = "") => {
+  const url = review
+    ? `${API_URL}/step-progress/approve/${progressId}?review=${encodeURIComponent(review)}`
+    : `${API_URL}/step-progress/approve/${progressId}`;
+
+  const response = await fetch(url, { method: "PUT" });
+
+  if (!response.ok) {
+    throw new Error("Failed to approve subtopic");
   }
+
+  return response.json();
 };
 
+
+// export const rejectSubTopicAPI = async (progressId, review) => {
+//   try {
+//     const response = await fetch(
+//       `${API_URL}/step-progress/reject/${progressId}?review=${encodeURIComponent(review)}`,
+//       {
+//         method: "PUT",
+//         headers: {
+//           "Content-Type": "application/json",
+//         },
+//       }
+//     );
+
+//     if (!response.ok) {
+//       throw new Error("Failed to reject subtopic");
+//     }
+
+//     return await response.json();
+//   } catch (error) {
+//     console.error("Reject API error:", error);
+//     throw error;
+//   }
+// };
+
 export const rejectSubTopicAPI = async (progressId, review) => {
+  if (!review || review.trim() === "") {
+    throw new Error("Review is required for rejection");
+  }
+
+  const response = await fetch(
+    `${API_URL}/step-progress/reject/${progressId}?review=${encodeURIComponent(review)}`,
+    { method: "PUT" }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to reject subtopic");
+  }
+
+  return response.json();
+};
+
+
+export const fetchSyllabusProgressByEmpId = async (empid) => {
   try {
-    const response = await fetch(
-      `${API_URL}/step-progress/reject/${progressId}?review=${encodeURIComponent(review)}`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
+    const response = await axios.get(
+      `${API_URL}/syllabus/all-progress/${empid}`
     );
-
-    if (!response.ok) {
-      throw new Error("Failed to reject subtopic");
-    }
-
-    return await response.json();
+    return response.data;
   } catch (error) {
-    console.error("Reject API error:", error);
+    console.error("Error fetching syllabus progress by empid:", error);
     throw error;
   }
 };
