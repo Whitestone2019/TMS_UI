@@ -385,3 +385,18 @@ export const fetchSyllabusProgressByEmpId = async (empid) => {
     throw error;
   }
 };
+
+
+const fetchSyllabusProgress = async (empId) => {
+  const res = await fetch(
+    `http://localhost:8080/api/syllabus/all-progress/${empId}`
+  );
+
+  if (!res.ok) {
+    const text = await res.text();
+    console.error("Backend error:", text);
+    throw new Error("Failed to fetch syllabus progress");
+  }
+
+  return await res.json(); // ✅ guaranteed JSON
+};
