@@ -460,7 +460,7 @@ const AssessmentForm = ({
   className = ''
 }) => {
   const [formData, setFormData] = useState({
-    subTopic: '',
+    
     marks: '',
     maxMarks: '100',
     assessmentDate: new Date()?.toISOString()?.split('T')?.[0],
@@ -469,7 +469,7 @@ const AssessmentForm = ({
     strengths: '',
     improvements: '',
     recommendations: '',
-    subTopicId: ''
+    subTopicId: null
   });
   const [errors, setErrors] = useState({});
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
@@ -510,7 +510,7 @@ const AssessmentForm = ({
     }
   };
 
-  console.log('Form data state:', trainee);
+  // console.log('Form data state:', trainee);
   const handleInputChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     setHasUnsavedChanges(true);
@@ -524,9 +524,13 @@ const AssessmentForm = ({
   const validateForm = () => {
     const newErrors = {};
     // Subtopic validation
-    if (!formData?.subTopic?.trim()) {
-      newErrors.subTopic = 'Subtopic is required';
-    }
+    // if (!formData?.subTopic?.trim()) {
+    //   newErrors.subTopic = 'Subtopic is required';
+    // }
+
+    if (!formData?.subTopicId) {
+  newErrors.subTopicId = 'Subtopic is required';
+}
 
     // Marks validation
     if (!formData?.marks) {
@@ -573,18 +577,22 @@ const AssessmentForm = ({
       empid: trainee?.trngid,
       traineeName: trainee?.name,
       currentStep: trainee?.currentStep,
-      subTopicId: formData.subTopicId,
+      subTopicId:formData.subTopicId,
       // isDraft,
       submittedAt: new Date()?.toISOString(),
       percentage: Math.round((parseFloat(formData?.marks) / parseFloat(formData?.maxMarks)) * 100)
     };
 
     console.log('Final assessment data to submit:', assessmentData);
+
     try {
       // setIsLoading(true);
       console.log('Submitting assessment data:', assessmentData);
       const response = await createAssessment(assessmentData.empid, assessmentData);
       console.log('Assessment saved successfully:', response);
+
+
+      alert("Assessment saved successfully!");
       // setIsLoading(false);
     } catch (error) {
       console.error('Error submitting assessment:', error);
@@ -714,14 +722,14 @@ const AssessmentForm = ({
         {/* Assessment Details */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-          <Input
+          {/* <Input
             label="Subtopic"
             placeholder="Enter subtopic name"
             value={formData?.subTopic}
             onChange={(e) => handleInputChange('subTopic', e?.target?.value)}
             error={errors?.subTopic}
             required
-          />
+          /> */}
           <Select
             label="Assessment Type"
             options={assessmentTypeOptions}
@@ -778,9 +786,9 @@ const AssessmentForm = ({
           onChange={(value) =>
             handleInputChange('subTopicId', value)
           }
+          
           searchable
         />
-
 
 
         {/* Remarks Section */}
