@@ -80,9 +80,9 @@ const TraineeSelector = ({
         ) : (
           filteredTrainees?.map((trainee) => (
             <div
-              key={trainee?.empid}
+              key={trainee?.trngid}
               className={`border border-border rounded-lg p-4 cursor-pointer transition-all duration-150 hover:elevation-1 ${
-                selectedTrainee?.empid === trainee?.empid
+                selectedTrainee?.trngid === trainee?.trngid
                   ? 'border-primary bg-primary/5' :'hover:border-primary/50'
               }`}
               onClick={() => onTraineeSelect(trainee)}
@@ -94,7 +94,7 @@ const TraineeSelector = ({
                   </div>
                   <div>
                     <h3 className="font-medium text-foreground">{trainee?.username}</h3>
-                    <p className="text-sm text-muted-foreground">ID: {trainee?.empid}</p>
+                    <p className="text-sm text-muted-foreground">ID: {trainee?.trngid}</p>
                     <div className="flex items-center space-x-2 mt-1">
                       <span className="text-xs text-muted-foreground">Step {trainee?.currentStep || 0}/5</span>
                       <div className="w-16 h-1.5 bg-muted rounded-full overflow-hidden">

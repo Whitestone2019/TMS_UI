@@ -182,7 +182,7 @@ const AssessmentEntry = () => {
       
     setSelectedTrainee(trainee);
       try {
-    const data = await getTraineeAssessments(trainee?.empid);
+    const data = await getTraineeAssessments(trainee?.trngid);
     setHistoryAssessments(data);
   } catch (error) {
     console.error("Error fetching assessments:", error);
@@ -206,6 +206,8 @@ const AssessmentEntry = () => {
       setTimeout(() => {
         setShowSuccessMessage(false);
       }, 3000);
+
+      alert('Assessment saved successfully!');
       
     } catch (error) {
       console.error('Error saving assessment:', error);

@@ -5,7 +5,6 @@ import SecureContentWrapper from '../../../components/ui/SecureContentWrapper';
 
 const CurrentStepContent = ({
   currentStep = 1,
-  traineeInfo = { name: 'John Doe', id: 'TRN001' },
   onStepComplete,
   className = '',
   syllabus = [],
@@ -14,68 +13,68 @@ const CurrentStepContent = ({
 }) => {
   const [isCompleting, setIsCompleting] = useState(false);
 
-  const stepContent = {
-    1: {
-      title: 'Introduction to Programming',
-      duration: '45 minutes',
-      content: `Welcome to the fundamentals of programming! This comprehensive module will introduce you to the core concepts that form the foundation of all programming languages.
+  // const stepContent = {
+  //   1: {
+  //     title: 'Introduction to Programming',
+  //     duration: '45 minutes',
+  //     content: `Welcome to the fundamentals of programming! This comprehensive module will introduce you to the core concepts that form the foundation of all programming languages.
 
-  Programming is the process of creating instructions for computers to execute. These instructions, written in various programming languages, tell the computer exactly what to do and how to do it.
+  // Programming is the process of creating instructions for computers to execute. These instructions, written in various programming languages, tell the computer exactly what to do and how to do it.
 
-  Key Concepts Covered:
-  • What is programming and why it matters
-  • Understanding algorithms and logic
-  • Basic programming terminology
-  • Problem-solving approaches
-  • Introduction to different programming paradigms
+  // Key Concepts Covered:
+  // • What is programming and why it matters
+  // • Understanding algorithms and logic
+  // • Basic programming terminology
+  // • Problem-solving approaches
+  // • Introduction to different programming paradigms
 
-  Learning Objectives:
-  By the end of this module, you will understand:
-  1. The fundamental concepts of programming
-  2. How computers process instructions
-  3. Basic problem-solving techniques
-  4. The importance of logical thinking in programming
+  // Learning Objectives:
+  // By the end of this module, you will understand:
+  // 1. The fundamental concepts of programming
+  // 2. How computers process instructions
+  // 3. Basic problem-solving techniques
+  // 4. The importance of logical thinking in programming
 
-  Practical Applications:
-  Throughout this module, you'll see real-world examples of how programming concepts apply to everyday technology, from mobile apps to web browsers to smart home devices.Remember: Programming is not just about writing code—it's about thinking logically and solving problems systematically.`,
-      resources: [
-        { name: 'Programming Fundamentals Guide', type: 'PDF', size: '2.4 MB' },
-        { name: 'Introduction Video Series', type: 'Video', duration: '30 min' },
-        { name: 'Practice Exercises', type: 'Interactive', items: '15 exercises' }
-      ]
-    },
-    2: {
-      title: 'Data Structures',
-      duration: '60 minutes',
-      content: `Data structures are fundamental building blocks in programming that allow us to organize, store, and manipulate data efficiently.
+  // Practical Applications:
+  // Throughout this module, you'll see real-world examples of how programming concepts apply to everyday technology, from mobile apps to web browsers to smart home devices.Remember: Programming is not just about writing code—it's about thinking logically and solving problems systematically.`,
+  //     resources: [
+  //       { name: 'Programming Fundamentals Guide', type: 'PDF', size: '2.4 MB' },
+  //       { name: 'Introduction Video Series', type: 'Video', duration: '30 min' },
+  //       { name: 'Practice Exercises', type: 'Interactive', items: '15 exercises' }
+  //     ]
+  //   },
+  //   2: {
+  //     title: 'Data Structures',
+  //     duration: '60 minutes',
+  //     content: `Data structures are fundamental building blocks in programming that allow us to organize, store, and manipulate data efficiently.
 
-  Understanding data structures is crucial for writing efficient programs and solving complex problems. Different data structures are optimized for different types of operations.
+  // Understanding data structures is crucial for writing efficient programs and solving complex problems. Different data structures are optimized for different types of operations.
 
-  Core Data Structures:
-  • Arrays: Ordered collections of elements
-  • Objects: Key-value pairs for structured data
-  • Lists: Dynamic collections that can grow and shrink
-  • Stacks: Last-in-first-out (LIFO) data structure
-  • Queues: First-in-first-out (FIFO) data structure
+  // Core Data Structures:
+  // • Arrays: Ordered collections of elements
+  // • Objects: Key-value pairs for structured data
+  // • Lists: Dynamic collections that can grow and shrink
+  // • Stacks: Last-in-first-out (LIFO) data structure
+  // • Queues: First-in-first-out (FIFO) data structure
 
-  When to Use Each Structure:
-  Arrays are perfect when you need indexed access to elements. Objects work well for representing real-world entities with properties. Lists are ideal when the size of your data changes frequently.
+  // When to Use Each Structure:
+  // Arrays are perfect when you need indexed access to elements. Objects work well for representing real-world entities with properties. Lists are ideal when the size of your data changes frequently.
 
-  Performance Considerations:
-  Different operations have different time complexities depending on the data structure used. Understanding these trade-offs helps you choose the right structure for your specific needs.
+  // Performance Considerations:
+  // Different operations have different time complexities depending on the data structure used. Understanding these trade-offs helps you choose the right structure for your specific needs.
 
-  Real-World Examples:
-  • Shopping cart items (Array/List)
-  • User profile information (Object)
-  • Browser history (Stack)
-  • Print queue (Queue)`,
-      resources: [
-        { name: 'Data Structures Handbook', type: 'PDF', size: '3.1 MB' },
-        { name: 'Interactive Visualizations', type: 'Interactive', items: '8 demos' },
-        { name: 'Coding Challenges', type: 'Practice', items: '20 problems' }
-      ]
-    }
-  };
+  // Real-World Examples:
+  // • Shopping cart items (Array/List)
+  // • User profile information (Object)
+  // • Browser history (Stack)
+  // • Print queue (Queue)`,
+  //     resources: [
+  //       { name: 'Data Structures Handbook', type: 'PDF', size: '3.1 MB' },
+  //       { name: 'Interactive Visualizations', type: 'Interactive', items: '8 demos' },
+  //       { name: 'Coding Challenges', type: 'Practice', items: '20 problems' }
+  //     ]
+  //   }
+  // };
 
 
   const currentContent = syllabus[currentStep - 1];

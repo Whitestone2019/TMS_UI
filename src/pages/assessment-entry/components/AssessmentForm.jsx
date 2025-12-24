@@ -3,16 +3,17 @@ import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 import Input from '../../../components/ui/Input';
 import Select from '../../../components/ui/Select';
-import {createAssessment} from '../../../api_service'
+import { createAssessment } from '../../../api_service'
 import { fromTheme } from 'tailwind-merge';
+import { fetchCompletedSubTopics } from '../../../api_service';
 
-const AssessmentForm = ({ 
-  trainee, 
-  onSave, 
-  onSaveDraft, 
+const AssessmentForm = ({
+  trainee,
+  onSave,
+  onSaveDraft,
   onCancel,
   isLoading = false,
-  className = '' 
+  className = ''
 }) => {
   const [formData, setFormData] = useState({
     marks: '',
@@ -22,11 +23,14 @@ const AssessmentForm = ({
     remarks: '',
     strengths: '',
     improvements: '',
-    recommendations: ''
+    recommendations: '',
+    subTopicId: ''
   });
   const [errors, setErrors] = useState({});
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [autoSaveStatus, setAutoSaveStatus] = useState('');
+  const [completedSubTopics, setCompletedSubTopics] = useState([]);
+
 
   const assessmentTypeOptions = [
     { value: 'weekly', label: 'Weekly Assessment' },
@@ -50,21 +54,22 @@ const AssessmentForm = ({
     if (trainee && formData?.marks) {
       const draftData = {
         ...formData,
-        empid: trainee?.empid,
+        empid: trainee?.trngid,
         isDraft: true,
         autoSaved: true
       };
-      
+
       // Simulate auto-save
       setAutoSaveStatus('Auto-saved');
       setTimeout(() => setAutoSaveStatus(''), 3000);
     }
   };
 
+  console.log('Form data state:', trainee);
   const handleInputChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     setHasUnsavedChanges(true);
-    
+
     // Clear specific field error
     if (errors?.[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
@@ -114,22 +119,19 @@ const AssessmentForm = ({
       return;
     }
 
-    
-    
-
-
-
     const assessmentData = {
       ...formData,
-      empid: trainee?.empid,
+      empid: trainee?.trngid,
       traineeName: trainee?.name,
       currentStep: trainee?.currentStep,
+      subTopicId: formData.subTopicId,
       // isDraft,
       submittedAt: new Date()?.toISOString(),
       percentage: Math.round((parseFloat(formData?.marks) / parseFloat(formData?.maxMarks)) * 100)
     };
 
-    try{
+    console.log('Final assessment data to submit:', assessmentData);
+    try {
       // setIsLoading(true);
       console.log('Submitting assessment data:', assessmentData);
       const response = await createAssessment(assessmentData.empid, assessmentData);
@@ -164,6 +166,54 @@ const AssessmentForm = ({
     if (percentage >= 70) return 'text-warning';
     return 'text-error';
   };
+
+
+  useEffect(() => {
+    if (!trainee?.trngid) {
+      setCompletedSubTopics([]);
+      return;
+    }
+
+    const loadData = async () => {
+      try {
+        const response = await fetchCompletedSubTopics();
+
+        const data = Array.isArray(response)
+          ? response
+          : Array.isArray(response?.data)
+            ? response.data
+            : [];
+
+        const filteredSubTopics = data.flatMap(syllabus =>
+          syllabus.subTopics?.flatMap(subTopic =>
+            subTopic.stepProgress
+              ?.filter(progress =>
+                progress.checker === true &&
+                progress.user?.empid === trainee.trngid
+              )
+              ?.map(() => ({
+                value: subTopic.subTopicId,
+                label: `${subTopic.stepNumber}. ${subTopic.name}`
+              })) || []
+          ) || []
+        );
+
+        console.log(
+          "Filtered SubTopics for",
+          trainee.trngid,
+          filteredSubTopics
+        );
+
+        setCompletedSubTopics(filteredSubTopics);
+
+      } catch (err) {
+        console.error("Error fetching completed subtopics", err);
+        setCompletedSubTopics([]);
+      }
+    };
+
+    loadData();
+  }, [trainee?.trngid]);
 
   const calculatePercentage = () => {
     const marks = parseFloat(formData?.marks);
@@ -260,6 +310,20 @@ const AssessmentForm = ({
             </div>
           </div>
         </div>
+
+
+        <Select
+          label="Select Sub Topic"
+          required
+          options={completedSubTopics}
+          value={formData.subTopicId}
+          onChange={(value) =>
+            handleInputChange('subTopicId', value)
+          }
+          searchable
+        />
+
+
 
         {/* Remarks Section */}
         <div>
