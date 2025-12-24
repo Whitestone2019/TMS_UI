@@ -12,7 +12,7 @@ const ManagerDashboard = () => {
   const [selectedTrainees, setSelectedTrainees] = useState([]);
   const [showAssessmentModal, setShowAssessmentModal] = useState(false);
   const [selectedTraineeForAssessment, setSelectedTraineeForAssessment] = useState(null);
-  
+
   const [filters, setFilters] = useState({
     searchName: '',
     syllabusStep: 'all',
@@ -35,7 +35,7 @@ const ManagerDashboard = () => {
   //     lastAssessmentScore: 88,
   //     interviewStatus: "scheduled"
   //   },
-  
+
   //   {
   //     id: 2,
   //     name: "Michael Chen",
@@ -105,19 +105,38 @@ const ManagerDashboard = () => {
     fetchTrainees();
   }, []);
 
-  const fetchTrainees = async () => {
-    try{
-    const response = await fetchAllTraineeSummary();
-    console.log('Fetched trainee summary:', response);
-    setTrainees(response.data);
-    setFilteredTrainees(response.data);
-    }catch(error){
-      console.error('Error fetching trainee summary:', error);
-    }
-    
-  }
+  // const fetchTrainees = async () => {
+  //   try{
+  //   const response = await fetchAllTraineeSummary();
+  //   console.log('Fetched trainee summary:', response);
+  //   setTrainees(response.data);
+  //   setFilteredTrainees(response.data);
+  //   }catch(error){
+  //     console.error('Error fetching trainee summary:', error);
+  //   }
+
+  // }
 
   // Calculate metrics
+  const fetchTrainees = async () => {
+    try {
+      const response = await fetchAllTraineeSummary();
+
+      const traineeList = Array.isArray(response?.data)
+        ? response.data
+        : Array.isArray(response?.data?.trainees)
+          ? response.data.trainees
+          : [];
+
+      setTrainees(traineeList);
+      setFilteredTrainees(traineeList);
+    } catch (error) {
+      console.error('Error fetching trainee summary:', error);
+      setTrainees([]);
+      setFilteredTrainees([]);
+    }
+  };
+
   const metrics = {
     totalTrainees: trainees?.length,
     avgCompletion: Math.round(trainees?.reduce((sum, t) => sum + t?.completionPercentage, 0) / trainees?.length),
@@ -233,9 +252,9 @@ const ManagerDashboard = () => {
       exportDate: new Date()?.toISOString(),
       filters: filters
     };
-    
+
     console.log('Exporting reports:', exportData);
-    
+
     // Create mock CSV content
     const csvContent = [
       ['Name', 'Email', 'Current Step', 'Completion %', 'Last Assessment', 'Score', 'Interview Status']?.join(','),
@@ -249,7 +268,7 @@ const ManagerDashboard = () => {
         t?.interviewStatus
       ]?.join(','))
     ]?.join('\n');
-    
+
     // Create and download file
     const blob = new Blob([csvContent], { type: 'text/csv' });
     const url = window.URL?.createObjectURL(blob);
@@ -275,7 +294,7 @@ const ManagerDashboard = () => {
   const handleSubmitAssessment = async (assessmentData) => {
     // Mock API call
     console.log('Submitting assessment:', assessmentData);
-    
+
     // Update trainee's last assessment data
     setTrainees(prev => prev?.map(trainee => {
       if (trainee?.id === assessmentData?.traineeId) {
@@ -289,7 +308,7 @@ const ManagerDashboard = () => {
       }
       return trainee;
     }));
-    
+
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 1000));
   };
@@ -300,16 +319,16 @@ const ManagerDashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header 
-        userRole="manager" 
-        userName="Manager Smith" 
+      <Header
+        userRole="manager"
+        userName="Manager Smith"
         onLogout={handleLogout}
       />
       <main className="pt-16">
         <div className="max-w-7xl mx-auto px-6 py-8">
           {/* Breadcrumb Navigation */}
           <NavigationBreadcrumb userRole="manager" className="mb-6" />
-          
+
           {/* Page Header */}
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-foreground mb-2">Manager Dashboard</h1>
