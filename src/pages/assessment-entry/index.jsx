@@ -631,13 +631,13 @@ const AssessmentEntry = () => {
     }
 
     setSelectedTrainee(trainee);
-      try {
-    const data = await getTraineeAssessments(trainee?.trngid);
-    setHistoryAssessments(data);
-  } catch (error) {
-    console.error("Error fetching assessments:", error);
-    setHistoryAssessments([]);
-  }
+    try {
+      const data = await getTraineeAssessments(trainee?.trngid);
+      setHistoryAssessments(data);
+    } catch (error) {
+      console.error("Error fetching assessments:", error);
+      setHistoryAssessments([]);
+    }
 
 
   };
@@ -658,7 +658,7 @@ const AssessmentEntry = () => {
       }, 3000);
 
       alert('Assessment saved successfully!');
-      
+
     } catch (error) {
       console.error('Error saving assessment:', error);
     } finally {
@@ -814,7 +814,7 @@ const AssessmentEntry = () => {
           <div className="mt-12 p-6 bg-card border border-border rounded-lg">
             <h3 className="text-lg font-semibold text-foreground mb-4">Quick Actions</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Button
+              {/* <Button
                 variant="outline"
                 onClick={() => navigate('/progress-reports')}
                 iconName="TrendingUp"
@@ -822,7 +822,7 @@ const AssessmentEntry = () => {
                 fullWidth
               >
                 View Progress Reports
-              </Button>
+              </Button> */}
               <Button
                 variant="outline"
                 onClick={() => navigate('/interview-scheduling')}

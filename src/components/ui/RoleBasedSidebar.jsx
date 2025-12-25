@@ -3,11 +3,11 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import Icon from '../AppIcon';
 import Button from './Button';
 
-const RoleBasedSidebar = ({ 
-  userRole = 'trainee', 
-  isCollapsed = false, 
+const RoleBasedSidebar = ({
+  userRole = 'trainee',
+  isCollapsed = false,
   onToggleCollapse,
-  className = '' 
+  className = ''
 }) => {
   const [activeSection, setActiveSection] = useState('');
   const location = useLocation();
@@ -38,12 +38,12 @@ const RoleBasedSidebar = ({
           icon: 'FileText',
           roles: ['trainee']
         },
-        {
-          label: 'Progress Reports',
-          path: '/progress-reports',
-          icon: 'TrendingUp',
-          roles: ['trainee', 'manager']
-        }
+        // {
+        //   label: 'Progress Reports',
+        //   path: '/progress-reports',
+        //   icon: 'TrendingUp',
+        //   roles: ['trainee', 'manager']
+        // }
       ]
     },
     {
@@ -75,9 +75,9 @@ const RoleBasedSidebar = ({
   ];
 
   const filteredSections = navigationSections?.map(section => ({
-      ...section,
-      items: section?.items?.filter(item => item?.roles?.includes(userRole))
-    }))?.filter(section => section?.items?.length > 0);
+    ...section,
+    items: section?.items?.filter(item => item?.roles?.includes(userRole))
+  }))?.filter(section => section?.items?.length > 0);
 
   const handleNavigation = (path) => {
     navigate(path);
@@ -90,8 +90,8 @@ const RoleBasedSidebar = ({
   const isActiveSection = (sectionId) => {
     const section = navigationSections?.find(s => s?.id === sectionId);
     if (!section) return false;
-    
-    return section?.items?.some(item => 
+
+    return section?.items?.some(item =>
       item?.roles?.includes(userRole) && isActivePath(item?.path)
     );
   };
@@ -110,10 +110,9 @@ const RoleBasedSidebar = ({
   };
 
   return (
-    <aside 
-      className={`fixed left-0 top-16 bottom-0 z-sidebar bg-surface border-r border-border transition-all duration-300 ${
-        isCollapsed ? 'w-16' : 'w-72'
-      } ${className}`}
+    <aside
+      className={`fixed left-0 top-16 bottom-0 z-sidebar bg-surface border-r border-border transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-72'
+        } ${className}`}
     >
       <div className="flex flex-col h-full">
         {/* Sidebar Header */}
@@ -129,7 +128,7 @@ const RoleBasedSidebar = ({
               </div>
             </div>
           )}
-          
+
           {onToggleCollapse && (
             <Button
               variant="ghost"
@@ -151,29 +150,27 @@ const RoleBasedSidebar = ({
                 {/* Section Header */}
                 <button
                   onClick={() => !isCollapsed && toggleSection(section?.id)}
-                  className={`w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-150 ${
-                    isActiveSection(section?.id)
-                      ? 'bg-primary/10 text-primary' :'text-muted-foreground hover:text-foreground hover:bg-muted'
-                  }`}
+                  className={`w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-150 ${isActiveSection(section?.id)
+                      ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                    }`}
                   title={isCollapsed ? section?.label : ''}
                 >
                   <div className="flex items-center space-x-3">
-                    <Icon 
-                      name={section?.icon} 
-                      size={18} 
-                      className={isActiveSection(section?.id) ? 'text-primary' : 'text-muted-foreground'} 
+                    <Icon
+                      name={section?.icon}
+                      size={18}
+                      className={isActiveSection(section?.id) ? 'text-primary' : 'text-muted-foreground'}
                     />
                     {!isCollapsed && (
                       <span>{section?.label}</span>
                     )}
                   </div>
                   {!isCollapsed && section?.items?.length > 1 && (
-                    <Icon 
-                      name="ChevronDown" 
-                      size={16} 
-                      className={`transition-transform duration-150 ${
-                        activeSection === section?.id ? 'rotate-180' : ''
-                      }`}
+                    <Icon
+                      name="ChevronDown"
+                      size={16}
+                      className={`transition-transform duration-150 ${activeSection === section?.id ? 'rotate-180' : ''
+                        }`}
                     />
                   )}
                 </button>

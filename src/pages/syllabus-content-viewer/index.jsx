@@ -29,7 +29,7 @@ const SyllabusContentViewer = () => {
   const [timeSpent, setTimeSpent] = useState(currentStep?.durationSeconds || 0);
   const contentRef = useRef(null);
 
-  sessionStorage.setItem("empid", "TRN001");
+  sessionStorage.setItem("empid", "WS10015");
   const empid = sessionStorage.getItem("empid");
 
   useEffect(() => { setSubTopicIndex(0); }, [currentStepId]);

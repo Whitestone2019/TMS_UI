@@ -4,12 +4,12 @@ import Button from '../../../components/ui/Button';
 import Input from '../../../components/ui/Input';
 import Select from '../../../components/ui/Select';
 
-const TraineeSelectionPanel = ({ 
-  trainees, 
-  selectedTrainees, 
-  onTraineeSelect, 
+const TraineeSelectionPanel = ({
+  trainees,
+  selectedTrainees,
+  onTraineeSelect,
   onBulkSelect,
-  className = '' 
+  className = ''
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -33,11 +33,11 @@ const TraineeSelectionPanel = ({
   const filteredTrainees = useMemo(() => {
     return trainees?.filter(trainee => {
       const matchesSearch = trainee?.name?.toLowerCase()?.includes(searchTerm?.toLowerCase()) ||
-                           trainee?.email?.toLowerCase()?.includes(searchTerm?.toLowerCase());
-      
+        trainee?.email?.toLowerCase()?.includes(searchTerm?.toLowerCase());
+
       const matchesStatus = statusFilter === 'all' || trainee?.interviewStatus === statusFilter;
       const matchesPriority = priorityFilter === 'all' || trainee?.priority === priorityFilter;
-      
+
       return matchesSearch && matchesStatus && matchesPriority;
     });
   }, [trainees, searchTerm, statusFilter, priorityFilter]);
@@ -49,9 +49,9 @@ const TraineeSelectionPanel = ({
       scheduled: { color: 'bg-accent/10 text-accent', label: 'Scheduled' },
       completed: { color: 'bg-success/10 text-success', label: 'Completed' }
     };
-    
+
     const config = statusConfig?.[status] || { color: 'bg-muted text-muted-foreground', label: status };
-    
+
     return (
       <span className={`px-2 py-1 text-xs font-medium rounded-full ${config?.color}`}>
         {config?.label}
@@ -65,20 +65,20 @@ const TraineeSelectionPanel = ({
       medium: { icon: 'Clock', color: 'text-warning' },
       low: { icon: 'Minus', color: 'text-muted-foreground' }
     };
-    
+
     const config = priorityConfig?.[priority] || { icon: 'Minus', color: 'text-muted-foreground' };
-    
+
     return <Icon name={config?.icon} size={16} className={config?.color} />;
   };
 
   const getDaysSinceLastInterview = (lastInterviewDate) => {
     if (!lastInterviewDate) return 'Never';
-    
+
     const today = new Date();
     const lastDate = new Date(lastInterviewDate);
     const diffTime = Math.abs(today - lastDate);
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
+
     return `${diffDays} days ago`;
   };
 
@@ -132,7 +132,7 @@ const TraineeSelectionPanel = ({
             onChange={(e) => setSearchTerm(e?.target?.value)}
             className="w-full"
           />
-          
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Select
               placeholder="Filter by status"
@@ -140,7 +140,7 @@ const TraineeSelectionPanel = ({
               value={statusFilter}
               onChange={setStatusFilter}
             />
-            
+
             <Select
               placeholder="Filter by priority"
               options={priorityOptions}
@@ -157,7 +157,7 @@ const TraineeSelectionPanel = ({
               <span className="text-sm font-medium text-primary">
                 {selectedTrainees?.length} trainee{selectedTrainees?.length > 1 ? 's' : ''} selected
               </span>
-              <Button
+              {/* <Button
                 variant="default"
                 size="sm"
                 onClick={() => onBulkSelect(selectedTrainees)}
@@ -165,7 +165,7 @@ const TraineeSelectionPanel = ({
                 iconSize={16}
               >
                 Bulk Schedule
-              </Button>
+              </Button> */}
             </div>
           </div>
         )}
@@ -182,19 +182,17 @@ const TraineeSelectionPanel = ({
             {filteredTrainees?.map(trainee => (
               <div
                 key={trainee?.id}
-                className={`p-4 hover:bg-muted/50 transition-colors duration-150 cursor-pointer ${
-                  isTraineeSelected(trainee?.id) ? 'bg-primary/5 border-l-4 border-l-primary' : ''
-                }`}
+                className={`p-4 hover:bg-muted/50 transition-colors duration-150 cursor-pointer ${isTraineeSelected(trainee?.id) ? 'bg-primary/5 border-l-4 border-l-primary' : ''
+                  }`}
                 onClick={() => onTraineeSelect(trainee?.id)}
               >
                 <div className="flex items-start justify-between">
                   <div className="flex items-start space-x-3 flex-1">
                     {/* Selection Checkbox */}
                     <div className="mt-1">
-                      <div className={`w-4 h-4 rounded border-2 flex items-center justify-center ${
-                        isTraineeSelected(trainee?.id) 
-                          ? 'bg-primary border-primary' :'border-border'
-                      }`}>
+                      <div className={`w-4 h-4 rounded border-2 flex items-center justify-center ${isTraineeSelected(trainee?.id)
+                          ? 'bg-primary border-primary' : 'border-border'
+                        }`}>
                         {isTraineeSelected(trainee?.id) && (
                           <Icon name="Check" size={12} className="text-primary-foreground" />
                         )}
@@ -209,11 +207,11 @@ const TraineeSelectionPanel = ({
                         </h4>
                         {getPriorityIcon(trainee?.priority)}
                       </div>
-                      
+
                       <p className="text-xs text-muted-foreground mb-2 truncate">
                         {trainee?.email}
                       </p>
-                      
+
                       <div className="flex items-center space-x-4 text-xs text-muted-foreground">
                         <span>Progress: {trainee?.progressPercentage}%</span>
                         <span>Last Interview: {getDaysSinceLastInterview(trainee?.lastInterviewDate)}</span>

@@ -7,7 +7,7 @@ import ProgressTracker from '././components/ProgressTracker';
 import CurrentStepContent from './components/CurrentStepContent';
 import AssessmentHistory from './components/AssessmentHistory';
 import InterviewSchedule from './components/InterviewSchedule';
-import QuickActions from './components/QuickActions';
+//import QuickActions from './components/QuickActions';
 import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
 import { fetchAssessmentsByTrainee } from '../../api_service';
@@ -26,7 +26,7 @@ const TraineeDashboard = () => {
   const [traineeInfo, setTraineeInfo] = useState(null);
   const [interviews, setInterviews] = useState([]);
 
-  const empId = sessionStorage.setItem("empid", "TRN001");
+  const empId = sessionStorage.setItem("empid", "WS10015");
 
   // const [traineeInfo] = useState({
   //   name: 'John Doe',
@@ -111,7 +111,7 @@ const TraineeDashboard = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const empId = sessionStorage.getItem("empid") || "TRN001";
+        const empId = sessionStorage.getItem("empid") || "WS10015";
 
         // 🔥 Interview schedule API call
         const response = await fetchInterviewScheduleByEmpId(empId);
@@ -363,13 +363,13 @@ const TraineeDashboard = () => {
             {/* Right Column - Sidebar */}
             <div className="space-y-8">
               {/* Quick Actions */}
-              <QuickActions />
+              {/* <QuickActions /> */}
 
               {/* Interview Schedule */}
               <InterviewSchedule interviews={interviews} />
 
               {/* Progress Summary Card */}
-              <div className="bg-card rounded-lg border border-border p-6">
+              {/* <div className="bg-card rounded-lg border border-border p-6">
                 <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center">
                   <Icon name="Target" size={20} className="mr-2 text-primary" />
                   Progress Summary
@@ -402,10 +402,10 @@ const TraineeDashboard = () => {
                     </Button>
                   </div>
                 </div>
-              </div>
+              </div> */}
 
               {/* Help & Support Card */}
-              <div className="bg-card rounded-lg border border-border p-6">
+              {/* <div className="bg-card rounded-lg border border-border p-6">
                 <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center">
                   <Icon name="HelpCircle" size={20} className="mr-2 text-primary" />
                   Need Help?
@@ -447,7 +447,7 @@ const TraineeDashboard = () => {
                     </Button>
                   </div>
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
