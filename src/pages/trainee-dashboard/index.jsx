@@ -26,7 +26,7 @@ const TraineeDashboard = () => {
   const [traineeInfo, setTraineeInfo] = useState(null);
   const [interviews, setInterviews] = useState([]);
 
-  const empId = sessionStorage.setItem("empid", "WS10015");
+  const empId = sessionStorage.setItem("empid", "WS10018");
 
   // const [traineeInfo] = useState({
   //   name: 'John Doe',
@@ -111,7 +111,7 @@ const TraineeDashboard = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const empId = sessionStorage.getItem("empid") || "WS10015";
+        const empId = sessionStorage.getItem("empid") || "WS10009";
 
         // 🔥 Interview schedule API call
         const response = await fetchInterviewScheduleByEmpId(empId);

@@ -206,15 +206,19 @@ const UploadSyllabus = ({ onCancel }) => {
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-10">
                     {/* LEFT FORM */}
-                    <div className="bg-white/50 backdrop-blur-lg shadow-xl rounded-2xl border border-blue-200">
-                        <div className="p-8 border-b bg-blue-100 rounded-t-2xl">
+                    {/* <div className="bg-white/50 backdrop-blur-lg shadow-xl rounded-2xl border border-blue-200"> */}
+                    <div className="bg-white/50 backdrop-blur-lg shadow-xl rounded-2xl border border-blue-200 
+                          flex flex-col max-h-[calc(100vh-140px)]">
+                        {/* <div className="p-8 border-b bg-blue-100 rounded-t-2xl"> */}
+                        <div className="p-8 border-b bg-blue-100 rounded-t-2xl sticky top-0 z-10">
+
                             <h2 className="text-3xl font-bold text-black">
                                 <Icon name="BookOpen" size={28} className="inline mr-2 text-blue-700" />
                                 {editingId ? "Edit Syllabus" : "Upload Syllabus"}
                             </h2>
                         </div>
 
-                        <div className="p-8 space-y-8">
+                        <div className="p-8 space-y-8 overflow-y-auto">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-7">
                                 <Input
                                     label="Title"
@@ -256,7 +260,7 @@ const UploadSyllabus = ({ onCancel }) => {
                             </div>
 
                             {/* SUBTOPICS */}
-                            <div className="space-y-6 h-[500px] overflow-y-scroll pr-3 custom-scroll">
+                            <div className="space-y-6 h-[500px] ">
 
 
                                 <h3 className="text-xl font-semibold text-blue-700">Subtopics</h3>

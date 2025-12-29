@@ -29,7 +29,7 @@ const SyllabusContentViewer = () => {
   const [timeSpent, setTimeSpent] = useState(currentStep?.durationSeconds || 0);
   const contentRef = useRef(null);
 
-  sessionStorage.setItem("empid", "WS10015");
+  sessionStorage.setItem("empid", "WS10018");
   const empid = sessionStorage.getItem("empid");
 
   useEffect(() => { setSubTopicIndex(0); }, [currentStepId]);
@@ -62,35 +62,99 @@ const SyllabusContentViewer = () => {
         const response = await fetch(`http://localhost:8080/api/syllabus/all-progress/${empid}`);
         const result = await response.json();
         const apiData = result?.data || result;
-        const formattedSteps = apiData.map((item, index) => ({
-          id: item?.syllabusId,
-          stepNumber: index + 1,
-          title: item?.title || `Step ${index + 1}`,
-          description: item?.topic || "",
-          isLocked: index !== 0,
-          // isLocked: idx !== 0 && !steps?.[idx - 1]?.isCompleted,
+        // const formattedSteps = apiData.map((item, index) => ({
+        //   id: item?.syllabusId,
+        //   stepNumber: index + 1,
+        //   title: item?.title || `Step ${index + 1}`,
+        //   description: item?.topic || "",
+        //   isLocked: !item?.subTopics?.every(sub =>
+        //     sub?.stepProgress?.some(p => p.complete === true && p.checker === true)
+        //   ),
 
-          isCompleted: item?.subTopics?.every(sub => sub?.stepProgress?.some(p => p.complete && p.checker)),
-          progress: item?.subTopics?.length ? Math.round(
-            (item.subTopics.filter(sub => sub.stepProgress?.some(p => p.complete && p.checker)).length / item.subTopics.length) * 100
-          ) : 0,
-          topics: [
-            {
-              title: item?.topic,
-              subTopics: item?.subTopics?.map(sub => ({
-                id: sub?.subTopicId,
-                title: sub?.name,
-                name: sub?.name,
-                description: sub?.description,
-                filePath: sub?.filePath,
-                stepNumber: sub?.stepNumber,
-                completed: sub?.stepProgress?.some(p => p.complete && p.checker),
-                managerDecision: sub?.stepProgress?.some(p => p.checker),
-              })) || []
-            }
-          ]
-        }));
+
+        //   isCompleted: item?.subTopics?.every(sub =>
+        //     sub?.stepProgress?.some(p => p.complete === true && p.checker === true)
+        //   ),
+
+        //   // isLocked: index !== 0,
+
+        //   // isLocked: idx !== 0 && !steps?.[idx - 1]?.isCompleted,
+
+        //   // isCompleted: item?.subTopics?.every(sub => sub?.stepProgress?.some(p => p.complete && p.checker)),
+        //   progress: item?.subTopics?.length ? Math.round(
+        //     (item.subTopics.filter(sub => sub.stepProgress?.some(p => p.complete && p.checker)).length / item.subTopics.length) * 100
+        //   ) : 0,
+        //   topics: [
+        //     {
+        //       title: item?.topic,
+        //       subTopics: item?.subTopics?.map(sub => ({
+        //         id: sub?.subTopicId,
+        //         title: sub?.name,
+        //         name: sub?.name,
+        //         description: sub?.description,
+        //         filePath: sub?.filePath,
+        //         stepNumber: sub?.stepNumber,
+        //         completed: sub?.stepProgress?.some(p => p.complete && p.checker),
+        //         managerDecision: sub?.stepProgress?.some(p => p.checker),
+        //       })) || []
+        //     }
+        //   ]
+        // }));
+
+        const formattedSteps = apiData.map((item, index, arr) => {
+          // 🔹 current step completed or not
+          const isStepCompleted = item?.subTopics?.every(sub =>
+            sub?.stepProgress?.some(p => p.complete === true && p.checker === true)
+          );
+
+          // 🔹 previous step completed or not
+          const prevStepCompleted =
+            index === 0
+              ? true
+              : arr[index - 1]?.subTopics?.every(sub =>
+                sub?.stepProgress?.some(p => p.complete === true && p.checker === true)
+              );
+
+          return {
+            id: item?.syllabusId,
+            stepNumber: index + 1,
+            title: item?.title || `Step ${index + 1}`,
+            description: item?.topic || "",
+
+            // ✅ MAIN FIX
+            isLocked: !prevStepCompleted,
+
+            isCompleted: isStepCompleted,
+
+            progress: item?.subTopics?.length
+              ? Math.round(
+                (item.subTopics.filter(sub =>
+                  sub.stepProgress?.some(p => p.complete === true && p.checker === true)
+                ).length / item.subTopics.length) * 100
+              )
+              : 0,
+
+            topics: [
+              {
+                title: item?.topic,
+                subTopics: item?.subTopics?.map(sub => ({
+                  id: sub?.subTopicId,
+                  title: sub?.name,
+                  name: sub?.name,
+                  description: sub?.description,
+                  filePath: sub?.filePath,
+                  stepNumber: sub?.stepNumber,
+
+                  completed: sub?.stepProgress?.some(p => p.complete === true),
+                  managerDecision: sub?.stepProgress?.some(p => p.checker === true),
+                })) || []
+              }
+            ]
+          };
+        });
+
         setSyllabusSteps(formattedSteps);
+
         if (formattedSteps.length > 0) setCurrentStepId(formattedSteps[0].id);
         setLoading(false);
       } catch (error) {

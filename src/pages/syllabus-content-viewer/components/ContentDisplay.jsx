@@ -66,14 +66,6 @@ const ContentDisplay = ({ currentStep, traineeInfo, onStepComplete, onNextStep, 
     startSubTopic(payload).catch(err => console.error("Start subtopic failed:", err));
   }, [currentSubIndex, currentStep?.id, subTopics, empid]);
 
-  const markSubtopicCompleted = async () => {
-    if (!sub || sub.managerDecision === false) return;
-    const updated = subTopics.map((s, i) => i === currentSubIndex ? { ...s, completed: true } : s);
-    currentStep.topics[0].subTopics = updated;
-    try {
-      await completeSubTopic({ empid, subtopicId: sub.id, endtimeSeconds: Math.floor(Date.now() / 1000), complete: true, checker: false });
-    } catch (err) { console.error("Complete subtopic failed:", err); }
-  };
 
   // const markSubtopicCompleted = async () => {
   //   if (!sub || sub.managerDecision === false) return;
@@ -99,11 +91,48 @@ const ContentDisplay = ({ currentStep, traineeInfo, onStepComplete, onNextStep, 
   //   }
   // };
 
+  //  const  markSubtopicCompleted = async () => {
+  //     if (!sub || sub.managerDecision === false) return;
+  //     const updated = subTopics.map((s, i) => i === currentSubIndex ? { ...s, completed: true } : s);
+  //     currentStep.topics[0].subTopics = updated;
+  //     try {
+  //       await completeSubTopic({ empid, subtopicId: sub.id, endtimeSeconds: Math.floor(Date.now() / 1000), complete: true, checker: false });
+  //     } catch (err) { console.error("Complete subtopic failed:", err); }
+  //   };
+
+  const markSubtopicCompleted = async () => {
+    if (!sub) return;
+
+    // 🔒 checker true → kuch mat karo
+    if (sub.managerDecision === true) return;
+
+    // UI update (only completed)
+    const updated = subTopics.map((s, i) =>
+      i === currentSubIndex ? { ...s, completed: true } : s
+    );
+    currentStep.topics[0].subTopics = updated;
+
+    try {
+      await completeSubTopic({
+        empid,
+        subtopicId: sub.id,
+        endtimeSeconds: Math.floor(Date.now() / 1000),
+        complete: true,
+        checker: false, // ❗ important
+      });
+    } catch (err) {
+      console.error("Complete subtopic failed:", err);
+    }
+  };
+
 
 
 
 
   const nextSub = () => { if (sub && !sub.completed) markSubtopicCompleted(); if (currentSubIndex < subTopics.length - 1) setCurrentSubIndex(currentSubIndex + 1); else onNextStep(); };
+
+
+
   const prevSub = () => currentSubIndex > 0 ? setCurrentSubIndex(currentSubIndex - 1) : onPreviousStep();
   const handleCompleteStep = () => { if (completedSubs === totalSubs) onStepComplete(currentStep?.id); else setShowCompletionModal(true); };
   // const confirmCompletion = () => { setShowCompletionModal(false); onStepComplete(currentStep?.id); };
@@ -190,7 +219,7 @@ const ContentDisplay = ({ currentStep, traineeInfo, onStepComplete, onNextStep, 
             {/* <Button variant="success" onClick={() => { if (!sub?.completed) markSubtopicCompleted(); if (isLastSub) handleCompleteStep(); }} iconName="CheckCircle" iconPosition="left" disabled={!sub?.managerDecision}>
               {!sub?.completed ? "Mark as Completed" : isLastSub ? "Complete Step" : "Mark as Completed"}
             </Button> */}
-            <Button
+            {/* <Button
               variant="success"
               iconName="CheckCircle"
               iconPosition="left"
@@ -214,12 +243,59 @@ const ContentDisplay = ({ currentStep, traineeInfo, onStepComplete, onNextStep, 
                 : isLastSub
                   ? "Complete Step"
                   : "Mark as Completed"}
+            </Button> */}
+
+            <Button
+              variant="success"
+              iconName="CheckCircle"
+              iconPosition="left"
+
+              // ✅ checker true hua to disable
+              disabled={sub?.managerDecision === true}
+
+              onClick={async () => {
+                // already approved → kuch nahi
+                if (sub?.managerDecision === true) return;
+
+                // last subtopic → popup
+                if (isLastSub) {
+                  setShowCompletionModal(true);
+                  return;
+                }
+
+                // normal subtopic
+                if (!sub?.completed) {
+                  await markSubtopicCompleted();
+                }
+              }}
+            >
+              {sub?.managerDecision
+                ? "Approved"
+                : sub?.completed
+                  ? "Completed"
+                  : "Mark as Completed"}
             </Button>
 
 
-            <Button variant="default" onClick={nextSub} iconName="ChevronRight" iconPosition="right" disabled={!sub?.completed || !sub?.managerDecision || isLastSubOfLastStep}>
+
+            {/* <Button variant="default" onClick={nextSub} iconName="ChevronRight" iconPosition="right" disabled={!sub?.completed || !sub?.managerDecision || isLastSubOfLastStep}>
               {isLastSub ? (isLastStep ? "Next Step" : "Next Step") : "Next Topic"}
+            </Button> */}
+
+            <Button
+              variant="default"
+              onClick={nextSub}
+              iconName="ChevronRight"
+              iconPosition="right"
+              disabled={
+                !sub?.completed ||          // ❌ not completed
+                !sub?.managerDecision ||    // ❌ checker false
+                isLastSubOfLastStep
+              }
+            >
+              {isLastSub ? "Next Step" : "Next Topic"}
             </Button>
+
           </div>
         </div>
       </div>

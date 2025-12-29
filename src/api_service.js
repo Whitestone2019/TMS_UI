@@ -35,74 +35,74 @@ export const storeUserDetails = async (data) => {
 
 export const fetchAllTrainees = async () => {
   const data = [
-  {
-    "userid": "2019Ws10019",
-    "trngid": "Ws10111",
-    "password": "$2a$10$uuitzF5IfvDByIhsOE5TieovEOJ6LyJJppMgaBjbECZBAaeLj0NnK",
-    "username": "BB",
-    "firstname": "BB",
-    "lastname": "A",
-    "emailid": "abs@gmail.bom",
-    "phonenumber": "9787255965",
-    
-  },
-  {
-    "userid": "2019wss123",
-    "trngid": "wss123",
-    "password": "$2a$10$2Z3nNVR5uGKJE33jSK9yreGFDwvktrzFuWwLb95IpQhex5eLOAk8e",
-    "username": "wss123",
-    "firstname": "BBB",
-    "lastname": "A",
-    "emailid": "wwm@gmail.com",
-    "phonenumber": "987635616",
-    
-  },
-  {
-    "userid": "2019WS1155",
-    "trngid": "WS1155",
-    "password": "$2a$10$G7szEGln2OiGaqVA0SnUpu0mN7EeaS3JpLpC83OSD35sYSholZL3C",
-    "username": null,
-    "firstname": "Aswathi",
-    "lastname": null,
-    "emailid": "aswathi.ravindran@whitestones.co.in",
-    "phonenumber": "09787255964",
-    
-  },
-  {
-    "userid": "2019WS1122",
-    "trngid": "WS1122",
-    "password": "$2a$10$VVz9JDazDVsGjfj3L5AzYeWPs1LCvU/HT6kcqUr55TRHVGJguIzGa",
-    "username": "Arunmaran",
-    "firstname": "Arunmaran",
-    "lastname": "Murugasen",
-    "emailid": "arunmaran.murugesan@whitestones.co.in",
-    "phonenumber": "9345287327",
-    
-  },
-  {
-    "userid": "2019WS10018",
-    "trngid": "WS10018",
-    "password": "$2a$10$qECY9SHPCdM1cA16TuC9.eDKw7GrlLOCEoE27iJuP9HlAEYFftVOm",
-    "username": "Britto",
-    "firstname": "Brit",
-    "lastname": "A",
-    "emailid": "abs@gmail.bom",
-    "phonenumber": "02345678444",
-   
-  },
-  {
-    "userid": "2019WS10009",
-    "trngid": "WS10009",
-    "password": "$2a$10$dCrmV.cSDhplIYnAvyNUR.XNiUn9d/pmW87uGj3AT79BN6dur8bum",
-    "username": "ANBU",
-    "firstname": "ANBU",
-    "lastname": "S",
-    "emailid": "anbarasan.sekar@whitestones.in",
-    "phonenumber": "9788313457",
-  }
-]
+    {
+      "userid": "2019Ws10019",
+      "trngid": "Ws10111",
+      "password": "$2a$10$uuitzF5IfvDByIhsOE5TieovEOJ6LyJJppMgaBjbECZBAaeLj0NnK",
+      "username": "BB",
+      "firstname": "BB",
+      "lastname": "A",
+      "emailid": "abs@gmail.bom",
+      "phonenumber": "9787255965",
+
+    },
+    {
+      "userid": "2019wss123",
+      "trngid": "wss123",
+      "password": "$2a$10$2Z3nNVR5uGKJE33jSK9yreGFDwvktrzFuWwLb95IpQhex5eLOAk8e",
+      "username": "wss123",
+      "firstname": "BBB",
+      "lastname": "A",
+      "emailid": "wwm@gmail.com",
+      "phonenumber": "987635616",
+
+    },
+    {
+      "userid": "2019WS1155",
+      "trngid": "WS1155",
+      "password": "$2a$10$G7szEGln2OiGaqVA0SnUpu0mN7EeaS3JpLpC83OSD35sYSholZL3C",
+      "username": null,
+      "firstname": "Aswathi",
+      "lastname": null,
+      "emailid": "aswathi.ravindran@whitestones.co.in",
+      "phonenumber": "09787255964",
+
+    },
+    {
+      "userid": "2019WS1122",
+      "trngid": "WS1122",
+      "password": "$2a$10$VVz9JDazDVsGjfj3L5AzYeWPs1LCvU/HT6kcqUr55TRHVGJguIzGa",
+      "username": "Arunmaran",
+      "firstname": "Arunmaran",
+      "lastname": "Murugasen",
+      "emailid": "arunmaran.murugesan@whitestones.co.in",
+      "phonenumber": "9345287327",
+
+    },
+    {
+      "userid": "2019WS10018",
+      "trngid": "WS10018",
+      "password": "$2a$10$qECY9SHPCdM1cA16TuC9.eDKw7GrlLOCEoE27iJuP9HlAEYFftVOm",
+      "username": "Britto",
+      "firstname": "Brit",
+      "lastname": "A",
+      "emailid": "abs@gmail.bom",
+      "phonenumber": "02345678444",
+
+    },
+    {
+      "userid": "2019WS10009",
+      "trngid": "WS10009",
+      "password": "$2a$10$dCrmV.cSDhplIYnAvyNUR.XNiUn9d/pmW87uGj3AT79BN6dur8bum",
+      "username": "ANBU",
+      "firstname": "ANBU",
+      "lastname": "S",
+      "emailid": "anbarasan.sekar@whitestones.in",
+      "phonenumber": "9788313457",
+    }
+  ]
   try {
-   const alreadyCreated = localStorage.getItem("bulkUsersCreated");
+    const alreadyCreated = localStorage.getItem("bulkUsersCreated");
 
     if (!alreadyCreated) {
       await storeUserDetails(data);
@@ -469,6 +469,8 @@ export const fetchSyllabusProgressByEmpId = async (empid) => {
     throw error;
   }
 };
+
+
 
 
 const fetchSyllabusProgress = async (empId) => {
