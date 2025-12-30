@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Header from '../../components/ui/Header';
 import SecureContentWrapper from '../../components/ui/SecureContentWrapper';
 import SessionTimeoutHandler from '../../components/ui/SessionTimeoutHandler';
@@ -10,7 +10,7 @@ import SecurityWatermark from './components/SecurityWatermark';
 import ProgressTracker from './components/ProgressTracker';
 import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
-import { updateStepProgress, fetchUserByEmpId } from '../../api_service';
+import { updateStepProgress, fetchUserByEmpId,fetchSyllabusProgressByEmpId } from '../../api_service';
 
 const SyllabusContentViewer = () => {
   const navigate = useNavigate();
@@ -23,13 +23,17 @@ const SyllabusContentViewer = () => {
   const [loading, setLoading] = useState(true);
   const [subTopicIndex, setSubTopicIndex] = useState(0);
 
+  const { state } = useLocation();
+  const stepNumber = state || 1;
+  
   const currentStep = syllabusSteps?.find((step) => step?.id === currentStepId);
+  // console.log("Current Step:", currentStepId);
   const currentStepIndex = syllabusSteps?.findIndex((step) => step?.id === currentStepId);
   const completedSteps = syllabusSteps?.filter((step) => step?.isCompleted)?.length;
   const [timeSpent, setTimeSpent] = useState(currentStep?.durationSeconds || 0);
   const contentRef = useRef(null);
 
-  sessionStorage.setItem("empid", "WS10018");
+  sessionStorage.setItem("empid", "TRN001");
   const empid = sessionStorage.getItem("empid");
 
   useEffect(() => { setSubTopicIndex(0); }, [currentStepId]);
@@ -59,47 +63,10 @@ const SyllabusContentViewer = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:8080/api/syllabus/all-progress/${empid}`);
-        const result = await response.json();
-        const apiData = result?.data || result;
-        // const formattedSteps = apiData.map((item, index) => ({
-        //   id: item?.syllabusId,
-        //   stepNumber: index + 1,
-        //   title: item?.title || `Step ${index + 1}`,
-        //   description: item?.topic || "",
-        //   isLocked: !item?.subTopics?.every(sub =>
-        //     sub?.stepProgress?.some(p => p.complete === true && p.checker === true)
-        //   ),
-
-
-        //   isCompleted: item?.subTopics?.every(sub =>
-        //     sub?.stepProgress?.some(p => p.complete === true && p.checker === true)
-        //   ),
-
-        //   // isLocked: index !== 0,
-
-        //   // isLocked: idx !== 0 && !steps?.[idx - 1]?.isCompleted,
-
-        //   // isCompleted: item?.subTopics?.every(sub => sub?.stepProgress?.some(p => p.complete && p.checker)),
-        //   progress: item?.subTopics?.length ? Math.round(
-        //     (item.subTopics.filter(sub => sub.stepProgress?.some(p => p.complete && p.checker)).length / item.subTopics.length) * 100
-        //   ) : 0,
-        //   topics: [
-        //     {
-        //       title: item?.topic,
-        //       subTopics: item?.subTopics?.map(sub => ({
-        //         id: sub?.subTopicId,
-        //         title: sub?.name,
-        //         name: sub?.name,
-        //         description: sub?.description,
-        //         filePath: sub?.filePath,
-        //         stepNumber: sub?.stepNumber,
-        //         completed: sub?.stepProgress?.some(p => p.complete && p.checker),
-        //         managerDecision: sub?.stepProgress?.some(p => p.checker),
-        //       })) || []
-        //     }
-        //   ]
-        // }));
+        
+        const response = await fetchSyllabusProgressByEmpId(empid);
+        // const result = await response.json();
+        const apiData = response?.data || response;
 
         const formattedSteps = apiData.map((item, index, arr) => {
           // 🔹 current step completed or not
@@ -155,7 +122,7 @@ const SyllabusContentViewer = () => {
 
         setSyllabusSteps(formattedSteps);
 
-        if (formattedSteps.length > 0) setCurrentStepId(formattedSteps[0].id);
+        if (formattedSteps.length > 0) setCurrentStepId(formattedSteps[stepNumber-1].id);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -173,16 +140,18 @@ const SyllabusContentViewer = () => {
       e?.preventDefault(); return false;
     }
   };
-  useEffect(() => {
-    document.addEventListener('contextmenu', handleContextMenu);
-    document.addEventListener('selectstart', handleSelectStart);
-    document.addEventListener('keydown', handleKeyDown);
-    return () => {
-      document.removeEventListener('contextmenu', handleContextMenu);
-      document.removeEventListener('selectstart', handleSelectStart);
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-  }, []);
+
+  // imp
+  // useEffect(() => {
+  //   document.addEventListener('contextmenu', handleContextMenu);
+  //   document.addEventListener('selectstart', handleSelectStart);
+  //   document.addEventListener('keydown', handleKeyDown);
+  //   return () => {
+  //     document.removeEventListener('contextmenu', handleContextMenu);
+  //     document.removeEventListener('selectstart', handleSelectStart);
+  //     document.removeEventListener('keydown', handleKeyDown);
+  //   };
+  // }, []);
 
   const handleStepSelect = (stepId) => {
     const step = syllabusSteps?.find((s) => s?.id === stepId);

@@ -7,12 +7,12 @@ import ProgressTracker from '././components/ProgressTracker';
 import CurrentStepContent from './components/CurrentStepContent';
 import AssessmentHistory from './components/AssessmentHistory';
 import InterviewSchedule from './components/InterviewSchedule';
-//import QuickActions from './components/QuickActions';
+import QuickActions from './components/QuickActions';
 import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
 import { fetchAssessmentsByTrainee } from '../../api_service';
 import { fetchUserByEmpId } from "../../api_service";
-import { fetchInterviewScheduleByEmpId } from "../../api_service"
+import { fetchInterviewScheduleByEmpId,fetchSyllabusProgressByEmpId } from "../../api_service"
 
 const TraineeDashboard = () => {
   const navigate = useNavigate();
@@ -26,7 +26,10 @@ const TraineeDashboard = () => {
   const [traineeInfo, setTraineeInfo] = useState(null);
   const [interviews, setInterviews] = useState([]);
 
-  const empId = sessionStorage.setItem("empid", "WS10018");
+  const [loading, setLoading] = useState(false);
+
+
+  const empId = sessionStorage.setItem("empid", "TRN001");
 
   // const [traineeInfo] = useState({
   //   name: 'John Doe',
@@ -73,11 +76,11 @@ const TraineeDashboard = () => {
         const empId = sessionStorage.getItem("empid");
 
         const user = await fetchUserByEmpId(empId);
-
+        console.log("Fetched trainee info:", user);
         if (user) {
           setTraineeInfo({
             name: `${user.firstname} ${user.lastname}`,
-            id: user.empid,
+            id: user.trngid,
             email: user.email,
             program: user.designation || "Training Program",
             startDate: user.createdAt || "2024-10-01", // or whatever
@@ -90,6 +93,7 @@ const TraineeDashboard = () => {
 
     loadTraineeInfo();
   }, []);
+
   // useEffect(() => {
   //   const loadData = async () => {
   //     try {
@@ -115,7 +119,8 @@ const TraineeDashboard = () => {
 
         // 🔥 Interview schedule API call
         const response = await fetchInterviewScheduleByEmpId(empId);
-
+        
+        console.log("Fetched interview schedule response:", response);
         if (response?.data) {
           // API returns: { status, success, message, data:[ ... ] }
 
@@ -151,7 +156,8 @@ const TraineeDashboard = () => {
               trainerApproval: item?.trainerApproval
             };
           });
-
+          
+          console.log("Loaded interviews:", cleanData);
           setInterviews(cleanData);
         }
 
@@ -169,8 +175,6 @@ const TraineeDashboard = () => {
       try {
         const empId = sessionStorage.getItem("empid");
         if (!empId) return;
-
-
 
         // 2️⃣ Fetch assessments
         const assessmentRes = await fetchAssessmentsByTrainee(empId);
@@ -256,6 +260,54 @@ const TraineeDashboard = () => {
     handleLogout();
   };
 
+  
+  sessionStorage.setItem("empid", "TRN001");
+  const empid = sessionStorage.getItem("empid");
+  useEffect(() => {
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const result = await fetchSyllabusProgressByEmpId(empid);
+  
+      const apiData = result?.data || result || [];
+
+      const formattedSteps = apiData.map((item, index, arr) => {
+        // ✔ current step completed
+        const isCompleted = item?.subTopics?.every(sub =>
+          sub?.stepProgress?.some(p => p.complete === true && p.checker === true)
+        );
+
+        // ✔ previous step completed
+        const prevCompleted =
+          index === 0
+            ? true
+            : arr[index - 1]?.subTopics?.every(sub =>
+                sub?.stepProgress?.some(
+                  p => p.complete === true && p.checker === true
+                )
+              );
+
+        return {
+          stepNumber: index + 1,
+          title: item?.title || `Step ${index + 1}`,
+          description: item?.topic || '',
+          completed: isCompleted,
+          locked: !prevCompleted
+        };
+      });
+
+      setStepsStatus(formattedSteps);
+      setLoading(false);
+    } catch (err) {
+      console.error(err);
+      setLoading(false);
+    }
+  };
+
+  if (empid) fetchData();
+}, [empid]);
+
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -338,23 +390,30 @@ const TraineeDashboard = () => {
             {/* Left Column - Main Content */}
             <div className="xl:col-span-2 space-y-8">
               {/* Progress Tracker */}
-              <ProgressTracker
-                currentStep={currentStep}
-                totalSteps={8}
-                completedSteps={stepsStatus.filter(s => s.completed).length}
+              {/* <ProgressTracker
+                // currentStep={currentStep}
+                // totalSteps={8}
+                // completedSteps={stepsStatus.filter(s => s.completed).length}
                 onStepClick={handleStepClick}
                 stepsStatus={stepsStatus}
-              />
+              /> */}
+
+<ProgressTracker
+  stepsStatus={stepsStatus}
+  onStepClick={(stepId) => {
+    console.log('Clicked step:', stepId);
+  }}
+/>
 
 
               {/* Current Step Content */}
-              <CurrentStepContent
+              {/* <CurrentStepContent
                 currentStep={currentStep}
                 traineeInfo={traineeInfo}
                 onStepComplete={handleStepComplete}
                 syllabus={syllabus}
                 stepsStatus={stepsStatus}
-              />
+              /> */}
 
               {/* Assessment History */}
               <AssessmentHistory assessments={assessments} />
@@ -363,7 +422,7 @@ const TraineeDashboard = () => {
             {/* Right Column - Sidebar */}
             <div className="space-y-8">
               {/* Quick Actions */}
-              {/* <QuickActions /> */}
+              <QuickActions />
 
               {/* Interview Schedule */}
               <InterviewSchedule interviews={interviews} />
