@@ -1,0 +1,3010 @@
+// import React, { useState } from 'react';
+// import Icon from '../../../components/AppIcon';
+// import Button from '../../../components/ui/Button';
+// import SecureContentWrapper from '../../../components/ui/SecureContentWrapper';
+
+import { LayoutDashboard } from "lucide-react"
+
+// const CurrentStepContent = ({
+//   currentStep = 1,
+//   syllabusData = [],
+//   traineeInfo = { name: 'John Doe', id: 'TRN001' },
+//   onStepComplete,
+//   className = ''
+// }) => {
+
+//   const [isCompleting, setIsCompleting] = useState(false);
+
+//   //   const stepContent = {
+//   //     1: {
+//   //       title: 'Introduction to Programming',
+//   //       duration: '45 minutes',
+//   //       content: `Welcome to the fundamentals of programming! This comprehensive module will introduce you to the core concepts that form the foundation of all programming languages.
+
+//   // Programming is the process of creating instructions for computers to execute. These instructions, written in various programming languages, tell the computer exactly what to do and how to do it.
+
+//   // Key Concepts Covered:
+//   // • What is programming and why it matters
+//   // • Understanding algorithms and logic
+//   // • Basic programming terminology
+//   // • Problem-solving approaches
+//   // • Introduction to different programming paradigms
+
+//   // Learning Objectives:
+//   // By the end of this module, you will understand:
+//   // 1. The fundamental concepts of programming
+//   // 2. How computers process instructions
+//   // 3. Basic problem-solving techniques
+//   // 4. The importance of logical thinking in programming
+
+//   // Practical Applications:
+//   // Throughout this module, you'll see real-world examples of how programming concepts apply to everyday technology, from mobile apps to web browsers to smart home devices.Remember: Programming is not just about writing code—it's about thinking logically and solving problems systematically.`,
+//   //       resources: [
+//   //         { name: 'Programming Fundamentals Guide', type: 'PDF', size: '2.4 MB' },
+//   //         { name: 'Introduction Video Series', type: 'Video', duration: '30 min' },
+//   //         { name: 'Practice Exercises', type: 'Interactive', items: '15 exercises' }
+//   //       ]
+//   //     },
+//   //     2: {
+//   //       title: 'Data Structures',
+//   //       duration: '60 minutes',
+//   //       content: `Data structures are fundamental building blocks in programming that allow us to organize, store, and manipulate data efficiently.
+
+//   // Understanding data structures is crucial for writing efficient programs and solving complex problems. Different data structures are optimized for different types of operations.
+
+//   // Core Data Structures:
+//   // • Arrays: Ordered collections of elements
+//   // • Objects: Key-value pairs for structured data
+//   // • Lists: Dynamic collections that can grow and shrink
+//   // • Stacks: Last-in-first-out (LIFO) data structure
+//   // • Queues: First-in-first-out (FIFO) data structure
+
+//   // When to Use Each Structure:
+//   // Arrays are perfect when you need indexed access to elements. Objects work well for representing real-world entities with properties. Lists are ideal when the size of your data changes frequently.
+
+//   // Performance Considerations:
+//   // Different operations have different time complexities depending on the data structure used. Understanding these trade-offs helps you choose the right structure for your specific needs.
+
+//   // Real-World Examples:
+//   // • Shopping cart items (Array/List)
+//   // • User profile information (Object)
+//   // • Browser history (Stack)
+//   // • Print queue (Queue)`,
+//   //       resources: [
+//   //         { name: 'Data Structures Handbook', type: 'PDF', size: '3.1 MB' },
+//   //         { name: 'Interactive Visualizations', type: 'Interactive', items: '8 demos' },
+//   //         { name: 'Coding Challenges', type: 'Practice', items: '20 problems' }
+//   //       ]
+//   //     }
+//   //   };
+
+//   // const currentContent = stepContent?.[currentStep] || stepContent?.[1];
+
+//   const currentContent = syllabusData.find(
+//     (item) => item.stepNumber === currentStep
+//   ) || {};
+
+
+//   const handleCompleteStep = async () => {
+//     setIsCompleting(true);
+
+//     // Simulate API call
+//     await new Promise(resolve => setTimeout(resolve, 2000));
+
+//     if (onStepComplete) {
+//       onStepComplete(currentStep);
+//     }
+
+//     setIsCompleting(false);
+//   };
+
+//   const handleSessionExpired = () => {
+//     // Handle session expiry
+//     console.log('Session expired - redirecting to login');
+//   };
+
+//   return (
+//     <SecureContentWrapper
+//       watermarkText={`${traineeInfo?.name} - ${traineeInfo?.id} - CONFIDENTIAL TRAINING MATERIAL`}
+//       sessionTimeout={30}
+//       onSessionExpired={handleSessionExpired}
+//       className={className}
+//     >
+//       <div className="bg-card rounded-lg border border-border overflow-hidden">
+//         {/* Content Header */}
+//         <div className="bg-primary/5 border-b border-border p-6">
+//           <div className="flex items-center justify-between">
+//             <div className="flex items-center space-x-4">
+//               <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center">
+//                 <Icon name="BookOpen" size={24} color="white" />
+//               </div>
+//               <div>
+//                 <h2 className="text-xl font-semibold text-foreground">{currentContent?.title}</h2>
+//                 <div className="flex items-center space-x-4 mt-1">
+//                   <span className="text-sm text-muted-foreground flex items-center">
+//                     <Icon name="Clock" size={14} className="mr-1" />
+//                     {currentContent?.duration}
+//                   </span>
+//                   <span className="text-sm text-muted-foreground flex items-center">
+//                     <Icon name="User" size={14} className="mr-1" />
+//                     Step {currentStep}
+//                   </span>
+//                 </div>
+//               </div>
+//             </div>
+//             <div className="text-right">
+//               <div className="px-3 py-1 bg-primary text-primary-foreground text-sm rounded-full">
+//                 In Progress
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+
+//         {/* Content Body */}
+//         <div className="p-6">
+//           {/* Main Content */}
+//           <div className="prose max-w-none mb-8">
+//             <div className="text-foreground leading-relaxed whitespace-pre-line">
+//               {currentContent?.content}
+//             </div>
+//           </div>
+
+//           {/* Resources Section */}
+//           <div className="border-t border-border pt-6">
+//             <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center">
+//               <Icon name="FileText" size={20} className="mr-2" />
+//               Learning Resources
+//             </h3>
+//             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+//               {currentContent?.resources?.map((resource, index) => (
+//                 <div key={index} className="bg-muted/30 rounded-lg p-4 border border-border">
+//                   <div className="flex items-start space-x-3">
+//                     <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+//                       <Icon
+//                         name={
+//                           resource?.type === 'PDF' ? 'FileText' :
+//                             resource?.type === 'Video' ? 'Play' :
+//                               resource?.type === 'Interactive' ? 'Monitor' : 'Book'
+//                         }
+//                         size={18}
+//                         className="text-primary"
+//                       />
+//                     </div>
+//                     <div className="flex-1 min-w-0">
+//                       <h4 className="font-medium text-foreground text-sm mb-1">{resource?.name}</h4>
+//                       <p className="text-xs text-muted-foreground">
+//                         {resource?.size || resource?.duration || `${resource?.items}`}
+//                       </p>
+//                       <div className="mt-2">
+//                         <Button
+//                           variant="outline"
+//                           size="xs"
+//                           iconName="ExternalLink"
+//                           iconPosition="right"
+//                           iconSize={12}
+//                           className="text-xs"
+//                         >
+//                           Access
+//                         </Button>
+//                       </div>
+//                     </div>
+//                   </div>
+//                 </div>
+//               ))}
+//             </div>
+//           </div>
+
+//           {/* Progress Actions */}
+//           <div className="border-t border-border pt-6">
+//             <div className="flex items-center justify-between">
+//               <div className="flex items-center space-x-4">
+//                 <Button
+//                   variant="outline"
+//                   iconName="BookmarkPlus"
+//                   iconPosition="left"
+//                   iconSize={16}
+//                 >
+//                   Bookmark
+//                 </Button>
+//                 <Button
+//                   variant="outline"
+//                   iconName="MessageSquare"
+//                   iconPosition="left"
+//                   iconSize={16}
+//                 >
+//                   Ask Question
+//                 </Button>
+//               </div>
+//               <div className="flex items-center space-x-3">
+//                 <Button
+//                   variant="outline"
+//                   iconName="ChevronLeft"
+//                   iconPosition="left"
+//                   iconSize={16}
+//                   disabled={currentStep === 1}
+//                 >
+//                   Previous
+//                 </Button>
+//                 <Button
+//                   variant="default"
+//                   iconName="CheckCircle"
+//                   iconPosition="left"
+//                   iconSize={16}
+//                   loading={isCompleting}
+//                   onClick={handleCompleteStep}
+//                 >
+//                   {isCompleting ? 'Completing...' : 'Mark as Complete'}
+//                 </Button>
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+//       </div>
+//     </SecureContentWrapper>
+//   );
+// };
+
+// export default CurrentStepContent;
+
+
+// import React, { useState, useEffect, useRef } from 'react';
+// import { useNavigate } from 'react-router-dom';
+// import Header from '../../components/ui/Header';
+// import SecureContentWrapper from '../../components/ui/SecureContentWrapper';
+// import SessionTimeoutHandler from '../../components/ui/SessionTimeoutHandler';
+// import NavigationBreadcrumb from '../../components/ui/NavigationBreadcrumb';
+// import StepNavigationSidebar from './components/StepNavigationSidebar';
+// import ContentDisplay from './components/ContentDisplay';
+// import SecurityWatermark from './components/SecurityWatermark';
+// import ProgressTracker  from './components/ProgressTracker';
+// import Icon from '../../components/AppIcon';
+// import Button from '../../components/ui/Button';
+
+// const SyllabusContentViewer = () => {
+//   const navigate = useNavigate();
+//   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+//   const [currentStepId, setCurrentStepId] = useState('step-1');
+//   const [sessionActive, setSessionActive] = useState(true);
+//   const [showProgressTracker, setShowProgressTracker] = useState(false);
+//   const contentRef = useRef(null);
+
+//   // Mock trainee information
+//   const traineeInfo = {
+//     id: "TRN-2024-001",
+//     name: "Sarah Johnson",
+//     email: "sarah.johnson@company.com",
+//     role: "trainee",
+//     department: "Software Development",
+//     startDate: "2024-10-01"
+//   };
+
+//   // Mock syllabus steps data
+//   const syllabusSteps = [
+//   {
+//     id: 'step-1',
+//     stepNumber: 1,
+//     title: 'Introduction to Web Development',
+//     description: 'Fundamentals of HTML, CSS, and JavaScript',
+//     isCompleted: true,
+//     isLocked: false,
+//     progress: 100,
+//     estimatedTime: '2 hours',
+//     completedAt: '2024-10-20T10:30:00Z',
+//     content: [
+//     {
+//       type: 'text',
+//       data: `<h2>Welcome to Web Development</h2>
+//                  <p>Web development is the process of creating websites and web applications. In this comprehensive course, you'll learn the fundamental technologies that power the modern web.</p>
+//                  <h3>What You'll Learn:</h3>
+//                  <ul>
+//                    <li>HTML structure and semantic markup</li>
+//                    <li>CSS styling and responsive design</li>
+//                    <li>JavaScript programming fundamentals</li>
+//                    <li>Modern development tools and workflows</li>
+//                  </ul>`
+//     },
+//     {
+//       type: 'image',
+//       data: {
+//         url: "https://images.unsplash.com/photo-1517180102446-f3ece451e9d8",
+//         alt: 'Computer screen displaying colorful code editor with HTML and CSS syntax highlighting',
+//         caption: 'Modern web development environment with code editor'
+//       }
+//     }]
+
+//   },
+//   {
+//     id: 'step-2',
+//     stepNumber: 2,
+//     title: 'HTML Fundamentals',
+//     description: 'Learn HTML structure, elements, and semantic markup',
+//     isCompleted: true,
+//     isLocked: false,
+//     progress: 100,
+//     estimatedTime: '3 hours',
+//     completedAt: '2024-10-21T14:15:00Z',
+//     content: [
+//     {
+//       type: 'text',
+//       data: `<h2>HTML Fundamentals</h2>
+//                  <p>HTML (HyperText Markup Language) is the standard markup language for creating web pages. It describes the structure of a web page using elements and tags.</p>
+//                  <h3>Basic HTML Structure:</h3>
+//                  <pre><code>&lt;!DOCTYPE html&gt;
+// &lt;html lang="en"&gt;
+// &lt;head&gt;
+//     &lt;meta charset="UTF-8"&gt;
+//     &lt;title&gt;Page Title&lt;/title&gt;
+// &lt;/head&gt;
+// &lt;body&gt;
+//     &lt;h1&gt;Main Heading&lt;/h1&gt;
+//     &lt;p&gt;Paragraph content&lt;/p&gt;
+// &lt;/body&gt;
+// &lt;/html&gt;</code></pre>`
+//     },
+//     {
+//       type: 'video',
+//       data: {
+//         url: 'https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4',
+//         poster: "https://images.unsplash.com/photo-1579823730815-0291253396b5",
+//         caption: 'HTML structure demonstration video'
+//       }
+//     }]
+
+//   },
+//   {
+//     id: 'step-3',
+//     stepNumber: 3,
+//     title: 'CSS Styling Basics',
+//     description: 'Introduction to CSS selectors, properties, and layouts',
+//     isCompleted: false,
+//     isLocked: false,
+//     progress: 65,
+//     estimatedTime: '4 hours',
+//     content: [
+//     {
+//       type: 'text',
+//       data: `<h2>CSS Styling Basics</h2>
+//                  <p>CSS (Cascading Style Sheets) is used to style and layout web pages. It controls the visual presentation of HTML elements.</p>
+//                  <h3>CSS Syntax:</h3>
+//                  <pre><code>selector {
+//     property: value;
+//     property: value;
+// }</code></pre>
+//                  <h3>Common CSS Properties:</h3>
+//                  <ul>
+//                    <li><strong>color:</strong> Sets text color</li>
+//                    <li><strong>background-color:</strong> Sets background color</li>
+//                    <li><strong>font-size:</strong> Controls text size</li>
+//                    <li><strong>margin:</strong> Controls outer spacing</li>
+//                    <li><strong>padding:</strong> Controls inner spacing</li>
+//                  </ul>`
+//     },
+//     {
+//       type: 'interactive',
+//       data: {
+//         title: 'CSS Playground',
+//         description: 'Practice CSS styling with this interactive editor',
+//         url: 'https://codepen.io/pen/'
+//       }
+//     }]
+
+//   },
+//   {
+//     id: 'step-4',
+//     stepNumber: 4,
+//     title: 'JavaScript Fundamentals',
+//     description: 'Variables, functions, and DOM manipulation',
+//     isCompleted: false,
+//     isLocked: false,
+//     progress: 0,
+//     estimatedTime: '5 hours',
+//     lockReason: 'Complete CSS Styling Basics first',
+//     content: [
+//     {
+//       type: 'text',
+//       data: `<h2>JavaScript Fundamentals</h2>
+//                  <p>JavaScript is a programming language that enables interactive web pages. It's an essential part of web applications.</p>
+//                  <h3>Variables and Data Types:</h3>
+//                  <pre><code>// Variables
+// let name = "John";
+// const age = 25;
+// var isStudent = true;
+
+// // Functions
+// function greetUser(name) {
+//     return "Hello, " + name + "!";
+// }</code></pre>`
+//     }]
+
+//   },
+//   {
+//     id: 'step-5',
+//     stepNumber: 5,
+//     title: 'Responsive Design',
+//     description: 'Creating mobile-friendly layouts with CSS Grid and Flexbox',
+//     isCompleted: false,
+//     isLocked: true,
+//     progress: 0,
+//     estimatedTime: '3 hours',
+//     lockReason: 'Complete JavaScript Fundamentals first',
+//     content: []
+//   },
+//   {
+//     id: 'step-6',
+//     stepNumber: 6,
+//     title: 'Final Project',
+//     description: 'Build a complete web application using all learned concepts',
+//     isCompleted: false,
+//     isLocked: true,
+//     progress: 0,
+//     estimatedTime: '8 hours',
+//     lockReason: 'Complete all previous steps first',
+//     content: []
+//   }];
+
+
+//   const currentStep = syllabusSteps?.find((step) => step?.id === currentStepId);
+//   const currentStepIndex = syllabusSteps?.findIndex((step) => step?.id === currentStepId);
+//   const completedSteps = syllabusSteps?.filter((step) => step?.isCompleted)?.length;
+
+//   // Disable right-click context menu
+//   const handleContextMenu = (e) => {
+//     e?.preventDefault();
+//     return false;
+//   };
+
+//   // Disable text selection
+//   const handleSelectStart = (e) => {
+//     e?.preventDefault();
+//     return false;
+//   };
+
+//   // Disable keyboard shortcuts
+//   const handleKeyDown = (e) => {
+//     // Disable Ctrl+S, Ctrl+P, Ctrl+C, F12, Print Screen
+//     if (
+//     e?.ctrlKey && (e?.key === 's' || e?.key === 'p' || e?.key === 'c' || e?.key === 'a') ||
+//     e?.key === 'F12' ||
+//     e?.key === 'PrintScreen')
+//     {
+//       e?.preventDefault();
+//       return false;
+//     }
+//   };
+
+//   // Add event listeners for security
+//   useEffect(() => {
+//     document.addEventListener('contextmenu', handleContextMenu);
+//     document.addEventListener('selectstart', handleSelectStart);
+//     document.addEventListener('keydown', handleKeyDown);
+
+//     return () => {
+//       document.removeEventListener('contextmenu', handleContextMenu);
+//       document.removeEventListener('selectstart', handleSelectStart);
+//       document.removeEventListener('keydown', handleKeyDown);
+//     };
+//   }, []);
+
+//   const handleStepSelect = (stepId) => {
+//     const step = syllabusSteps?.find((s) => s?.id === stepId);
+//     if (step && !step?.isLocked) {
+//       setCurrentStepId(stepId);
+//     }
+//   };
+
+//   const handleStepComplete = (stepId) => {
+//     // In a real app, this would make an API call
+//     console.log(`Step ${stepId} completed`);
+
+//     // Update step completion status
+//     const stepIndex = syllabusSteps?.findIndex((s) => s?.id === stepId);
+//     if (stepIndex !== -1) {
+//       syllabusSteps[stepIndex].isCompleted = true;
+//       syllabusSteps[stepIndex].progress = 100;
+//       syllabusSteps[stepIndex].completedAt = new Date()?.toISOString();
+
+//       // Unlock next step if exists
+//       if (stepIndex + 1 < syllabusSteps?.length) {
+//         syllabusSteps[stepIndex + 1].isLocked = false;
+//       }
+//     }
+//   };
+
+//   const handleNextStep = () => {
+//     if (currentStepIndex < syllabusSteps?.length - 1) {
+//       const nextStep = syllabusSteps?.[currentStepIndex + 1];
+//       if (!nextStep?.isLocked) {
+//         setCurrentStepId(nextStep?.id);
+//       }
+//     }
+//   };
+
+//   const handlePreviousStep = () => {
+//     if (currentStepIndex > 0) {
+//       setCurrentStepId(syllabusSteps?.[currentStepIndex - 1]?.id);
+//     }
+//   };
+
+//   const canGoNext = currentStepIndex < syllabusSteps?.length - 1 &&
+//   !syllabusSteps?.[currentStepIndex + 1]?.isLocked;
+//   const canGoPrevious = currentStepIndex > 0;
+
+//   const handleSessionExpired = () => {
+//     setSessionActive(false);
+//     navigate('/trainee-dashboard');
+//   };
+
+//   const handleLogout = () => {
+//     navigate('/trainee-dashboard');
+//   };
+
+
+//   if (!sessionActive) {
+//     return (
+//       <div className="flex items-center justify-center min-h-screen bg-background">
+//         <div className="text-center p-8 bg-card rounded-lg elevation-2 max-w-md">
+//           <Icon name="Shield" size={48} className="text-warning mx-auto mb-4" />
+//           <h2 className="text-xl font-semibold text-foreground mb-2">Session Expired</h2>
+//           <p className="text-muted-foreground mb-4">
+//             Your secure learning session has expired. Please return to your dashboard.
+//           </p>
+//           <Button
+//             variant="default"
+//             onClick={() => navigate('/trainee-dashboard')}
+//             iconName="ArrowLeft"
+//             iconPosition="left">
+
+//             Back to Dashboard
+//           </Button>
+//         </div>
+//       </div>);
+
+//   }
+
+//   return (
+//     <SecureContentWrapper
+//       watermarkText={`${traineeInfo?.name} | ID: ${traineeInfo?.id} | CONFIDENTIAL TRAINING MATERIAL`}
+//       sessionTimeout={30}
+//       onSessionExpired={handleSessionExpired}
+//       enableScreenshotProtection={true}
+//       enableRightClickDisable={true}>
+
+//       <div className="min-h-screen bg-background">
+//         {/* Session Timeout Handler */}
+//         <SessionTimeoutHandler
+//           sessionDuration={30}
+//           warningTime={5}
+//           onSessionExpired={handleSessionExpired}
+//           onSessionExtended={() => setSessionActive(true)}
+//           isActive={sessionActive} />
+
+
+//         {/* Security Watermark */}
+//         <SecurityWatermark traineeInfo={traineeInfo} />
+
+//         {/* Header */}
+//         <Header
+//           userRole="trainee"
+//           userName={traineeInfo?.name}
+//           onLogout={handleLogout} />
+
+
+//         {/* Main Content */}
+//         <div className="pt-16 flex h-screen">
+//           {/* Step Navigation Sidebar */}
+//           <StepNavigationSidebar
+//             steps={syllabusSteps}
+//             currentStepId={currentStepId}
+//             onStepSelect={handleStepSelect}
+//             isCollapsed={isSidebarCollapsed}
+//             onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)} />
+
+
+//           {/* Content Area */}
+//           <div className="flex-1 flex flex-col overflow-hidden">
+//             {/* Breadcrumb Navigation */}
+//             <div className="bg-surface border-b border-border px-6 py-3">
+//               <NavigationBreadcrumb userRole="trainee" />
+//             </div>
+
+//             {/* Main Content Display */}
+//             <div className="flex-1 flex overflow-hidden">
+//               <div className="flex-1 overflow-hidden" ref={contentRef}>
+//                 <ContentDisplay
+//                   currentStep={currentStep}
+//                   traineeInfo={traineeInfo}
+//                   onStepComplete={handleStepComplete}
+//                   onNextStep={handleNextStep}
+//                   onPreviousStep={handlePreviousStep}
+//                   canGoNext={canGoNext}
+//                   canGoPrevious={canGoPrevious} />
+
+//               </div>
+
+//               {/* Progress Tracker Sidebar */}
+//               {showProgressTracker &&
+//               <div className="w-80 border-l border-border overflow-y-auto">
+//                   <ProgressTracker
+//                   currentStep={currentStep}
+//                   totalSteps={syllabusSteps?.length}
+//                   completedSteps={completedSteps}
+//                   timeSpent={45} // Mock time in minutes
+//                   estimatedTimeRemaining={180} // Mock remaining time in minutes
+//                   className="m-4" />
+
+//                 </div>
+//               }
+//             </div>
+//           </div>
+
+//           {/* Floating Progress Toggle */}
+//           <Button
+//             variant="default"
+//             size="icon"
+//             onClick={() => setShowProgressTracker(!showProgressTracker)}
+//             className="fixed bottom-6 right-6 z-40 h-12 w-12 rounded-full elevation-2"
+//             iconName={showProgressTracker ? "X" : "BarChart3"}
+//             iconSize={20}
+//             title={showProgressTracker ? "Hide Progress" : "Show Progress"} />
+
+//         </div>
+
+//         {/* Security Notice */}
+//         <div className="fixed bottom-4 left-4 bg-card border border-border rounded-lg p-3 text-xs z-30 max-w-xs">
+//           <div className="flex items-center space-x-2">
+//             <Icon name="Shield" size={14} className="text-warning" />
+//             <span className="text-muted-foreground">
+//               This content is protected and monitored for security.
+//             </span>
+//           </div>
+//         </div>
+//       </div>
+//     </SecureContentWrapper>);
+
+// };
+
+// export default SyllabusContentViewer;
+
+
+
+
+//
+
+// Content
+
+// import React, { useState, useEffect } from "react";
+// import axios from "axios";
+// import Icon from "../../../components/AppIcon";
+// import Button from "../../../components/ui/Button";
+// import SecureContentWrapper from "../../../components/ui/SecureContentWrapper";
+
+// const CurrentStepContent = ({
+//   currentStep = 1,
+//   traineeInfo,
+//   className = "",
+// }) => {
+//   const [isCompleting, setIsCompleting] = useState(false);
+//   const [stepContent, setStepContent] = useState(null);
+//   const [progress, setProgress] = useState(null);
+
+//   const empid = traineeInfo?.id || "TRN001";
+
+//   // Fetch trainee progress
+//   const fetchProgress = async () => {
+//     try {
+//       const res = await axios.get(
+//         `http://localhost:8080/api/progress/${empid}`
+//       );
+//       setProgress(res.data);
+//     } catch (err) {
+//       console.error("Error fetching progress:", err);
+//     }
+//   };
+
+//   // Fetch syllabus content for specific step
+//   // Example fetchStepContent
+//   const fetchStepContent = async (stepNumber) => {
+//     if (!stepNumber || stepNumber < 1) return; // skip invalid steps
+//     try {
+//       const res = await axios.get(`http://localhost:8080/api/syllabus/${stepNumber}`);
+//       setStepContent(res.data);
+//     } catch (err) {
+//       console.error("Error fetching step content:", err);
+//     }
+//   };
+
+
+//   useEffect(() => {
+//     fetchProgress();
+//     fetchStepContent();
+//   }, [currentStep]);
+
+//   const handleCompleteStep = async () => {
+//     if (!stepContent) return;
+//     setIsCompleting(true);
+
+//     try {
+//       await axios.post(`http://localhost:8080/api/progress/update`, {
+//         empid,
+//         stepId: `step-${currentStep}`,
+//         progress: 100,
+//         completed: true,
+//       });
+
+//       // ✅ Fetch latest progress from backend
+//       if (onStepComplete) await onStepComplete();
+//     } catch (err) {
+//       console.error("Error completing step:", err);
+//     } finally {
+//       setIsCompleting(false);
+//     }
+//   };
+
+
+
+
+//   const handleSessionExpired = () => {
+//     console.log("Session expired");
+//   };
+
+//   if (!stepContent) {
+//     return <div>Loading step content...</div>;
+//   }
+
+//   return (
+//     <SecureContentWrapper
+//       watermarkText={`${traineeInfo?.name} - ${traineeInfo?.id} - CONFIDENTIAL`}
+//       sessionTimeout={30}
+//       onSessionExpired={handleSessionExpired}
+//       className={className}
+//     >
+//       <div className="bg-card rounded-lg border border-border overflow-hidden">
+//         {/* Header */}
+//         <div className="bg-primary/5 border-b border-border p-6">
+//           <div className="flex items-center justify-between">
+//             <div className="flex items-center space-x-4">
+//               <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center">
+//                 <Icon name="BookOpen" size={24} color="white" />
+//               </div>
+//               <div>
+//                 <h2 className="text-xl font-semibold">{stepContent?.title}</h2>
+
+//                 <div className="flex items-center space-x-4 mt-1">
+//                   <span className="text-sm flex items-center">
+//                     <Icon name="Clock" size={14} className="mr-1" />
+//                     {stepContent?.duration || "10 mins"}
+//                   </span>
+
+//                   <span className="text-sm flex items-center">
+//                     <Icon name="User" size={14} className="mr-1" />
+//                     Step {currentStep}
+//                   </span>
+//                 </div>
+//               </div>
+//             </div>
+
+//             <div className="px-3 py-1 bg-primary text-primary-foreground rounded-full text-sm">
+//               In Progress
+//             </div>
+//           </div>
+//         </div>
+
+//         {/* Content */}
+//         <div className="p-6">
+//           <div className="prose max-w-none mb-8 whitespace-pre-line">
+//             {stepContent?.content}
+//           </div>
+
+//           {/* Resources */}
+//           {stepContent?.resources?.length > 0 && (
+//             <div className="border-t border-border pt-6">
+//               <h3 className="text-lg font-semibold mb-4 flex items-center">
+//                 <Icon name="FileText" size={20} className="mr-2" />
+//                 Learning Resources
+//               </h3>
+
+//               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+//                 {stepContent.resources.map((res, index) => (
+//                   <div
+//                     key={index}
+//                     className="bg-muted/30 rounded-lg p-4 border border-border"
+//                   >
+//                     <h4 className="text-sm font-medium">{res.name}</h4>
+//                     <p className="text-xs text-muted-foreground">{res.type}</p>
+
+//                     <Button
+//                       variant="outline"
+//                       size="xs"
+//                       className="mt-2"
+//                       onClick={() =>
+//                         window.open(
+//                           `http://localhost:8080/api/syllabus/file-url?path=${res.path}`,
+//                           "_blank"
+//                         )
+//                       }
+//                     >
+//                       Access
+//                     </Button>
+//                   </div>
+//                 ))}
+//               </div>
+//             </div>
+//           )}
+
+//           {/* Actions */}
+//           <div className="border-t border-border pt-6">
+//             <div className="flex justify-between">
+//               <Button variant="outline">Bookmark</Button>
+//               <Button
+//                 variant="default"
+//                 loading={isCompleting}
+//                 onClick={handleCompleteStep}
+//               >
+//                 Mark as Complete
+//               </Button>
+//             </div>
+//           </div>
+//         </div>
+//       </div>
+//     </SecureContentWrapper>
+//   );
+// };
+
+// export default CurrentStepContent;
+
+
+// Progress Tracker
+
+
+// import React, { useEffect, useState } from 'react';
+// import Icon from '../../../components/AppIcon';
+// import Button from '../../../components/ui/Button';
+// import axios from 'axios';
+
+// const ProgressTracker = ({
+//   currentStep = 1,
+//   totalSteps = 8,
+//   completedSteps = 0,
+//   onStepClick,
+//   className = ''
+// }) => {
+
+//   const [steps, setSteps] = useState([]);
+
+//   // 🔥 Fetch syllabus from backend
+//   const fetchSteps = async () => {
+//     try {
+//       const res = await axios.get("http://localhost:8080/api/syllabus/all");
+//       setSteps(res.data);
+//     } catch (err) {
+//       console.error("Error fetching syllabus:", err);
+//     }
+//   };
+
+//   useEffect(() => {
+//     fetchSteps();
+//   }, []);
+
+//   const progressPercentage = steps.length
+//     ? (steps.filter(s => s.completed).length / steps.length) * 100
+//     : 0;
+
+//   const getStepStatus = (stepNumber) => {
+//     const step = steps[stepNumber - 1]; // index = stepNumber - 1
+//     if (!step) return 'locked';
+//     if (step.completed) return 'completed';
+//     if (stepNumber === currentStep) return 'current';
+//     return 'locked';
+//   };
+
+//   const getStepIcon = (stepNumber) => {
+//     const status = getStepStatus(stepNumber);
+//     switch (status) {
+//       case 'completed':
+//         return 'CheckCircle';
+//       case 'current':
+//         return 'PlayCircle';
+//       default:
+//         return 'Lock';
+//     }
+//   };
+
+//   const getStepColor = (stepNumber) => {
+//     const status = getStepStatus(stepNumber);
+//     switch (status) {
+//       case 'completed':
+//         return 'text-success';
+//       case 'current':
+//         return 'text-primary';
+//       default:
+//         return 'text-muted-foreground';
+//     }
+//   };
+
+//   return (
+//     <div className={`bg-card rounded-lg border border-border p-6 ${className}`}>
+
+//       {/* Header */}
+//       <div className="flex items-center justify-between mb-6">
+//         <div>
+//           <h2 className="text-xl font-semibold text-foreground">Learning Progress</h2>
+//           <p className="text-sm text-muted-foreground">
+//             Step {currentStep} of {steps?.length} • {Math.round(progressPercentage)}% Complete
+//           </p>
+//         </div>
+//         <div className="text-right">
+//           <div className="text-2xl font-bold text-primary">{completedSteps}/{steps?.length}</div>
+//           <div className="text-xs text-muted-foreground">Steps Completed</div>
+//         </div>
+//       </div>
+
+//       {/* Progress Bar */}
+//       <div className="mb-8">
+//         <div className="flex items-center justify-between mb-2">
+//           <span className="text-sm font-medium text-foreground">Overall Progress</span>
+//           <span className="text-sm text-muted-foreground">{Math.round(progressPercentage)}%</span>
+//         </div>
+//         <div className="w-full bg-muted rounded-full h-3">
+//           <div
+//             className="bg-primary rounded-full h-3 transition-all duration-500 ease-out"
+//             style={{ width: `${progressPercentage}%` }}
+//           />
+//         </div>
+//       </div>
+
+//       {/* Steps Grid */}
+//       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+//         {steps?.map((step, index) => {
+//           const stepNumber = index + 1; // backend me id na ho to numbering
+//           const status = getStepStatus(stepNumber);
+//           const isClickable = status === 'completed' || status === 'current';
+
+//           return (
+//             <div
+//               key={stepNumber}
+//               className={`relative p-4 rounded-lg border transition-all duration-200 ${status === 'current'
+//                 ? 'border-primary bg-primary/5'
+//                 : status === 'completed'
+//                   ? 'border-success bg-success/5'
+//                   : 'border-border bg-muted/30'
+//                 } ${isClickable ? 'cursor-pointer hover:shadow-sm' : 'cursor-not-allowed'}`}
+//               onClick={() => isClickable && onStepClick && onStepClick(stepNumber)}
+//             >
+
+//               {/* Step Number & Icon */}
+//               <div className="flex items-center space-x-3 mb-2">
+//                 <div className={`w-8 h-8 rounded-full flex items-center justify-center ${status === 'current'
+//                   ? 'bg-primary text-primary-foreground'
+//                   : status === 'completed'
+//                     ? 'bg-success text-success-foreground'
+//                     : 'bg-muted text-muted-foreground'
+//                   }`}>
+//                   <Icon name={getStepIcon(stepNumber)} size={16} className="text-current" />
+//                 </div>
+
+//                 <div className="flex-1">
+//                   <div className="flex items-center space-x-2">
+//                     <span className="text-xs font-medium text-muted-foreground">
+//                       Step {stepNumber}
+//                     </span>
+
+//                     {status === 'current' && (
+//                       <span className="px-2 py-0.5 bg-primary text-primary-foreground text-xs rounded-full">
+//                         Current
+//                       </span>
+//                     )}
+
+//                     {status === 'completed' && (
+//                       <span className="px-2 py-0.5 bg-success text-success-foreground text-xs rounded-full">
+//                         Completed
+//                       </span>
+//                     )}
+//                   </div>
+//                 </div>
+//               </div>
+
+//               {/* Step Content */}
+//               <div className="space-y-1">
+//                 <h3 className={`font-medium ${status === 'locked' ? 'text-muted-foreground' : 'text-foreground'}`}>
+//                   {step?.title}
+//                 </h3>
+//                 <p className={`text-sm ${status === 'locked' ? 'text-muted-foreground/70' : 'text-muted-foreground'}`}>
+//                   {step?.description}
+//                 </p>
+//               </div>
+
+//             </div>
+//           );
+//         })}
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default ProgressTracker;
+
+
+import React, { useState, useEffect } from "react";
+import Icon from "../../../components/AppIcon";
+import Button from "../../../components/ui/Button";
+
+const ContentDisplay = ({
+  currentStep,
+  traineeInfo,
+  onStepComplete,
+  onNextStep,
+  onPreviousStep,
+  canGoNext,
+  canGoPrevious,
+}) => {
+  const [timeSpent, setTimeSpent] = useState(0);
+  const [startTime] = useState(Date.now());
+  const [currentSubIndex, setCurrentSubIndex] = useState(0);
+  const [showCompletionModal, setShowCompletionModal] = useState(false);
+  const [fileData, setFileData] = useState(null);
+  const [showFile, setShowFile] = useState(false);
+
+  const topic = currentStep?.topics?.[0] ?? { subTopics: [] };
+  const subTopics = Array.isArray(topic.subTopics) ? topic.subTopics : [];
+  const totalSubs = subTopics.length;
+  const completedSubs = subTopics.filter((s) => s?.completed).length;
+  const calcProgress =
+    totalSubs > 0 ? Math.round((completedSubs / totalSubs) * 100) : 0;
+
+  const sub = subTopics[currentSubIndex] ?? null;
+  const isLastSub = currentSubIndex === subTopics.length - 1;
+
+  // Reset subtopic when step changes
+  useEffect(() => setCurrentSubIndex(0), [currentStep?.id]);
+
+  // Timer
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTimeSpent(Math.floor((Date.now() - startTime) / 1000));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [startTime]);
+
+  const formatTime = (seconds) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    return hours > 0 ? `${hours}h ${minutes}m ${secs}s` : `${minutes}m ${secs}s`;
+  };
+
+  // -----------------------------
+  // NEW FUNCTION (Non Breaking)
+  // -----------------------------
+  const getPreviewUrl = () => {
+    if (!fileData || !fileData.url || !fileData.mime) return null;
+
+    const isOffice =
+      fileData.mime.includes("word") ||
+      fileData.mime.includes("presentation") ||
+      fileData.mime.includes("excel") ||
+      fileData.name.endsWith(".doc") ||
+      fileData.name.endsWith(".docx") ||
+      fileData.name.endsWith(".pptx") ||
+      fileData.name.endsWith(".xlsx");
+
+    // Office → Microsoft Office Viewer (NO redirect issue)
+    if (isOffice) {
+      return `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(
+        fileData.url
+      )}`;
+    }
+
+    // PDF → direct blob
+    if (fileData.mime === "application/pdf") {
+      return fileData.url;
+    }
+
+    // Images → blob
+    if (
+      fileData.mime.startsWith("image/") ||
+      fileData.name.match(/\.(png|jpg|jpeg|gif|webp)$/i)
+    ) {
+      return fileData.url;
+    }
+
+    return fileData.url;
+  };
+
+  // Fetch file blob from backend
+  useEffect(() => {
+    if (!sub?.filePath) {
+      setFileData(null);
+      return;
+    }
+
+    // Extract only filename (IMPORTANT FIX)
+    const cleanFileName = sub.filePath
+      .replace(/\\/g, "/")
+      .split("/")
+      .pop();
+
+    fetch(`http://localhost:8080/api/syllabus/preview?path=${cleanFileName}`)
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+        return res.blob();
+      })
+      .then((blob) => {
+        setFileData({
+          url: URL.createObjectURL(blob),
+          mime: blob.type,
+          name: cleanFileName,
+        });
+      })
+      .catch((err) => {
+        console.error("Error loading file:", err);
+        setFileData({ error: true, message: "Unable to load this file." });
+      });
+  }, [sub]);
+
+
+  const markSubtopicCompleted = () => {
+    if (!sub) return;
+    const updated = [...subTopics];
+    updated[currentSubIndex] = { ...updated[currentSubIndex], completed: true };
+    currentStep.topics[0].subTopics = updated;
+  };
+
+  const nextSub = () => {
+    if (sub && !sub.completed) markSubtopicCompleted();
+    if (currentSubIndex < subTopics.length - 1) {
+      setCurrentSubIndex(currentSubIndex + 1);
+    } else {
+      onNextStep();
+    }
+  };
+
+  const prevSub = () => {
+    if (currentSubIndex > 0) setCurrentSubIndex(currentSubIndex - 1);
+    else onPreviousStep();
+  };
+
+  const handleCompleteStep = () => {
+    if (completedSubs === totalSubs) onStepComplete(currentStep?.id);
+    else setShowCompletionModal(true);
+  };
+
+  const confirmCompletion = () => {
+    setShowCompletionModal(false);
+    onStepComplete(currentStep?.id);
+  };
+
+
+  if (!currentStep)
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="text-center">
+          <Icon name="BookOpen" size={48} className="text-muted-foreground mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-foreground mb-2">No Content Selected</h3>
+          <p className="text-muted-foreground">Select a step from the sidebar to begin learning.</p>
+        </div>
+      </div>
+    );
+
+  return (
+    <div className="flex flex-col h-full">
+      {/* HEADER */}
+      <div className="flex-shrink-0 bg-surface border-b border-border p-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-foreground mb-2">
+              Step {currentStep?.stepNumber}: {currentStep?.title}
+            </h1>
+            <p className="text-muted-foreground">{currentStep?.description}</p>
+          </div>
+          <div className="flex items-center space-x-4 text-sm text-muted-foreground">
+            <div className="flex items-center space-x-2">
+              <Icon name="Clock" size={16} />
+              <span>Time: {formatTime(timeSpent)}</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Icon name="Target" size={16} />
+              <span>Est: {currentStep?.estimatedTime}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* PROGRESS BAR */}
+        <div className="mt-4 px-6">
+          <div className="flex items-center justify-between text-sm text-muted-foreground mb-2">
+            <span>Step Progress</span>
+            <span>{calcProgress}%</span>
+          </div>
+          <div className="w-full bg-muted rounded-full h-2">
+            <div
+              className="bg-primary h-2 rounded-full transition-all duration-300"
+              style={{ width: `${calcProgress}%` }}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* MAIN CONTENT */}
+      <div className="flex-1 overflow-y-auto p-6">
+        <div className="max-w-4xl mx-auto">
+          {sub ? (
+            <>
+              <h2 className="text-xl font-bold">{sub.title ?? sub.name}</h2>
+              <p className="text-gray-700 whitespace-pre-line mt-2">{sub.description}</p>
+
+              {sub?.filePath && (
+                <button
+                  onClick={() => {
+                    if (fileData && !fileData.error) {
+                      window.open(getPreviewUrl(), "_blank");
+                    } else {
+                      alert("File is not available");
+                    }
+                  }}
+                  style={{
+                    padding: "10px 18px",
+                    background: "#0000ff",
+                    color: "white",
+                    borderRadius: "8px",
+                    marginTop: "12px",
+                    cursor: "pointer",
+                  }}
+                >
+                  {fileData
+                    ? fileData.error
+                      ? "Error loading file"
+                      : `View File (${sub.filePath.split("/").pop()})`
+                    : "Loading..."}
+                </button>
+
+              )}
+
+              {showFile && fileData && (
+                <div className="mt-4 border rounded p-3">
+                  {fileData.error ? (
+                    <p className="text-red-500 text-center">{fileData.message}</p>
+                  ) : (
+                    <iframe
+                      src={getPreviewUrl()}
+                      style={{ width: "100%", height: "80vh", border: "none" }}
+                      title={fileData.name || "Document"}
+                    />
+                  )}
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="text-center py-20 text-muted-foreground">
+              No subtopics available for this step.
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* FOOTER */}
+      <div className="flex-shrink-0 bg-surface border-t border-border p-6 mb-10">
+        <div className="flex items-end justify-between">
+          <Button
+            variant="outline"
+            onClick={prevSub}
+            iconName="ChevronLeft"
+            iconPosition="left"
+          >
+            {currentSubIndex === 0 ? "Previous Step" : "Previous Topic"}
+          </Button>
+
+          <div className="flex items-center space-x-3">
+            <Button
+              variant="success"
+              onClick={() => {
+                if (!sub?.completed) markSubtopicCompleted();
+                if (isLastSub) handleCompleteStep();
+              }}
+              iconName="CheckCircle"
+              iconPosition="left"
+            >
+              {!sub?.completed
+                ? "Mark as Completed"
+                : isLastSub
+                  ? "Complete Step"
+                  : "Mark as Completed"}
+            </Button>
+
+            <Button
+              variant="default"
+              onClick={nextSub}
+              iconName="ChevronRight"
+              iconPosition="right"
+            >
+              {isLastSub ? "Next Step" : "Next Topic"}
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* COMPLETION MODAL */}
+      {showCompletionModal && (
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-card p-6 rounded-lg elevation-3 max-w-md mx-4">
+            <div className="text-center">
+              <Icon name="CheckCircle" size={48} className="text-success mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-foreground mb-2">Complete This Step?</h3>
+              <p className="text-muted-foreground mb-6">
+                Make sure you have reviewed all subtopics before completing this step.
+              </p>
+              <div className="flex space-x-3">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowCompletionModal(false)}
+                  className="flex-1"
+                >
+                  Review More
+                </Button>
+                <Button variant="success" onClick={confirmCompletion} className="flex-1">
+                  Complete Step
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default ContentDisplay;
+
+
+
+
+
+
+// import React, { useState, useEffect } from "react";
+// import Icon from "../../../components/AppIcon";
+// import Button from "../../../components/ui/Button";
+// import PdfViewer from "./PdfViewer";
+// import { updateStepProgress } from "../../../api_service";
+
+
+// const ContentDisplay = ({
+//   currentStep,
+//   traineeInfo,
+//   onStepComplete,
+//   onNextStep,
+//   onPreviousStep,
+//   canGoNext,
+//   canGoPrevious,
+// }) => {
+//   const [timeSpent, setTimeSpent] = useState(0);
+//   const [startTime] = useState(Date.now());
+//   const [currentSubIndex, setCurrentSubIndex] = useState(0);
+//   const [showCompletionModal, setShowCompletionModal] = useState(false);
+//   const [fileData, setFileData] = useState(null);
+//   const [showFile, setShowFile] = useState(false);
+
+//   const topic = currentStep?.topics?.[0] ?? { subTopics: [] };
+//   const subTopics = Array.isArray(topic.subTopics) ? topic.subTopics : [];
+//   const totalSubs = subTopics.length;
+//   const completedSubs = subTopics.filter((s) => s?.completed).length;
+
+//   const calcProgress =
+//     totalSubs > 0 ? Math.round((completedSubs / totalSubs) * 100) : 0;
+
+//   const sub = subTopics[currentSubIndex] ?? null;
+//   const isLastSub = currentSubIndex === subTopics.length - 1;
+
+//   // Reset subtopic when step changes
+//   useEffect(() => setCurrentSubIndex(0), [currentStep?.id]);
+
+//   // Timer
+//   useEffect(() => {
+//     const interval = setInterval(() => {
+//       setTimeSpent(Math.floor((Date.now() - startTime) / 1000));
+//     }, 1000);
+
+//     return () => clearInterval(interval);
+//   }, [startTime]);
+
+//   const formatTime = (seconds) => {
+//     const hours = Math.floor(seconds / 3600);
+//     const minutes = Math.floor((seconds % 3600) / 60);
+//     const secs = seconds % 60;
+
+//     return hours > 0 ? `${hours}h ${minutes}m ${secs}s` : `${minutes}m ${secs}s`;
+//   };
+
+//   // -----------------------------
+//   // NEW FUNCTION (Non Breaking)
+//   // -----------------------------
+//   const getPreviewUrl = () => {
+//     if (!fileData || !fileData.url || !fileData.mime) return null;
+
+//     const isOffice =
+//       fileData.mime.includes("word") ||
+//       fileData.mime.includes("presentation") ||
+//       fileData.mime.includes("excel") ||
+//       fileData.name.endsWith(".doc") ||
+//       fileData.name.endsWith(".docx") ||
+//       fileData.name.endsWith(".pptx") ||
+//       fileData.name.endsWith(".xlsx");
+
+//     // Office → Microsoft Office Viewer (NO redirect issue)
+//     if (isOffice) {
+//       return `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(
+//         fileData.url
+//       )}`;
+//     }
+
+//     // PDF → direct blob
+//     if (fileData.mime === "application/pdf") {
+//       return fileData.url;
+//     }
+
+//     // Images → blob
+//     if (
+//       fileData.mime.startsWith("image/") ||
+//       fileData.name.match(/\.(png|jpg|jpeg|gif|webp)$/i)
+//     ) {
+//       return fileData.url;
+//     }
+
+//     return fileData.url;
+//   };
+
+//   // Fetch file blob from backend
+//   useEffect(() => {
+//     if (!sub?.filePath) {
+//       setFileData(null);
+//       return;
+//     }
+
+//     // Extract only filename (IMPORTANT FIX)
+//     const cleanFileName = sub.filePath.replace(/\\/g, "/").split("/").pop();
+
+//     fetch(`http://localhost:8080/api/syllabus/preview?path=${cleanFileName}`)
+//       .then((res) => {
+//         if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+//         return res.blob();
+//       })
+//       .then((blob) => {
+//         setFileData({
+//           url: URL.createObjectURL(blob),
+//           mime: blob.type,
+//           name: cleanFileName,
+//         });
+//       })
+//       .catch((err) => {
+//         console.error("Error loading file:", err);
+//         setFileData({ error: true, message: "Unable to load this file." });
+//       });
+//   }, [sub]);
+
+//   const markSubtopicCompleted = () => {
+//     if (!sub) return;
+//     const updated = [...subTopics];
+//     updated[currentSubIndex] = {
+//       ...updated[currentSubIndex],
+//       completed: true,
+//     };
+//     currentStep.topics[0].subTopics = updated;
+//   };
+
+//   const nextSub = () => {
+//     if (sub && !sub.completed) markSubtopicCompleted();
+//     if (currentSubIndex < subTopics.length - 1) {
+//       setCurrentSubIndex(currentSubIndex + 1);
+//     } else {
+//       onNextStep();
+//     }
+//   };
+
+//   const prevSub = () => {
+//     if (currentSubIndex > 0) setCurrentSubIndex(currentSubIndex - 1);
+//     else onPreviousStep();
+//   };
+
+//   const handleCompleteStep = () => {
+//     if (completedSubs === totalSubs) onStepComplete(currentStep?.id);
+//     else setShowCompletionModal(true);
+//   };
+
+//   const confirmCompletion = () => {
+//     setShowCompletionModal(false);
+//     onStepComplete(currentStep?.id);
+//   };
+
+//   if (!currentStep)
+//     return (
+//       <div className="flex items-center justify-center h-full">
+//         <div className="text-center">
+//           <Icon
+//             name="BookOpen"
+//             size={48}
+//             className="text-muted-foreground mx-auto mb-4"
+//           />
+//           <h3 className="text-lg font-semibold text-foreground mb-2">
+//             No Content Selected
+//           </h3>
+//           <p className="text-muted-foreground">
+//             Select a step from the sidebar to begin learning.
+//           </p>
+//         </div>
+//       </div>
+//     );
+
+//   return (
+//     <div className="flex flex-col h-full">
+//       {/* HEADER */}
+//       <div className="flex-shrink-0 bg-surface border-b border-border p-6">
+//         <div className="flex items-center justify-between">
+//           <div>
+//             <h1 className="text-2xl font-bold text-foreground mb-2">
+//               Step {currentStep?.stepNumber}: {currentStep?.title}
+//             </h1>
+//             <p className="text-muted-foreground">{currentStep?.description}</p>
+//           </div>
+
+//           <div className="flex items-center space-x-4 text-sm text-muted-foreground">
+//             <div className="flex items-center space-x-2">
+//               <Icon name="Clock" size={16} />
+//               <span>Time: {formatTime(timeSpent)}</span>
+//             </div>
+//             <div className="flex items-center space-x-2">
+//               <Icon name="Target" size={16} />
+//               <span>Est: {currentStep?.estimatedTime}</span>
+//             </div>
+//           </div>
+//         </div>
+
+//         {/* PROGRESS BAR */}
+//         <div className="mt-4 px-6">
+//           <div className="flex items-center justify-between text-sm text-muted-foreground mb-2">
+//             <span>Step Progress</span>
+//             <span>{calcProgress}%</span>
+//           </div>
+//           <div className="w-full bg-muted rounded-full h-2">
+//             <div
+//               className="bg-primary h-2 rounded-full transition-all duration-300"
+//               style={{ width: `${calcProgress}%` }}
+//             />
+//           </div>
+//         </div>
+//       </div>
+
+
+//       {/* MAIN CONTENT */}
+//       <div className="flex-1 overflow-y-auto p-6">
+//         <div className="max-w-4xl mx-auto">
+//           {sub ? (
+//             <>
+//               <h2 className="text-xl font-bold">{sub.title ?? sub.name}</h2>
+//               <p className="text-gray-700 whitespace-pre-line mt-2">{sub.description}</p>
+
+//               {sub?.filePath && fileData && !fileData.error && (
+//                 <div className="bg-gray-50 mt-6 border rounded-xl shadow-lg p-4 max-h-[600px] overflow-auto custom-scrollbar">
+//                   <div className="flex justify-between items-center mb-3">
+//                     <h3 className="text-sm font-semibold text-gray-800">
+//                       {fileData.name}
+//                     </h3>
+//                   </div>
+
+//                   <div className="rounded-xl overflow-hidden border bg-white">
+//                     {fileData.mime.startsWith("image/") ? (
+//                       <img
+//                         src={fileData.url}
+//                         alt="Preview"
+//                         className="w-full max-h-[550px] object-contain"
+//                       />
+//                     ) : fileData.mime === "application/pdf" ? (
+//                       <PdfViewer url={fileData.url} />
+//                     ) : (
+//                       <div className="text-sm text-gray-500 italic p-4 text-center">
+//                         Preview not available
+//                       </div>
+//                     )}
+//                   </div>
+//                 </div>
+//               )}
+
+//               {fileData?.error && (
+//                 <div className="text-red-500 mt-4">{fileData.message}</div>
+//               )}
+//             </>
+//           ) : (
+//             <div className="text-center py-20 text-muted-foreground">
+//               No subtopics available for this step.
+//             </div>
+//           )}
+//         </div>
+//       </div>
+
+
+//       {/* FOOTER */}
+//       <div className="flex-shrink-0 bg-surface border-t border-border p-6 mb-10">
+//         <div className="flex items-end justify-between">
+//           <Button
+//             variant="outline"
+//             onClick={prevSub}
+//             iconName="ChevronLeft"
+//             iconPosition="left"
+//           >
+//             {currentSubIndex === 0 ? "Previous Step" : "Previous Topic"}
+//           </Button>
+
+//           <div className="flex items-center space-x-3">
+//             <Button
+//               variant="success"
+//               onClick={() => {
+//                 if (!sub?.completed) markSubtopicCompleted();
+//                 if (isLastSub) handleCompleteStep();
+//               }}
+//               iconName="CheckCircle"
+//               iconPosition="left"
+//             >
+//               {!sub?.completed
+//                 ? "Mark as Completed"
+//                 : isLastSub
+//                   ? "Complete Step"
+//                   : "Mark as Completed"}
+//             </Button>
+
+//             <Button
+//               variant="default"
+//               onClick={nextSub}
+//               iconName="ChevronRight"
+//               iconPosition="right"
+//             >
+//               {isLastSub ? "Next Step" : "Next Topic"}
+//             </Button>
+//           </div>
+//         </div>
+//       </div>
+
+//       {/* COMPLETION MODAL */}
+//       {showCompletionModal && (
+//         <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+//           <div className="bg-card p-6 rounded-lg elevation-3 max-w-md mx-4">
+//             <div className="text-center">
+//               <Icon
+//                 name="CheckCircle"
+//                 size={48}
+//                 className="text-success mx-auto mb-4"
+//               />
+//               <h3 className="text-lg font-semibold text-foreground mb-2">
+//                 Complete This Step?
+//               </h3>
+//               <p className="text-muted-foreground mb-6">
+//                 Make sure you have reviewed all subtopics before completing this
+//                 step.
+//               </p>
+//               <div className="flex space-x-3">
+//                 <Button
+//                   variant="outline"
+//                   onClick={() => setShowCompletionModal(false)}
+//                   className="flex-1"
+//                 >
+//                   Review More
+//                 </Button>
+//                 <Button
+//                   variant="success"
+//                   onClick={confirmCompletion}
+//                   className="flex-1"
+//                 >
+//                   Complete Step
+//                 </Button>
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+//       )}
+//     </div>
+//   );
+// };
+
+// export default ContentDisplay;
+
+
+
+// package whitestone.trainee_management.service;
+
+// import org.docx4j.Docx4J;
+// import org.docx4j.openpackaging.exceptions.Docx4JException;
+// import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
+// import org.springframework.web.multipart.MultipartFile;
+
+// import java.io.*;
+
+// public class FileUploadUtil {
+
+//     public static String saveFile(MultipartFile file, String uploadDir) throws Exception {
+
+//         // 1️⃣ Ensure directory exists
+//         File directory = new File(uploadDir);
+//         if (!directory.exists()) {
+//             boolean created = directory.mkdirs();
+//             System.out.println("UPLOAD DIR CREATED = " + created);
+//         }
+
+//         // 2️⃣ Clean filename (remove spaces)
+//         String originalName = file.getOriginalFilename();
+//         originalName = originalName.replaceAll("\\s+", "_");  // remove spaces
+
+//         String extension = originalName.substring(originalName.lastIndexOf(".") + 1).toLowerCase();
+
+//         // 3️⃣ DOC / DOCX → convert to PDF
+//         if (extension.equals("doc") || extension.equals("docx")) {
+
+//             String pdfName = originalName.replace("." + extension, ".pdf");
+//             File pdfFile = new File(directory, pdfName);
+
+//             convertToPdf(file.getInputStream(), pdfFile);
+
+//             return pdfFile.getAbsolutePath();
+//         }
+
+//         // 4️⃣ PDF → direct save
+//         if (extension.equals("pdf")) {
+
+
+//             File dir = new File(uploadDir);
+//             if (!dir.exists()) {
+//                 dir.mkdirs();
+//             }
+//             String safeName = originalName.replaceAll("\\s+", "_");
+//             File dest = new File(dir, safeName);
+
+//             file.transferTo(dest);
+
+//             return dest.getAbsolutePath();
+
+//             // DEBUG: print location
+           
+
+//         }
+
+//         throw new IllegalArgumentException("Invalid file format. Only DOC, DOCX, PDF allowed.");
+//     }
+
+    
+//     // 5️⃣ DOC/DOCX → PDF conversion
+//     private static void convertToPdf(InputStream inputStream, File pdfFile)
+//             throws Docx4JException, IOException {
+
+//         WordprocessingMLPackage wordMLPackage = WordprocessingMLPackage.load(inputStream);
+
+//         try (FileOutputStream os = new FileOutputStream(pdfFile)) {
+//             Docx4J.toPDF(wordMLPackage, os);
+//         }
+//     }
+// }
+
+
+
+// import React, { useState, useEffect } from 'react';
+// import { useNavigate } from 'react-router-dom';
+// import Header from '../../components/ui/Header';
+// import NavigationBreadcrumb from '../../components/ui/NavigationBreadcrumb';
+// import SessionTimeoutHandler from '../../components/ui/SessionTimeoutHandler';
+// import ProgressTracker from '././components/ProgressTracker';
+// import CurrentStepContent from './components/CurrentStepContent';
+// import AssessmentHistory from './components/AssessmentHistory';
+// import InterviewSchedule from './components/InterviewSchedule';
+// import QuickActions from './components/QuickActions';
+// import Icon from '../../components/AppIcon';
+// import Button from '../../components/ui/Button';
+// import { fetchAssessmentsByTrainee } from '../../api_service';
+// import { fetchUserByEmpId } from "../../api_service";
+
+
+// const TraineeDashboard = () => {
+//   const navigate = useNavigate();
+//   const [currentStep, setCurrentStep] = useState(2);
+//   const [completedSteps, setCompletedSteps] = useState(1);
+//   const [isLoading, setIsLoading] = useState(true);
+//   const [syllabus, setSyllabus] = useState([]);
+//   const [stepsStatus, setStepsStatus] = useState([]);
+//   const [overall, setOverall] = useState(0);
+//   const [assessments, setAssessments] = useState([]);
+//   const [traineeInfo, setTraineeInfo] = useState(null);
+
+
+//   const empid = sessionStorage.setItem("empid", "TRN001");
+
+
+
+//   // const [traineeInfo] = useState({
+//   //   name: 'John Doe',
+//   //   id: 'TRN001',
+//   //   email: 'john.doe@company.com',
+//   //   startDate: '2024-10-01',
+//   //   program: 'Software Development Training'
+//   // });
+
+
+//   // useEffect(() => {
+//   //   const fetchData = async () => {
+//   //     try {
+//   //       const empId = traineeInfo.id;
+
+//   //       // 1) Syllabus data
+//   //       const syllabusRes = await fetch(`http://localhost:8080/syllabus/all`);
+//   //       const syllabusData = await syllabusRes.json();
+//   //       setSyllabus(syllabusData);
+
+//   //       // 2) Steps progress data
+//   //       const stepsRes = await fetch(`http://localhost:8080/steps/${empId}`);
+//   //       const stepsData = await stepsRes.json();
+//   //       setStepsStatus(stepsData);
+
+//   //       // 3) Overall progress
+//   //       const overallRes = await fetch(`http://localhost:8080/overall/${empId}`);
+//   //       const overallData = await overallRes.json();
+//   //       setOverall(overallData.overallProgress);
+
+//   //       setIsLoading(false);
+//   //     } catch (err) {
+//   //       console.error("Error loading dashboard:", err);
+//   //       setIsLoading(false);
+//   //     }
+//   //   };
+
+//   //   fetchData();
+//   // }, []);
+
+//   useEffect(() => {
+//     const loadTraineeInfo = async () => {
+//       try {
+//         const empId = sessionStorage.getItem("empid");
+
+//         const user = await fetchUserByEmpId(empId);
+
+//         if (user) {
+//           setTraineeInfo({
+//             name: `${user.firstname} ${user.lastname}`,
+//             id: user.empid,
+//             email: user.email,
+//             program: user.designation || "Training Program",
+//             startDate: user.createdAt || "2024-10-01", // or whatever
+//           });
+//         }
+//       } catch (err) {
+//         console.error("Failed to load trainee info", err);
+//       }
+//     };
+
+//     loadTraineeInfo();
+//   }, []);
+
+
+
+//   //Mock authentication check
+//   //🔥 Fetch Assessment History(ONLY THIS EFFECT)
+//   // useEffect(() => {
+//   //   const fetchAssessmentHistory = async () => {
+//   //     try {
+//   //       const empId = sessionStorage.getItem("empid");
+
+//   //       const res = await fetch(
+//   //         `http://localhost:8080/api/assessments/trainee/${empId}`
+//   //       );
+
+//   //       const json = await res.json();
+
+//   //       console.log("RAW RESPONSE:", json);
+
+//   //       // Ensure data.data is an array
+//   //       const list = Array.isArray(json?.data) ? json.data : [];
+
+//   //       // Final normalized mapping
+//   //       const normalized = list.map((a, index) => ({
+//   //         id: a.assessmentId,
+//   //         week: index + 1, // Because API does not provide week number
+//   //         date: a.assessmentDate,
+//   //         step: a.assessmentType || "Weekly Assessment",
+
+//   //         marks: Number(a.marks),
+//   //         maxMarks: Number(a.maxMarks),
+//   //         grade:
+//   //           Number(a.marks) >= 85
+//   //             ? "A"
+//   //             : Number(a.marks) >= 70
+//   //               ? "B"
+//   //               : Number(a.marks) >= 55
+//   //                 ? "C"
+//   //                 : "D",
+
+//   //         // Manager name from user object
+//   //         managerName: `${a.user.firstname} ${a.user.lastname}`,
+
+//   //         managerAvatar:
+//   //           "https://ui-avatars.com/api/?background=random&name=" +
+//   //           encodeURIComponent(`${a.user.firstname} ${a.user.lastname}`),
+
+//   //         managerAvatarAlt: `Avatar of ${a.user.firstname} ${a.user.lastname}`,
+
+//   //         remarks: a.remarks,
+//   //         feedback: a.recommendations,
+//   //         submittedAt: a.submittedAt,
+
+//   //         status: Number(a.currentStep) >= 1 ? "completed" : "pending"
+//   //       }));
+
+//   //       setAssessments(normalized);
+//   //     } catch (error) {
+//   //       console.error("Error loading assessment history:", error);
+//   //       setAssessments([]);
+//   //     }
+//   //   };
+
+//   //   fetchAssessmentHistory();
+//   // }, []);
+
+
+
+//   useEffect(() => {
+//     const loadTraineeData = async () => {
+//       try {
+//         const empId = sessionStorage.getItem("empid");
+//         if (!empId) return;
+
+
+
+//         // 2️⃣ Fetch assessments
+//         const assessmentRes = await fetchAssessmentsByTrainee(empId);
+//         const list = Array.isArray(assessmentRes.data) ? assessmentRes.data : [];
+
+//         const normalized = list.map((a, index) => ({
+//           id: a.assessmentId,
+//           week: index + 1, // Because API does not provide week number
+//           date: a.assessmentDate,
+//           step: a.assessmentType || "Weekly Assessment",
+
+//           marks: Number(a.marks),
+//           maxMarks: Number(a.maxMarks),
+//           grade:
+//             Number(a.marks) >= 85
+//               ? "A"
+//               : Number(a.marks) >= 70
+//                 ? "B"
+//                 : Number(a.marks) >= 55
+//                   ? "C"
+//                   : "D",
+
+//           // Manager name from user object
+//           managerName: `${a.user.firstname} ${a.user.lastname}`,
+
+//           managerAvatar:
+//             "https://ui-avatars.com/api/?background=random&name=" +
+//             encodeURIComponent(`${a.user.firstname} ${a.user.lastname}`),
+
+//           managerAvatarAlt: `Avatar of ${a.user.firstname} ${a.user.lastname}`,
+
+//           remarks: a.remarks,
+//           feedback: a.recommendations,
+//           submittedAt: a.submittedAt,
+
+//           status: Number(a.currentStep) >= 1 ? "completed" : "pending"
+//         }));
+
+//         setAssessments(normalized);
+
+//       } catch (err) {
+//         console.error("Error loading trainee dashboard data:", err);
+//       }
+//     };
+
+//     loadTraineeData();
+//   }, []);
+
+
+
+
+
+
+//   useEffect(() => {
+//     const checkAuth = async () => {
+//       // Simulate auth check
+//       await new Promise(resolve => setTimeout(resolve, 1000));
+//       setIsLoading(false);
+//     };
+
+//     checkAuth();
+//   }, []);
+
+//   const handleStepComplete = (stepNumber) => {
+//     if (stepNumber === currentStep) {
+//       setCompletedSteps(prev => Math.max(prev, stepNumber));
+//       setCurrentStep(prev => Math.min(prev + 1, 8));
+//     }
+//   };
+
+//   const handleStepClick = (stepNumber) => {
+//     if (stepNumber <= completedSteps + 1) {
+//       setCurrentStep(stepNumber);
+//     }
+//   };
+
+//   const handleLogout = () => {
+//     // Clear session data
+//     localStorage.removeItem('authToken');
+//     navigate('/login');
+//   };
+
+//   const handleSessionExpired = () => {
+//     handleLogout();
+//   };
+
+//   if (isLoading) {
+//     return (
+//       <div className="min-h-screen bg-background flex items-center justify-center">
+//         <div className="text-center">
+//           <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+//           <p className="text-muted-foreground">Loading dashboard...</p>
+//         </div>
+//       </div>
+//     );
+//   }
+
+//   return (
+//     <div className="min-h-screen bg-background">
+//       {/* Session Management */}
+//       <SessionTimeoutHandler
+//         sessionDuration={30}
+//         warningTime={5}
+//         onSessionExpired={handleSessionExpired}
+//         onSessionExtended={() => { }}
+//         isActive={true}
+//       />
+//       {/* Header */}
+//       <Header
+//         userRole="trainee"
+//         userName={traineeInfo?.name}
+//         onLogout={handleLogout}
+//       />
+//       {/* Main Content */}
+//       <main className="pt-16">
+//         <div className="max-w-7xl mx-auto px-6 py-8">
+//           {/* Breadcrumb Navigation */}
+//           <NavigationBreadcrumb
+//             userRole="trainee"
+//             showHomeIcon={true}
+//             className="mb-6"
+//           />
+
+//           {/* Welcome Section */}
+//           <div className="mb-8">
+//             <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg p-6 border border-border">
+//               <div className="flex items-center justify-between">
+//                 <div>
+//                   <h1 className="text-2xl font-bold text-foreground mb-2">
+//                     Welcome back, {traineeInfo?.name}!
+//                   </h1>
+//                   <p className="text-muted-foreground">
+//                     Continue your learning journey in the {traineeInfo?.program}
+//                   </p>
+//                   <div className="flex items-center space-x-4 mt-3 text-sm text-muted-foreground">
+//                     <span className="flex items-center">
+//                       <Icon name="Calendar" size={14} className="mr-1" />
+//                       Started: {new Date(traineeInfo.startDate)?.toLocaleDateString('en-US', {
+//                         month: 'long',
+//                         day: 'numeric',
+//                         year: 'numeric'
+//                       })}
+//                     </span>
+//                     <span className="flex items-center">
+//                       <Icon name="User" size={14} className="mr-1" />
+//                       ID: {traineeInfo?.id}
+//                     </span>
+//                   </div>
+//                 </div>
+//                 <div className="hidden md:block">
+//                   <div className="w-20 h-20 bg-primary rounded-full flex items-center justify-center">
+//                     <Icon name="GraduationCap" size={40} color="white" />
+//                   </div>
+//                 </div>
+//               </div>
+//             </div>
+//           </div>
+
+//           {/* Dashboard Grid */}
+//           <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+//             {/* Left Column - Main Content */}
+//             <div className="xl:col-span-2 space-y-8">
+//               {/* Progress Tracker */}
+//               <ProgressTracker
+//                 currentStep={currentStep}
+//                 totalSteps={8}
+//                 completedSteps={stepsStatus.filter(s => s.completed).length}
+//                 onStepClick={handleStepClick}
+//                 stepsStatus={stepsStatus}
+//               />
+
+
+//               {/* Current Step Content */}
+//               <CurrentStepContent
+//                 currentStep={currentStep}
+//                 traineeInfo={traineeInfo}
+//                 onStepComplete={handleStepComplete}
+//                 syllabus={syllabus}
+//                 stepsStatus={stepsStatus}
+//               />
+
+//               {/* Assessment History */}
+//               <AssessmentHistory assessments={assessments} />
+
+//             </div>
+
+//             {/* Right Column - Sidebar */}
+//             <div className="space-y-8">
+//               {/* Quick Actions */}
+//               <QuickActions />
+
+//               {/* Interview Schedule */}
+//               <InterviewSchedule />
+
+//               {/* Progress Summary Card */}
+//               <div className="bg-card rounded-lg border border-border p-6">
+//                 <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center">
+//                   <Icon name="Target" size={20} className="mr-2 text-primary" />
+//                   Progress Summary
+//                 </h3>
+//                 <div className="space-y-4">
+//                   <div className="flex items-center justify-between">
+//                     <span className="text-sm text-muted-foreground">Steps Completed</span>
+//                     <span className="font-medium text-foreground">{completedSteps}/8</span>
+//                   </div>
+//                   <div className="flex items-center justify-between">
+//                     <span className="text-sm text-muted-foreground">Current Step</span>
+//                     <span className="font-medium text-foreground">Step {currentStep}</span>
+//                   </div>
+//                   <div className="flex items-center justify-between">
+//                     <span className="text-sm text-muted-foreground">Overall Progress</span>
+//                     <span className="font-medium text-primary">{overall}%
+//                     </span>
+//                   </div>
+//                   <div className="pt-4 border-t border-border">
+//                     <Button
+//                       variant="default"
+//                       size="sm"
+//                       iconName="TrendingUp"
+//                       iconPosition="left"
+//                       iconSize={14}
+//                       fullWidth
+//                       onClick={() => navigate('/progress-reports')}
+//                     >
+//                       View Detailed Reports
+//                     </Button>
+//                   </div>
+//                 </div>
+//               </div>
+
+//               {/* Help & Support Card */}
+//               <div className="bg-card rounded-lg border border-border p-6">
+//                 <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center">
+//                   <Icon name="HelpCircle" size={20} className="mr-2 text-primary" />
+//                   Need Help?
+//                 </h3>
+//                 <div className="space-y-3">
+//                   <p className="text-sm text-muted-foreground">
+//                     Get assistance with your training program
+//                   </p>
+//                   <div className="space-y-2">
+//                     <Button
+//                       variant="outline"
+//                       size="sm"
+//                       iconName="MessageSquare"
+//                       iconPosition="left"
+//                       iconSize={14}
+//                       fullWidth
+//                     >
+//                       Ask a Question
+//                     </Button>
+//                     <Button
+//                       variant="outline"
+//                       size="sm"
+//                       iconName="Book"
+//                       iconPosition="left"
+//                       iconSize={14}
+//                       fullWidth
+//                     >
+//                       Training Guide
+//                     </Button>
+//                     <Button
+//                       variant="outline"
+//                       size="sm"
+//                       iconName="Phone"
+//                       iconPosition="left"
+//                       iconSize={14}
+//                       fullWidth
+//                     >
+//                       Contact Support
+//                     </Button>
+//                   </div>
+//                 </div>
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+//       </main>
+//     </div>
+//   );
+// };
+
+// export default TraineeDashboard;
+
+
+
+
+// import React, { useState } from 'react';
+// import Icon from '../../../components/AppIcon';
+// import Button from '../../../components/ui/Button';
+
+// const InterviewSchedule = ({ className = '', interviews = [] }) => {
+//   const [selectedInterview, setSelectedInterview] = useState(null);
+
+//   // const interviews = [
+//   //   {
+//   //     id: 1,
+//   //     title: "Technical Assessment - Programming Fundamentals",
+//   //     date: "2024-11-05",
+//   //     time: "10:00 AM",
+//   //     duration: "45 minutes",
+//   //     interviewer: "Dr. Michael Chen",
+//   //     interviewerRole: "Senior Technical Lead",
+//   //     interviewerAvatar: "https://images.unsplash.com/photo-1676989880361-091e12efc056",
+//   //     interviewerAvatarAlt: "Professional headshot of Asian man with glasses in dark suit smiling confidently",
+//   //     location: "Conference Room A",
+//   //     meetingLink: "https://meet.company.com/tech-assessment-001",
+//   //     status: "scheduled",
+//   //     type: "technical",
+//   //     description: `This technical interview will assess your understanding of programming fundamentals covered in the first month of training.
+
+//   // Topics to be covered:
+//   // • Basic programming concepts and terminology
+//   // • Data structures and their applications
+//   // • Problem-solving approaches
+//   // • Code reading and logic analysis
+
+//   // Preparation tips:
+//   // • Review your completed training modules
+//   // • Practice explaining concepts clearly
+//   // • Prepare questions about the training program
+//   // • Ensure stable internet connection for video call`,
+//   //     feedback: null,
+//   //     completedAt: null
+//   //   },
+//   //   {
+//   //     id: 2,
+//   //     title: "Progress Review - Mid-Training Evaluation",
+//   //     date: "2024-10-28",
+//   //     time: "2:30 PM",
+//   //     duration: "30 minutes",
+//   //     interviewer: "Sarah Johnson",
+//   //     interviewerRole: "Training Manager",
+//   //     interviewerAvatar: "https://images.unsplash.com/photo-1734456611474-13245d164868",
+//   //     interviewerAvatarAlt: "Professional headshot of woman with brown hair in business attire smiling at camera",
+//   //     location: "Virtual Meeting",
+//   //     meetingLink: "https://meet.company.com/progress-review-002",
+//   //     status: "completed",
+//   //     type: "progress",
+//   //     description: "Mid-training progress evaluation to discuss learning outcomes and address any challenges.",
+//   //     feedback: `Excellent progress demonstrated throughout the training program. John shows strong analytical thinking and consistent improvement in technical skills.
+
+//   // Strengths observed:
+//   // • Consistent attendance and engagement
+//   // • Strong problem-solving approach
+//   // • Good communication of technical concepts
+//   // • Proactive in seeking help when needed
+
+//   // Areas for continued focus:
+//   // • Continue practicing coding exercises
+//   // • Prepare for upcoming technical assessments
+//   // • Consider additional reading on advanced topics
+
+//   // Overall assessment: Exceeding expectations. Well-prepared for the next phase of training.`,
+//   //     completedAt: "2024-10-28T14:30:00Z"
+//   //   },
+//   //   {
+//   //     id: 3,
+//   //     title: "Final Project Presentation",
+//   //     date: "2024-11-20",
+//   //     time: "11:00 AM",
+//   //     duration: "60 minutes",
+//   //     interviewer: "Panel Interview",
+//   //     interviewerRole: "Technical Review Board",
+//   //     interviewerAvatar: "https://images.unsplash.com/photo-1493882552576-fce827c6161e",
+//   //     interviewerAvatarAlt: "Professional group photo of diverse team members in business attire in modern office setting",
+//   //     location: "Main Conference Hall",
+//   //     meetingLink: null,
+//   //     status: "pending",
+//   //     type: "presentation",
+//   //     description: `Final capstone project presentation to demonstrate comprehensive understanding of all training modules.
+
+//   // Presentation requirements:
+//   // • 20-minute project demonstration
+//   // • 10-minute Q&A session
+//   // • Technical documentation review
+//   // • Code walkthrough and explanation
+
+//   // Panel members:
+//   // • Dr. Michael Chen (Technical Lead)
+//   // • Sarah Johnson (Training Manager)
+//   // • Alex Rodriguez (Senior Developer)
+//   // • Lisa Wang (Product Manager)`,
+//   //     feedback: null,
+//   //     completedAt: null
+//   //   }];
+
+
+//   const getStatusColor = (status) => {
+//     switch (status) {
+//       case 'completed':
+//         return 'text-success';
+//       case 'scheduled':
+//         return 'text-primary';
+//       case 'pending':
+//         return 'text-warning';
+//       case 'cancelled':
+//         return 'text-error';
+//       default:
+//         return 'text-muted-foreground';
+//     }
+//   };
+
+//   const getStatusBg = (status) => {
+//     switch (status) {
+//       case 'completed':
+//         return 'bg-success/10';
+//       case 'scheduled':
+//         return 'bg-primary/10';
+//       case 'pending':
+//         return 'bg-warning/10';
+//       case 'cancelled':
+//         return 'bg-error/10';
+//       default:
+//         return 'bg-muted/10';
+//     }
+//   };
+
+//   const getStatusIcon = (status) => {
+//     switch (status) {
+//       case 'completed':
+//         return 'CheckCircle';
+//       case 'scheduled':
+//         return 'Calendar';
+//       case 'pending':
+//         return 'Clock';
+//       case 'cancelled':
+//         return 'XCircle';
+//       default:
+//         return 'AlertCircle';
+//     }
+//   };
+
+//   const getTypeIcon = (type) => {
+//     switch (type) {
+//       case 'technical':
+//         return 'Code';
+//       case 'progress':
+//         return 'TrendingUp';
+//       case 'presentation':
+//         return 'Presentation';
+//       default:
+//         return 'MessageSquare';
+//     }
+//   };
+
+//   const formatDate = (dateString) => {
+//     return new Date(dateString)?.toLocaleDateString('en-US', {
+//       weekday: 'long',
+//       month: 'long',
+//       day: 'numeric',
+//       year: 'numeric'
+//     });
+//   };
+
+//   const isUpcoming = (dateString) => {
+//     return new Date(dateString) > new Date();
+//   };
+
+//   const upcomingInterviews = interviews?.filter((interview) =>
+//     interview?.status === 'scheduled' && isUpcoming(interview?.date)
+//   );
+
+//   return (
+//     <div className={`bg-card rounded-lg border border-border ${className}`}>
+//       {/* Header */}
+//       <div className="p-6 border-b border-border">
+//         <div className="flex items-center justify-between">
+//           <div>
+//             <h2 className="text-xl font-semibold text-foreground flex items-center">
+//               <Icon name="Calendar" size={24} className="mr-3 text-primary" />
+//               Interview Schedule
+//             </h2>
+//             <p className="text-sm text-muted-foreground mt-1">
+//               Upcoming interviews and evaluation sessions
+//             </p>
+//           </div>
+//           <div className="text-right">
+//             <div className="text-2xl font-bold text-primary">{upcomingInterviews?.length}</div>
+//             <div className="text-xs text-muted-foreground">Upcoming</div>
+//           </div>
+//         </div>
+//       </div>
+//       {/* Interview List */}
+//       <div className="p-6">
+//         <div className="space-y-4">
+//           {interviews?.map((interview) => (
+
+//             <div
+//               key={interview?.id}
+//               className={`border border-border rounded-lg p-4 transition-all duration-200 hover:shadow-sm ${selectedInterview === interview?.id ? 'border-primary bg-primary/5' : ''}`}
+//             >
+
+//               {/* Interview Header */}
+//               <div className="flex items-start justify-between mb-4">
+//                 <div className="flex items-start space-x-4">
+//                   <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${getStatusBg(interview?.status)}`}>
+//                     {/* <Icon
+//                       name={getTypeIcon(interview?.interviewType)}
+//                       size={20}
+//                       className={getStatusColor(interview?.status)}
+//                     /> */}
+//                   </div>
+
+//                   <div className="flex-1">
+//                     <h3 className="font-semibold text-foreground mb-1">{interview?.interviewType}</h3>
+
+//                     <div className="flex items-center space-x-4 text-sm text-muted-foreground">
+//                       <span className="flex items-center">
+//                         <Icon name="Calendar" size={14} className="mr-1" />
+//                         {formatDate(interview?.date)}
+//                       </span>
+
+//                       <span className="flex items-center">
+//                         <Icon name="Clock" size={14} className="mr-1" />
+//                         {interview?.time} ({interview?.duration})
+//                       </span>
+//                     </div>
+//                   </div>
+//                 </div>
+
+//                 <div className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusBg(interview?.status)} ${getStatusColor(interview?.status)}`}>
+//                   {/* <Icon name={getStatusIcon(interview?.status)} size={12} className="inline mr-1" />
+//                   {interview?.status?.charAt(0)?.toUpperCase() + interview?.status?.slice(1)} */}
+//                 </div>
+//               </div>
+
+//               {/* Interviewer Info (Trainer) */}
+//               <div className="flex items-center space-x-3 mb-4">
+//                 <div className="w-8 h-8 rounded-full overflow-hidden"></div>
+
+//                 <div>
+//                   <p className="text-sm font-medium text-foreground">{interview?.trainerName}</p>
+//                   <p className="text-xs text-muted-foreground">{interview?.trainerTitle}</p>
+//                 </div>
+//               </div>
+
+//               {/* Meeting / Location */}
+//               <div className="flex items-center justify-between mb-4">
+//                 <div className="flex items-center space-x-4 text-sm text-muted-foreground">
+//                   <span className="flex items-center">
+//                     <Icon name="MapPin" size={14} className="mr-1" />
+//                     {interview?.location}
+//                   </span>
+
+//                   {interview?.meetingLink && (
+//                     <Button
+//                       variant="outline"
+//                       size="xs"
+//                       iconName="ExternalLink"
+//                       iconPosition="right"
+//                       iconSize={12}
+//                       onClick={() => window.open(interview?.meetingLink, "_blank")}
+//                     >
+//                       Join Meeting
+//                     </Button>
+//                   )}
+//                 </div>
+//               </div>
+
+//               {/* Actions */}
+//               <div className="flex items-center justify-between">
+//                 <div className="flex items-center space-x-2">
+//                   {interview?.status === "scheduled" && isUpcoming(interview?.date) && (
+//                     <div className="flex items-center space-x-1 text-xs text-primary">
+//                       <Icon name="Bell" size={14} />
+//                       <span>Reminder set</span>
+//                     </div>
+//                   )}
+//                 </div>
+
+//                 <Button
+//                   variant="outline"
+//                   size="sm"
+//                   iconName={selectedInterview === interview?.id ? "ChevronUp" : "ChevronDown"}
+//                   iconPosition="right"
+//                   iconSize={14}
+//                   onClick={() =>
+//                     setSelectedInterview(
+//                       selectedInterview === interview?.id ? null : interview?.id
+//                     )
+//                   }
+//                 >
+//                   {selectedInterview === interview?.id ? "Hide Details" : "View Details"}
+//                 </Button>
+//               </div>
+
+//               {/* Expanded Details */}
+//               {selectedInterview === interview?.id && (
+//                 <div className="mt-4 pt-4 border-t border-border">
+//                   <div className="space-y-4">
+//                     {/* Description */}
+//                     <div>
+//                       <h4 className="font-medium text-foreground mb-2">Interview Notes:</h4>
+//                       <div className="bg-muted/30 rounded-lg p-4">
+//                         <p className="text-sm text-foreground whitespace-pre-line">
+//                           {interview?.notes}
+//                         </p>
+//                       </div>
+//                     </div>
+
+//                     {/* Trainee Info */}
+//                     <div>
+//                       <h4 className="font-medium text-foreground mb-2">Trainee Info:</h4>
+//                       <div className="bg-muted/30 rounded-lg p-4">
+//                         <p className="text-sm">Name: {interview?.traineeName}</p>
+//                         <p className="text-sm">Email: {interview?.traineeEmail}</p>
+//                         <p className="text-sm">Emp ID: {interview?.traineeEmpId}</p>
+//                       </div>
+//                     </div>
+
+//                     {/* Approvals */}
+//                     <div>
+//                       <h4 className="font-medium text-foreground mb-2">Approval Status:</h4>
+//                       <div className="bg-muted/30 rounded-lg p-4">
+//                         <p className="text-sm">Trainer Approval: {interview?.trainerApproval}</p>
+//                         <p className="text-sm">Trainee Approval: {interview?.traineeApproval}</p>
+//                         <p className="text-sm">RSVP Status: {interview?.rsvpStatus}</p>
+//                       </div>
+//                     </div>
+//                   </div>
+//                 </div>
+//               )}
+//             </div>
+//           ))}
+
+//         </div>
+
+//         {/* Summary Stats */}
+//         <div className="mt-6 pt-6 border-t border-border">
+//           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+//             <div className="text-center p-4 bg-muted/30 rounded-lg">
+//               <div className="text-xl font-bold text-success">
+//                 {interviews?.filter((i) => i?.status === 'completed')?.length}
+//               </div>
+//               <div className="text-xs text-muted-foreground">Completed</div>
+//             </div>
+//             <div className="text-center p-4 bg-muted/30 rounded-lg">
+//               <div className="text-xl font-bold text-primary">
+//                 {interviews?.filter((i) => i?.status === 'scheduled')?.length}
+//               </div>
+//               <div className="text-xs text-muted-foreground">Scheduled</div>
+//             </div>
+//             <div className="text-center p-4 bg-muted/30 rounded-lg">
+//               <div className="text-xl font-bold text-warning">
+//                 {interviews?.filter((i) => i?.status === 'pending')?.length}
+//               </div>
+//               <div className="text-xs text-muted-foreground">Pending</div>
+//             </div>
+//             <div className="text-center p-4 bg-muted/30 rounded-lg">
+//               <div className="text-xl font-bold text-foreground">
+//                 {upcomingInterviews?.length}
+//               </div>
+//               <div className="text-xs text-muted-foreground">Upcoming</div>
+//             </div>
+//           </div>
+//         </div>
+//       </div>
+//     </div>);
+
+// };
+
+// // export default InterviewSchedule;
+
+
+// import React, { useState, useEffect, useRef } from 'react';
+// import { useNavigate } from 'react-router-dom';
+// import Header from '../../components/ui/Header';
+// import SecureContentWrapper from '../../components/ui/SecureContentWrapper';
+// import SessionTimeoutHandler from '../../components/ui/SessionTimeoutHandler';
+// import NavigationBreadcrumb from '../../components/ui/NavigationBreadcrumb';
+// import StepNavigationSidebar from './components/StepNavigationSidebar';
+// import ContentDisplay from './components/ContentDisplay';
+// import SecurityWatermark from './components/SecurityWatermark';
+// import ProgressTracker from './components/ProgressTracker';
+// import Icon from '../../components/AppIcon';
+// import Button from '../../components/ui/Button';
+// import { updateStepProgress, fetchUserByEmpId } from '../../api_service';
+
+// const SyllabusContentViewer = () => {
+//   const navigate = useNavigate();
+//   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+//   const [currentStepId, setCurrentStepId] = useState(null);
+//   const [sessionActive, setSessionActive] = useState(true);
+//   const [showProgressTracker, setShowProgressTracker] = useState(false);
+//   const [syllabusSteps, setSyllabusSteps] = useState([]);
+//   const [traineeInfo, setTraineeInfo] = useState({});
+//   const [loading, setLoading] = useState(true);
+//   const [subTopicIndex, setSubTopicIndex] = useState(0);
+
+//   const currentStep = syllabusSteps?.find((step) => step?.id === currentStepId);
+//   const currentStepIndex = syllabusSteps?.findIndex((step) => step?.id === currentStepId);
+//   const completedSteps = syllabusSteps?.filter((step) => step?.isCompleted)?.length;
+
+//   const [timeSpent, setTimeSpent] = useState(currentStep?.durationSeconds || 0);
+
+
+
+//   const contentRef = useRef(null);
+//   sessionStorage.setItem("empid", "TRN001");
+//   const empid = sessionStorage.getItem("empid");
+
+//   useEffect(() => {
+//     setSubTopicIndex(0);
+//   }, [currentStepId]);
+
+
+//   useEffect(() => {
+//     const loadTraineeInfo = async () => {
+//       try {
+//         const empId = sessionStorage.getItem("empid");
+
+//         const user = await fetchUserByEmpId(empId);
+
+//         if (user) {
+//           setTraineeInfo({
+//             name: `${user.firstname} ${user.lastname}`,
+//             id: user.empid,
+//             email: user.email,
+//             program: user.designation || "Training Program",
+//             startDate: user.createdAt || "2024-10-01", // or whatever
+//           });
+//         }
+//       } catch (err) {
+//         console.error("Failed to load trainee info", err);
+//       }
+//     };
+
+//     loadTraineeInfo();
+//   }, []);
+
+
+
+
+
+//   useEffect(() => {
+//     const fetchData = async () => {
+//       try {
+//         setLoading(true);
+
+//         const response = await fetch("http://localhost:8080/api/syllabus/all");
+//         const result = await response.json();
+
+//         const apiData = result?.data || [];
+
+//         const formattedSteps = apiData.map((item, index) => ({
+//           id: item?.id,
+//           stepNumber: index + 1,
+//           title: item?.title || `Step ${index + 1}`,
+//           description: item?.topic || "",
+//           isLocked: index !== 0, // first step unlocked
+//           isCompleted: false,
+//           progress: 0,
+//           topics: [
+//             {
+//               title: item?.title || item?.topic,
+//               subTopics: item?.subTopics?.map(sub => ({
+//                 id: sub.id,
+//                 title: sub.name,
+//                 name: sub.name,
+//                 description: sub.description,
+//                 filePath: sub.filePath,
+//                 stepNumber: sub.stepNumber,
+//               })) || []
+//             }
+//           ]
+//         }));
+
+//         setSyllabusSteps(formattedSteps);
+
+//         // Set first step as current
+//         if (formattedSteps.length > 0) {
+//           setCurrentStepId(formattedSteps[0].id);
+//         }
+
+//         setLoading(false);
+//       } catch (error) {
+//         console.error("Error fetching data:", error);
+//         setLoading(false);
+//       }
+//     };
+
+//     fetchData();
+//   }, []);
+
+
+//   // useEffect(() => {
+//   //   const fetchSteps = async () => {
+//   //     const res = await fetch(`http://localhost:8080/api/progress/steps/${empid}`);
+//   //     const data = await res.json();
+
+//   //     setSyllabusSteps(prevSteps =>
+//   //       prevSteps.map(step => {
+//   //         const saved = data.find(s => s.stepId === step.id);
+//   //         return saved ? {
+//   //           ...step,
+//   //           isCompleted: saved.completed,
+//   //           progress: saved.progress,
+//   //           durationTime: saved.durationTime
+//   //         } : step;
+//   //       })
+//   //     );
+//   //   };
+//   //   fetchSteps();
+//   // }, []);
+
+
+
+
+
+
+
+//   // const totalSubs =
+//   //   currentStep?.topics?.[0]?.subTopics?.length || 0;
+
+//   // const completedSubs =
+//   //   currentStep?.topics?.[0]?.subTopics?.filter(s => s.completed)?.length || 0;
+
+//   // const calcProgress =
+//   //   totalSubs > 0 ? Math.round((completedSubs / totalSubs) * 100) : 0;
+
+//   // SECURITY EVENT HANDLERS (kept same)
+//   const handleContextMenu = (e) => { e?.preventDefault(); return false; };
+//   const handleSelectStart = (e) => { e?.preventDefault(); return false; };
+//   const handleKeyDown = (e) => {
+//     if (
+//       e?.ctrlKey && (e?.key === 's' || e?.key === 'p' || e?.key === 'c' || e?.key === 'a') ||
+//       e?.key === 'F12' ||
+//       e?.key === 'PrintScreen'
+//     ) {
+//       e?.preventDefault();
+//       return false;
+//     }
+//   };
+
+//   useEffect(() => {
+//     document.addEventListener('contextmenu', handleContextMenu);
+//     document.addEventListener('selectstart', handleSelectStart);
+//     document.addEventListener('keydown', handleKeyDown);
+//     return () => {
+//       document.removeEventListener('contextmenu', handleContextMenu);
+//       document.removeEventListener('selectstart', handleSelectStart);
+//       document.removeEventListener('keydown', handleKeyDown);
+//     };
+//   }, []);
+
+//   const handleStepSelect = (stepId) => {
+//     const step = syllabusSteps?.find((s) => s?.id === stepId);
+//     if (step && !step?.isLocked) {
+//       setCurrentStepId(stepId);
+//     }
+//   };
+
+//   // const handleStepComplete = (stepId) => {
+//   //   // same behavior: mark complete + unlock next
+//   //   setSyllabusSteps((prev) =>
+//   //     prev.map((s, idx) =>
+//   //       s.id === stepId
+//   //         ? { ...s, isCompleted: true, progress: 100, completedAt: new Date().toISOString() }
+//   //         : s
+//   //     ).map((s, idx, arr) => {
+//   //       // unlock next one
+//   //       if (s.id === stepId) {
+//   //         const next = arr.find((_, i) => i === idx + 1);
+//   //         if (next) next.isLocked = false;
+//   //       }
+//   //       return s;
+//   //     })
+//   //   );
+//   // };
+
+//   const handleCompleteStep = (stepId) => {
+//     setSyllabusSteps(prevSteps =>
+//       prevSteps.map((step, index) => {
+//         // complete current step
+//         if (step.id === stepId) {
+//           return {
+//             ...step,
+//             isCompleted: true,
+//             progress: 100,
+//             completedAt: new Date().toISOString()
+//           };
+//         }
+
+//         // unlock next step
+//         const prevIndex = prevSteps.findIndex(s => s.id === stepId);
+//         if (index === prevIndex + 1) {
+//           return { ...step, isLocked: false };
+//         }
+
+//         return step;
+//       })
+//     );
+//   };
+//   // const handleCompleteStep = async (stepId) => {
+//   //   setSyllabusSteps((prevSteps) => {
+//   //     const updated = [...prevSteps];
+//   //     const idx = updated.findIndex((s) => s.id === stepId);
+//   //     if (idx !== -1) {
+//   //       updated[idx] = {
+//   //         ...updated[idx],
+//   //         isCompleted: true,
+//   //         progress: 100,
+//   //         completedAt: new Date().toISOString(),
+//   //       };
+//   //       if (idx + 1 < updated.length) {
+//   //         updated[idx + 1] = { ...updated[idx + 1], isLocked: false };
+//   //       }
+//   //     }
+//   //     return updated;
+//   //   });
+
+//   //   try {
+//   //     await updateStepProgress(empid, stepId, 100, timeSpent); // send duration
+//   //   } catch (err) {
+//   //     console.error("Error updating step progress:", err);
+//   //   }
+//   // };
+
+
+
+
+
+
+//   const handleNextStep = () => {
+//     if (currentStepIndex < syllabusSteps?.length - 1) {
+//       const nextStep = syllabusSteps?.[currentStepIndex + 1];
+//       if (!nextStep?.isLocked) {
+//         setCurrentStepId(nextStep?.id);
+//       }
+//     }
+//   };
+
+//   const handlePreviousStep = () => {
+//     if (currentStepIndex > 0) {
+//       setCurrentStepId(syllabusSteps?.[currentStepIndex - 1]?.id);
+//     }
+//   };
+
+//   const canGoNext = currentStepIndex < syllabusSteps?.length - 1 &&
+//     !syllabusSteps?.[currentStepIndex + 1]?.isLocked;
+//   const canGoPrevious = currentStepIndex > 0;
+
+//   const handleSessionExpired = () => {
+//     setSessionActive(false);
+//     navigate('/trainee-dashboard');
+//   };
+
+//   const handleLogout = () => {
+//     navigate('/trainee-dashboard');
+//   };
+
+//   if (!sessionActive) {
+//     return (
+//       <div className="flex items-center justify-center min-h-screen bg-background">
+//         <div className="text-center p-8 bg-card rounded-lg elevation-2 max-w-md">
+//           <Icon name="Shield" size={48} className="text-warning mx-auto mb-4" />
+//           <h2 className="text-xl font-semibold text-foreground mb-2">Session Expired</h2>
+//           <p className="text-muted-foreground mb-4">
+//             Your secure learning session has expired. Please return to your dashboard.
+//           </p>
+//           <Button variant="default" onClick={() => navigate('/trainee-dashboard')} iconName="ArrowLeft" iconPosition="left">
+//             Back to Dashboard
+//           </Button>
+//         </div>
+//       </div>
+//     );
+//   }
+
+//   return (
+//     // <SecureContentWrapper
+//     //   watermarkText={`${traineeInfo?.name} | ID: ${traineeInfo?.id} | CONFIDENTIAL TRAINING MATERIAL`}
+//     //   sessionTimeout={30}
+//     //   onSessionExpired={handleSessionExpired}
+//     //   enableScreenshotProtection={true}
+//     //   enableRightClickDisable={true}>
+
+//     <div className="min-h-screen bg-background">
+//       {/* <SessionTimeoutHandler
+//         sessionDuration={30}
+//         warningTime={5}
+//         onSessionExpired={handleSessionExpired}
+//         onSessionExtended={() => setSessionActive(true)}
+//         isActive={sessionActive}
+//       /> */}
+
+
+//       {/* Security Watermark */}
+//       {/* <SecurityWatermark traineeInfo={traineeInfo} /> */}
+
+//       <Header userRole="trainee" userName={traineeInfo?.name} onLogout={handleLogout} />
+
+//       <div className="pt-16 flex h-screen">
+//         <StepNavigationSidebar
+//           steps={syllabusSteps}
+//           currentStepId={currentStepId}
+//           onStepSelect={handleStepSelect}
+//           isCollapsed={isSidebarCollapsed}
+//           onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+//         />
+
+//         <div className="flex-1 flex flex-col overflow-hidden">
+//           <div className="bg-surface border-b border-border px-6 py-3">
+//             <NavigationBreadcrumb userRole="trainee" />
+//           </div>
+
+//           <div className="flex-1 flex overflow-hidden">
+//             <div className="flex-1 overflow-hidden" ref={contentRef}>
+//               <ContentDisplay
+//                 currentStep={currentStep}
+//                 traineeInfo={traineeInfo}
+//                 onStepComplete={handleCompleteStep}
+//                 onNextStep={handleNextStep}
+
+//                 onPreviousStep={handlePreviousStep}
+//                 canGoNext={canGoNext}
+//                 canGoPrevious={canGoPrevious}
+//               />
+//             </div>
+
+//             {showProgressTracker &&
+//               <div className="w-80 border-l border-border overflow-y-auto">
+//                 <ProgressTracker
+//                   currentStep={currentStep}
+//                   totalSteps={syllabusSteps?.length}
+//                   completedSteps={completedSteps}
+//                   timeSpent={45}
+//                   estimatedTimeRemaining={180}
+//                   className="m-4"
+//                 />
+//               </div>
+//             }
+//           </div>
+//         </div>
+
+//         <Button
+//           variant="default"
+//           size="icon"
+//           onClick={() => setShowProgressTracker(!showProgressTracker)}
+//           className="fixed bottom-6 right-6 z-40 h-12 w-12 rounded-full elevation-2"
+//           iconName={showProgressTracker ? "X" : "BarChart3"}
+//           iconSize={20}
+//           title={showProgressTracker ? "Hide Progress" : "Show Progress"}
+//         />
+//       </div>
+
+//       <div className="fixed bottom-4 left-4 bg-card border border-border rounded-lg p-3 text-xs z-30 max-w-xs">
+//         <div className="flex items-center space-x-2">
+//           <Icon name="Shield" size={14} className="text-warning" />
+//           <span className="text-muted-foreground">This content is protected and monitored for security.</span>
+//         </div>
+//       </div>
+//     </div>
+//     //  </SecureContentWrapper>
+//   );
+
+//   // );
+
+// };
+
+// export default SyllabusContentViewer;
