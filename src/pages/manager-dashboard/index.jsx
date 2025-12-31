@@ -12,7 +12,7 @@ const ManagerDashboard = () => {
   const [selectedTrainees, setSelectedTrainees] = useState([]);
   const [showAssessmentModal, setShowAssessmentModal] = useState(false);
   const [selectedTraineeForAssessment, setSelectedTraineeForAssessment] = useState(null);
-  const empId = sessionStorage.setItem("empid", "TRN001");
+
 
   const [filters, setFilters] = useState({
     searchName: '',

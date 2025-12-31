@@ -10,7 +10,7 @@ import SecurityWatermark from './components/SecurityWatermark';
 import ProgressTracker from './components/ProgressTracker';
 import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
-import { updateStepProgress, fetchUserByEmpId,fetchSyllabusProgressByEmpId } from '../../api_service';
+import { updateStepProgress, fetchUserByEmpId, fetchSyllabusProgressByEmpId } from '../../api_service';
 
 const SyllabusContentViewer = () => {
   const navigate = useNavigate();
@@ -25,7 +25,7 @@ const SyllabusContentViewer = () => {
 
   const { state } = useLocation();
   const stepNumber = state || 1;
-  
+
   const currentStep = syllabusSteps?.find((step) => step?.id === currentStepId);
   // console.log("Current Step:", currentStepId);
   const currentStepIndex = syllabusSteps?.findIndex((step) => step?.id === currentStepId);
@@ -33,7 +33,6 @@ const SyllabusContentViewer = () => {
   const [timeSpent, setTimeSpent] = useState(currentStep?.durationSeconds || 0);
   const contentRef = useRef(null);
 
-  sessionStorage.setItem("empid", "TRN001");
   const empid = sessionStorage.getItem("empid");
 
   useEffect(() => { setSubTopicIndex(0); }, [currentStepId]);
@@ -63,7 +62,7 @@ const SyllabusContentViewer = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        
+
         const response = await fetchSyllabusProgressByEmpId(empid);
         // const result = await response.json();
         const apiData = response?.data || response;
@@ -122,7 +121,7 @@ const SyllabusContentViewer = () => {
 
         setSyllabusSteps(formattedSteps);
 
-        if (formattedSteps.length > 0) setCurrentStepId(formattedSteps[stepNumber-1].id);
+        if (formattedSteps.length > 0) setCurrentStepId(formattedSteps[stepNumber - 1].id);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
