@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080/api";
+const API_URL = process.env.REACT_APP_API_URL;
+console.log("API URL:", API_URL);
 
 export const createAccount = async (data) => {
   try {
@@ -463,13 +464,12 @@ export const fetchSyllabusProgressByEmpId = async (empid) => {
     const response = await axios.get(
       `${API_URL}/syllabus/all-progress/${empid}`
     );
-    return response.data;
+    return response;
   } catch (error) {
     console.error("Error fetching syllabus progress by empid:", error);
     throw error;
   }
 };
-
 
 
 

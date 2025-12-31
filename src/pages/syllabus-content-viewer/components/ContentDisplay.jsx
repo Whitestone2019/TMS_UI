@@ -50,7 +50,7 @@ const ContentDisplay = ({ currentStep, traineeInfo, onStepComplete, onNextStep, 
   useEffect(() => {
     if (!sub?.filePath) { setFileData(null); return; }
     const cleanFileName = sub.filePath.replace(/\\/g, "/").split("/").pop();
-    fetch(`http://localhost:8080/api/syllabus/preview?path=${cleanFileName}`)
+    fetch(`${process.env.REACT_APP_API_URL}/syllabus/preview?path=${cleanFileName}`)
       .then(res => res.ok ? res.blob() : Promise.reject(res.status))
       .then(blob => setFileData({ url: URL.createObjectURL(blob), mime: blob.type, name: cleanFileName }))
       .catch(err => setFileData({ error: true, message: "Unable to load this file." }));
