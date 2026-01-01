@@ -3,22 +3,22 @@ import Input from '../../../components/ui/Input';
 import Select from '../../../components/ui/Select';
 import Button from '../../../components/ui/Button';
 
-const FilterToolbar = ({ 
-  filters, 
-  onFilterChange, 
-  onExportReports, 
-  onScheduleInterview, 
+const FilterToolbar = ({
+  filters,
+  onFilterChange,
+  onExportReports,
+  onScheduleInterview,
   onAddAssessment,
-  resultsCount 
+  resultsCount
 }) => {
-  const syllabusStepOptions = [
-    { value: 'all', label: 'All Steps' },
-    { value: 'step1', label: 'Step 1: Introduction' },
-    { value: 'step2', label: 'Step 2: Fundamentals' },
-    { value: 'step3', label: 'Step 3: Intermediate' },
-    { value: 'step4', label: 'Step 4: Advanced' },
-    { value: 'step5', label: 'Step 5: Final Project' }
-  ];
+  // const syllabusStepOptions = [
+  //   { value: 'all', label: 'All Steps' },
+  //   { value: 'step1', label: 'Step 1: Introduction' },
+  //   { value: 'step2', label: 'Step 2: Fundamentals' },
+  //   { value: 'step3', label: 'Step 3: Intermediate' },
+  //   { value: 'step4', label: 'Step 4: Advanced' },
+  //   { value: 'step5', label: 'Step 5: Final Project' }
+  // ];
 
   const completionStatusOptions = [
     { value: 'all', label: 'All Status' },
@@ -43,21 +43,21 @@ const FilterToolbar = ({
             value={filters?.searchName}
             onChange={(e) => handleInputChange('searchName', e?.target?.value)}
           />
-          
-          <Select
+
+          {/* <Select
             label="Syllabus Step"
             options={syllabusStepOptions}
             value={filters?.syllabusStep}
             onChange={(value) => handleInputChange('syllabusStep', value)}
           />
-          
+           */}
           <Select
             label="Completion Status"
             options={completionStatusOptions}
             value={filters?.completionStatus}
             onChange={(value) => handleInputChange('completionStatus', value)}
           />
-          
+
           <div className="space-y-2">
             <Input
               label="Date Range"
@@ -74,7 +74,7 @@ const FilterToolbar = ({
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-3 lg:ml-6">
+        <div className="flex flex-col sm:flex-row gap-1 lg:ml-6">
           <Button
             variant="outline"
             onClick={onExportReports}
@@ -84,7 +84,7 @@ const FilterToolbar = ({
           >
             Export Reports
           </Button>
-          
+
           <Button
             variant="outline"
             onClick={onScheduleInterview}
@@ -94,7 +94,7 @@ const FilterToolbar = ({
           >
             Schedule Interview
           </Button>
-          
+
           <Button
             variant="default"
             onClick={onAddAssessment}

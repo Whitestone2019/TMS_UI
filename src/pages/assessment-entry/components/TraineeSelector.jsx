@@ -166,14 +166,14 @@ const TraineeSelector = ({
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStep, setFilterStep] = useState('');
 
-  const stepOptions = [
-    { value: '', label: 'All Steps' },
-    { value: '1', label: 'Step 1: Foundation' },
-    { value: '2', label: 'Step 2: Intermediate' },
-    { value: '3', label: 'Step 3: Advanced' },
-    { value: '4', label: 'Step 4: Specialization' },
-    { value: '5', label: 'Step 5: Final Assessment' }
-  ];
+  // const stepOptions = [
+  //   { value: '', label: 'All Steps' },
+  //   { value: '1', label: 'Step 1: Foundation' },
+  //   { value: '2', label: 'Step 2: Intermediate' },
+  //   { value: '3', label: 'Step 3: Advanced' },
+  //   { value: '4', label: 'Step 4: Specialization' },
+  //   { value: '5', label: 'Step 5: Final Assessment' }
+  // ];
 
   const filteredTrainees = trainees?.filter(trainee => {
     const matchesSearch = trainee?.username?.toLowerCase()?.includes(searchTerm?.toLowerCase()) ||
@@ -216,12 +216,12 @@ const TraineeSelector = ({
           onChange={(e) => setSearchTerm(e?.target?.value)}
           className="w-full"
         />
-        <Select
+        {/* <Select
           options={stepOptions}
           value={filterStep}
           onChange={setFilterStep}
           placeholder="Filter by current step"
-        />
+        /> */}
       </div>
       {/* Trainees List */}
       <div className="space-y-3 max-h-96 overflow-y-auto">
@@ -234,10 +234,9 @@ const TraineeSelector = ({
           filteredTrainees?.map((trainee) => (
             <div
               key={trainee?.trngid}
-              className={`border border-border rounded-lg p-4 cursor-pointer transition-all duration-150 hover:elevation-1 ${
-                selectedTrainee?.trngid === trainee?.trngid
-                  ? 'border-primary bg-primary/5' :'hover:border-primary/50'
-              }`}
+              className={`border border-border rounded-lg p-4 cursor-pointer transition-all duration-150 hover:elevation-1 ${selectedTrainee?.trngid === trainee?.trngid
+                ? 'border-primary bg-primary/5' : 'hover:border-primary/50'
+                }`}
               onClick={() => onTraineeSelect(trainee)}
             >
               <div className="flex items-center justify-between">
