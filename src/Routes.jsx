@@ -4,6 +4,7 @@ import ScrollToTop from "./components/ScrollToTop";
 import ErrorBoundary from "./components/ErrorBoundary";
 import NotFound from "./pages/NotFound";
 import LoginScreen from './pages/login-screen';
+import ResetPassword from "./pages/login-screen/ResetPassword";
 import ManagerDashboard from './pages/manager-dashboard';
 import ProgressReports from './pages/progress-reports';
 import SyllabusContentViewer from './pages/syllabus-content-viewer';
@@ -30,6 +31,7 @@ const Routes = () => {
         <Route path="/assessment-entry" element={<AssessmentEntry />} />
         <Route path="/upload-syllabus" element={<UploadSyllabus />} />
         <Route path="/trainee-steps" element={<TraineeStepsPage />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
 
 
         <Route path="/progress-reports/:traineeId" element={<ProgressReports />} />
