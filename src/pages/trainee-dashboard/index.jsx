@@ -114,7 +114,7 @@ const TraineeDashboard = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const empId = sessionStorage.getItem("empid") || "WS10018";
+        const empId = sessionStorage.getItem("empid");
 
         // 🔥 Interview schedule API call
         const response = await fetchInterviewScheduleByEmpId(empId);

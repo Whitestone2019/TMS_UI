@@ -643,28 +643,28 @@ const AssessmentEntry = () => {
   };
 
 
-  const handleSaveAssessment = async (assessmentData) => {
-    setIsLoading(true);
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+  // const handleSaveAssessment = async (assessmentData) => {
+  //   setIsLoading(true);
+  //   try {
+  //     // Simulate API call
+  //     await new Promise(resolve => setTimeout(resolve, 1500));
 
-      console.log('Assessment saved:', assessmentData);
-      setShowSuccessMessage(true);
+  //     console.log('Assessment saved:', assessmentData);
+  //     setShowSuccessMessage(true);
 
-      // Auto-hide success message after 3 seconds
-      setTimeout(() => {
-        setShowSuccessMessage(false);
-      }, 3000);
+  //     // Auto-hide success message after 3 seconds
+  //     setTimeout(() => {
+  //       setShowSuccessMessage(false);
+  //     }, 3000);
 
-      alert('Assessment saved successfully!');
+  //     alert('Assessment saved successfully!');
 
-    } catch (error) {
-      console.error('Error saving assessment:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  //   } catch (error) {
+  //     console.error('Error saving assessment:', error);
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
 
   const handleSaveDraft = async (draftData) => {
     try {
@@ -793,7 +793,7 @@ const AssessmentEntry = () => {
               {/* Assessment Form */}
               <AssessmentForm
                 trainee={selectedTrainee}
-                onSave={handleSaveAssessment}
+                // onSave={handleSaveAssessment}
                 onSaveDraft={handleSaveDraft}
                 onCancel={handleCancel}
                 isLoading={isLoading}
