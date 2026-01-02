@@ -216,7 +216,7 @@ const ResetPassword = () => {
                     {/* Footer */}
                     <div className="bg-muted/30 px-8 py-4 text-center">
                         <button
-                            onClick={() => navigate("/login")}
+                            onClick={() => navigate("/")}
                             className="text-sm text-primary hover:text-primary/80"
                         >
                             Back to Login
