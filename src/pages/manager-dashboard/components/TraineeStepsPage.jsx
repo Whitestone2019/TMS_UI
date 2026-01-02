@@ -86,6 +86,10 @@ export default function TraineeStepsPage() {
     // }, []);
 
     useEffect(() => {
+
+
+  loadData();
+}, []);
   const loadData = async () => {
     try {
       const response = await fetchCompletedSubTopics();
@@ -104,10 +108,6 @@ export default function TraineeStepsPage() {
     }
   };
 
-  loadData();
-}, []);
-
-
     // ----------------------------------------------------
     // DECISION HANDLER
     // ----------------------------------------------------
@@ -121,6 +121,7 @@ export default function TraineeStepsPage() {
 
         if (value === "ACCEPT") {
             await approveSubTopicAPI(progressId, review);
+            loadData();
             alert("Approved successfully");
         } else {
             await rejectSubTopicAPI(progressId, review);
