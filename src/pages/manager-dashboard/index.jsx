@@ -669,13 +669,19 @@ const ManagerDashboard = () => {
     const list = res?.data || [];
 
     const options = [
-      { value: 'all', label: 'All Steps', stepNo: 0 },
-      ...list.map(item => ({
-        value: item.syllabusId,
-        label: `Step ${item.syllabusId}`,
-        stepNo: Number(item.syllabusId)
-      }))
+      { value: 'all', label: 'All Steps', stepNo: 0 }
     ];
+
+    list.forEach((item, index) => {
+      options.push({
+        value: item.syllabusId,           // backend value
+        stepNo: index + 1,                 // static step
+        label: `Step ${index + 1} : ${item.title}`
+      });
+    });
+
+    // 🔹 sort by stepNo
+    options.sort((a, b) => a.stepNo - b.stepNo);
 
     setSyllabusOptions(options);
   };
@@ -703,11 +709,20 @@ const ManagerDashboard = () => {
         trainee?.email?.toLowerCase()?.includes(filters?.searchName?.toLowerCase())
       );
     }
+    const getStepNumber = (currentStep) => {
+      if (!currentStep || currentStep === 'No Assessment Yet') return null;
+      const match = currentStep.match(/\d+/);
+      return match ? Number(match[0]) : null;
+    };
+
 
     if (filters?.syllabusStep !== 'all') {
-      filtered = filtered.filter(
-        t => Number(t.syllabusId) === Number(filters.syllabusStep)
-      );
+      filtered = filtered?.filter(trainee => {
+        const stepNumber = getStepNumber(trainee?.currentStep);
+
+
+        return stepNumber === Number(filters?.syllabusStep);
+      });
     }
 
     if (filters?.completionStatus !== 'all') {
@@ -750,32 +765,43 @@ const ManagerDashboard = () => {
   };
 
   const handleSort = (key, direction) => {
-    const sorted = [...filteredTrainees].sort((a, b) => {
-      let aValue, bValue;
+    const sortedData = [...filteredTrainees].sort((a, b) => {
+      let aValue;
+      let bValue;
 
-      // STEP SORT
+      const getStepNumber = (currentStep) => {
+        if (!currentStep || currentStep === 'No Assessment Yet') return 0;
+        const match = currentStep.match(/\d+/);
+        return match ? Number(match[0]) : 0;
+      };
       if (key === 'currentStep') {
-        const getStepNumber = (val) => {
-          const match = val?.match(/\d+/); // "Step 2: Intro" -> 2
-          return match ? Number(match[0]) : 0;
-        };
-        aValue = getStepNumber(a?.currentStep);
-        bValue = getStepNumber(b?.currentStep);
+        aValue = getStepNumber(a.currentStep);
+        bValue = getStepNumber(b.currentStep);
+        console.log(
+          a.currentStep, getStepNumber(a.currentStep),
+          b.currentStep, getStepNumber(b.currentStep)
+        );
+
       }
-      // COMPLETION %
+
+
+
+      // ✅ COMPLETION %
       else if (key === 'completion') {
-        aValue = Number(a?.completionPercentage ?? 0);
-        bValue = Number(b?.completionPercentage ?? 0);
+        aValue = Number(a?.completionPercentage || 0);
+        bValue = Number(b?.completionPercentage || 0);
       }
-      // LAST ASSESSMENT DATE
-      else if (key === 'lastAssessmentDate') {
+
+      // ✅ LAST ASSESSMENT DATE
+      else if (key === 'lastAssessment') {
         aValue = new Date(a?.lastAssessmentDate);
         bValue = new Date(b?.lastAssessmentDate);
       }
-      // STRING SORT
+
+      // ✅ DEFAULT STRING SORT (Name, Email etc.)
       else {
-        aValue = a?.[key]?.toString()?.toLowerCase() ?? '';
-        bValue = b?.[key]?.toString()?.toLowerCase() ?? '';
+        aValue = (a?.[key] || '').toString().toLowerCase();
+        bValue = (b?.[key] || '').toString().toLowerCase();
       }
 
       if (direction === 'asc') {
@@ -785,7 +811,7 @@ const ManagerDashboard = () => {
       }
     });
 
-    setFilteredTrainees(sorted);
+    setFilteredTrainees(sortedData);
   };
 
 

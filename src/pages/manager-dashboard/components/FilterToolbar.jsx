@@ -193,9 +193,10 @@ const FilterToolbar = ({
           <Select
             label="Syllabus Step"
             options={syllabusOptions}
-            value={filters.syllabusId}  // <-- yaha filters.syllabusStep hona chahiye
+            value={filters.syllabusStep}   // ✅ correct
             onChange={(value) => handleInputChange('syllabusStep', value)}
           />
+
 
 
           <Select

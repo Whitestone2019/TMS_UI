@@ -1,7 +1,7 @@
 import axios from "axios";
 
-// const API_URL = process.env.REACT_APP_API_URL;
-const API_URL = "http://192.168.0.21:8085/TMS/api";
+const API_URL = process.env.REACT_APP_API_URL;
+//onst API_URL = "http://192.168.0.21:8085/TMS/api";
 
 console.log("API URL:", API_URL);
 
@@ -38,7 +38,7 @@ export const sendOtp = async (trngId) => {
 
 export const resetPassword = async (data) => {
   try {
-    const response = await axios.post(`${API_URL}/users/verify-otp`, data); 
+    const response = await axios.post(`${API_URL}/users/verify-otp`, data);
     return response.data;
   } catch (error) {
     console.error("Error resetting password:", error);
