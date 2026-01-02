@@ -12,10 +12,9 @@ const LoginScreen = () => {
 
   // Form state
   const [formData, setFormData] = useState({
-    email: '',
-    traineeId: '',
+
+    trngId: '',
     password: '',
-    role: '',
     rememberMe: false
   });
 
@@ -26,27 +25,6 @@ const LoginScreen = () => {
   const [failedAttempts, setFailedAttempts] = useState(0);
   const [isLocked, setIsLocked] = useState(false);
   const [lockTimeRemaining, setLockTimeRemaining] = useState(0);
-
-  const empId = sessionStorage.setItem("empid", "WS10018");
-  const roleOptions = [
-    { value: 'manager', label: 'Manager', description: 'Administrative access' },
-    { value: 'trainee', label: 'Trainee', description: 'Learning access' }
-  ];
-
-  // Mock user data for demonstration
-  // const mockUsers = {
-  //   manager: {
-  //     email: 'admin@traineesystem.com',
-  //     password: 'Manager123!',
-  //     redirectPath: '/manager-dashboard'
-  //   },
-  //   trainee: {
-  //     email: 'john.doe@company.com',
-  //     traineeId: 'TRN001',
-  //     password: 'Trainee123!',
-  //     redirectPath: '/trainee-dashboard'
-  //   }
-  // };
 
   // Account lockout timer
   useEffect(() => {
@@ -84,21 +62,21 @@ const LoginScreen = () => {
   const validateForm = () => {
     const newErrors = {};
 
-    // Role validation
-    if (!formData?.role) {
-      newErrors.role = 'Please select your role';
-    }
+    // // Role validation
+    // if (!formData?.role) {
+    //   newErrors.role = 'Please select your role';
+    // }
 
     // Email validation for both roles
-    if (!formData?.email) {
-      newErrors.email = 'Email is required';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/?.test(formData?.email)) {
-      newErrors.email = 'Please enter a valid email address';
-    }
+    // if (!formData?.email) {
+    //   newErrors.email = 'Email is required';
+    // } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/?.test(formData?.email)) {
+    //   newErrors.email = 'Please enter a valid email address';
+    // }
 
     // Trainee ID validation for trainee role
-    if (formData?.role === 'trainee' && !formData?.traineeId) {
-      newErrors.traineeId = 'Trainee ID is required';
+    if (!formData?.trngId) {
+      newErrors.trngId = 'Trainee ID is required';
     }
 
     // Password validation
@@ -114,6 +92,7 @@ const LoginScreen = () => {
 
   const handleLogin = async (e) => {
     e?.preventDefault();
+
 
     if (isLocked) {
       return;
@@ -131,33 +110,46 @@ const LoginScreen = () => {
 
       // Mock authentication logic
       // const mockUser = mockUsers?.[formData?.role];
+
       console.log('Creating account with data:', formData);
 
       const response = await login(formData);
       console.log('Login response:', response);
 
+      console.log("Response Status:", response?.status);
 
       const isValidCredentials = response?.status === 200;
 
 
       if (isValidCredentials) {
         // Successful login
+        console.log('Login successful', response?.data?.redirect);
+
         setFailedAttempts(0);
 
         if (formData?.rememberMe) {
           localStorage.setItem('userSession', JSON.stringify({
-            role: formData?.role,
-            email: formData?.email,
-            traineeId: formData?.traineeId,
+            trngId: formData?.trngId,
             timestamp: Date.now()
           }));
         }
 
-        // Redirect to appropriate dashboard
+        const empId = sessionStorage.setItem("empid", `${formData?.trngId}`);
+        navigate(response?.data?.redirect || '/');
 
-
-        navigate(response?.redirect || '/');
       } else {
+        if (response?.status === 401) {
+          setErrors({
+            general: response?.message || 'Invalid credentials. Please try again.'
+          });
+          return;
+        }
+        // if (response?.status === 402) {
+        //   setErrors({
+        //     general: response?.message || 'Invalid credentials. Please try again.'
+        //   });
+        //   return;
+        // }
         // Failed login
         const newFailedAttempts = failedAttempts + 1;
         setFailedAttempts(newFailedAttempts);
@@ -177,8 +169,9 @@ const LoginScreen = () => {
 
 
     } catch (error) {
+      console.error('Login error:', error);
       setErrors({
-        general: 'Connection error. Please check your internet connection and try again.'
+        general: 'An error occurred during login. Please try again later.'
       });
     } finally {
       setIsLoading(false);
@@ -188,6 +181,7 @@ const LoginScreen = () => {
   const handleForgotPassword = () => {
     // In real app, trigger password reset flow
     alert('Password reset instructions would be sent to your email.');
+    navigate('/reset-password');
   };
 
   const formatLockTime = (seconds) => {
@@ -246,7 +240,7 @@ const LoginScreen = () => {
               )}
 
               {/* Role Selection */}
-              <Select
+              {/* <Select
                 label="Select Your Role"
                 required
                 options={roleOptions}
@@ -255,10 +249,10 @@ const LoginScreen = () => {
                 error={errors?.role}
                 placeholder="Choose your access level"
                 className="w-full"
-              />
+              /> */}
 
               {/* Email Field */}
-              <div className="relative">
+              {/* <div className="relative">
                 <Input
                   label="Email Address"
                   type="email"
@@ -270,24 +264,29 @@ const LoginScreen = () => {
                   className="pl-10"
                 />
                 <Mail className="absolute left-3 top-9 w-4 h-4 text-muted-foreground" />
-              </div>
+              </div> */}
 
               {/* Trainee ID Field (conditional) */}
-              {formData?.role === 'trainee' && (
-                <div className="relative">
-                  <Input
-                    label="Trainee ID"
-                    type="text"
-                    required
-                    value={formData?.traineeId}
-                    onChange={(e) => handleInputChange('traineeId', e?.target?.value)}
-                    error={errors?.traineeId}
-                    placeholder="Enter your trainee ID"
-                    className="pl-10"
-                  />
-                  <User className="absolute left-3 top-9 w-4 h-4 text-muted-foreground" />
-                </div>
-              )}
+              {/* {formData?.role === 'trainee' && ( */}
+
+
+              <div className="relative">
+                <Input
+                  label="Trainee/Manager ID"
+                  type="text"
+                  required
+                  value={formData?.trngId}
+                  onChange={(e) => handleInputChange('trngId', e?.target?.value)}
+                  error={errors?.trngId}
+                  placeholder="Enter your trainee ID"
+                  className="pl-10"
+                  autoComplete="username"
+                />
+                <User className="absolute left-3 top-9 w-4 h-4 text-muted-foreground" />
+              </div>
+
+
+              {/* )} */}
 
               {/* Password Field */}
               <div className="relative">
@@ -300,6 +299,8 @@ const LoginScreen = () => {
                   error={errors?.password}
                   placeholder="Enter your password"
                   className="pl-10 pr-10"
+
+                  autoComplete="current-password"
                 />
                 <Lock className="absolute left-3 top-9 w-4 h-4 text-muted-foreground" />
                 <button
@@ -338,7 +339,7 @@ const LoginScreen = () => {
               <Button
                 type="submit"
                 loading={isLoading}
-                disabled={isLocked}
+                // disabled={isLocked}
                 className="w-full"
                 size="lg"
               >

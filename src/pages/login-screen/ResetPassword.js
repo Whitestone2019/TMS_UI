@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Input from "../../components/ui/Input";
 import Button from "../../components/ui/Button";
 import { Shield, Mail, Lock, Eye, EyeOff, AlertCircle } from "lucide-react";
+import { sendOtp, resetPassword } from "../../api_service";
 
 // import { forgetPassword, resetPassword } from "../../api_service";
 
@@ -14,7 +15,7 @@ const ResetPassword = () => {
     const [isLoading, setIsLoading] = useState(false);
 
     const [form, setForm] = useState({
-        email: "",
+        trngId: "",
         otp: "",
         newPassword: "",
         confirmPassword: "",
@@ -32,29 +33,38 @@ const ResetPassword = () => {
     // ======================
     // STEP 1 – SEND OTP
     // ======================
-    const handleSendOTP = (e) => {
+    const handleSendOTP = async (e) => {
         e.preventDefault();
 
         const newErrors = {};
-        if (!form.email) newErrors.email = "Email is required";
+        if (!form.trngId) newErrors.trngId = "Trainee/Manager ID is required";
 
         setErrors(newErrors);
         if (Object.keys(newErrors).length > 0) return;
 
-        setIsLoading(true);
+        try {
+            setIsLoading(true);
 
-        setTimeout(() => {
-            console.log("OTP sent to:", form.email);
-            alert("OTP sent successfully (API not connected)");
-            setIsLoading(false);
-            setStep(2);
-        }, 800);
+            const response = await sendOtp(form.trngId);
+            if (response?.status === 200) {
+                alert("OTP sent successfully");
+                setIsLoading(false);
+                setStep(2);
+            } else {
+                setErrors({
+                    general: response?.message || "Failed to send OTP. Please try again.",
+                });
+                setIsLoading(false);
+            }
+        } catch (error) {
+            console.error("Error in sending OTP:", error);
+        }
     };
 
     // ======================
     // STEP 2 – RESET PASSWORD
     // ======================
-    const handleResetPassword = (e) => {
+    const handleResetPassword = async (e) => {
         e.preventDefault();
 
         const newErrors = {};
@@ -68,14 +78,34 @@ const ResetPassword = () => {
         setErrors(newErrors);
         if (Object.keys(newErrors).length > 0) return;
 
-        setIsLoading(true);
+        try {
 
-        setTimeout(() => {
-            console.log("Password reset data:", form);
-            alert("Password reset successfully (API not connected)");
-            setIsLoading(false);
-            navigate("/login");
-        }, 800);
+            setIsLoading(true);
+            const response = await resetPassword({
+                trngId: form.trngId,
+                otp: form.otp,
+                newPassword: form.newPassword
+            });
+            if (response?.status === 200) {
+                alert("Password reset successfully");
+                setIsLoading(false);
+                navigate("/");
+            } else {
+                setErrors({
+                    general: response?.message || "Failed to reset password. Please try again.",
+                });
+                setIsLoading(false);
+            }
+        } catch (error) {
+            console.error("Error in resetting password:", error);
+        }
+
+        // setTimeout(() => {
+        //     console.log("Password reset data:", form);
+        //     alert("Password reset successfully (API not connected)");
+        //     setIsLoading(false);
+        //     navigate("/");
+        // }, 800);
     };
 
     return (
@@ -131,15 +161,15 @@ const ResetPassword = () => {
                             {step === 1 && (
                                 <div className="relative">
                                     <Input
-                                        label="Email Address"
-                                        type="email"
+                                        label="Trainee/Manager ID"
+                                        type="text"
                                         required
-                                        value={form.email}
+                                        value={form.trngId}
                                         onChange={(e) =>
-                                            handleChange("email", e.target.value)
+                                            handleChange("trngId", e.target.value)
                                         }
-                                        error={errors.email}
-                                        placeholder="Enter your registered email"
+                                        error={errors.trngId}
+                                        placeholder="Enter your registered Trainee/Manager ID"
                                         className="pl-10"
                                     />
                                     <Mail className="absolute left-3 top-9 w-4 h-4 text-muted-foreground" />

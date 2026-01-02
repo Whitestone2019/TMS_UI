@@ -15,7 +15,7 @@ export const createAccount = async (data) => {
 
 export const login = async (credentials) => {
   try {
-    const response = await axios.post(`${API_URL}/login`, credentials);
+    const response = await axios.post(`${API_URL}/users/login`, credentials);
     return response.data;
   } catch (error) {
     console.error("Error logging in:", error);
@@ -23,6 +23,26 @@ export const login = async (credentials) => {
   }
 };
 
+
+export const sendOtp = async (trngId) => {
+  try {
+    const response = await axios.post(`${API_URL}/users/send-otp`, { trngId });
+    return response.data;
+  } catch (error) {
+    console.error("Error sending OTP:", error);
+    throw error;
+  }
+};
+
+export const resetPassword = async (data) => {
+  try {
+    const response = await axios.post(`${API_URL}/users/verify-otp`, data); 
+    return response.data;
+  } catch (error) {
+    console.error("Error resetting password:", error);
+    throw error;
+  }
+};
 
 export const storeUserDetails = async (data) => {
   try {

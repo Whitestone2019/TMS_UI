@@ -594,19 +594,38 @@ const AssessmentForm = ({
 
       alert("Assessment saved successfully!");
       // setIsLoading(false);
+      resetForm();
     } catch (error) {
       console.error('Error submitting assessment:', error);
     }
 
     if (isDraft) {
       onSaveDraft(assessmentData);
-    } else {
-      onSave(assessmentData);
-    }
+    } 
+    // else {
+    //   onSave(assessmentData);
+    // }
 
     setHasUnsavedChanges(false);
   };
 
+
+  const resetForm = () => {
+  setFormData({
+    marks: '',
+    maxMarks: '100',
+    assessmentDate: new Date().toISOString().split('T')[0],
+    assessmentType: 'weekly',
+    remarks: '',
+    strengths: '',
+    improvements: '',
+    recommendations: ''
+  });
+
+  setErrors({});
+  setHasUnsavedChanges(false);
+  setAutoSaveStatus('');
+};
   const handleCancel = () => {
     if (hasUnsavedChanges) {
       if (window.confirm('You have unsaved changes. Are you sure you want to cancel?')) {
