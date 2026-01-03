@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import Button from '../../../components/ui/Button';
 import Input from '../../../components/ui/Input';
 import Select from '../../../components/ui/Select';
+import { fetchAssessmentsByTrainee } from "../../../api_service"
 
 const AssessmentEntryModal = ({
   isOpen,
@@ -11,7 +12,7 @@ const AssessmentEntryModal = ({
   onSubmitAssessment
 }) => {
   const [assessmentData, setAssessmentData] = useState({
-    traineeId: trainee?.id || '',
+    traineeId: trainee?.traineeId || '',
     assessmentType: '',
     marks: '',
     maxMarks: '100',
@@ -22,12 +23,70 @@ const AssessmentEntryModal = ({
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // const assessmentTypeOptions = [
+  //   { value: 'weekly', label: 'Weekly Assessment' },
+  //   { value: 'module', label: 'Module Assessment' },
+  //   { value: 'practical', label: 'Practical Assessment' },
+  //   { value: 'project', label: 'Project Assessment' }
+  // ];
+
   const assessmentTypeOptions = [
     { value: 'weekly', label: 'Weekly Assessment' },
+    { value: 'monthly', label: 'Monthly Assessment' }, // ✅ ADD THIS
     { value: 'module', label: 'Module Assessment' },
     { value: 'practical', label: 'Practical Assessment' },
     { value: 'project', label: 'Project Assessment' }
   ];
+
+
+  useEffect(() => {
+    if (!trainee?.traineeId || !isOpen) return;
+    console.log(trainee.traineeId);
+    if (!isOpen) return null;
+
+    // 👇👇 YAHAN ADD KARO
+    console.log(
+      "Dropdown value:",
+      assessmentData.assessmentType,
+      typeof assessmentData.assessmentType
+    );
+
+    const loadLastAssessment = async () => {
+      try {
+        const res = await fetchAssessmentsByTrainee(trainee.traineeId);
+
+        console.log("Assessment API response:", res);
+
+        // const list = Array.isArray(res?.data?.data) ? res.data.data : [];
+        const list = Array.isArray(res?.data) ? res.data : [];
+
+        console.log("Assessment list:", list);
+
+        if (list.length === 0) return;
+
+        const lastAssessment = list[list.length - 1];
+
+        console.log("Last assessment:", lastAssessment);
+
+        setAssessmentData({
+          traineeId: trainee.traineeId,
+          assessmentType: lastAssessment.assessmentType?.toLowerCase() || '',
+          marks: String(lastAssessment.marks || ''),
+          maxMarks: String(lastAssessment.maxMarks || '100'),
+          remarks: lastAssessment.remarks || '',
+          assessmentDate: lastAssessment.assessmentDate
+            ? new Date(lastAssessment.assessmentDate).toISOString().split('T')[0]
+            : new Date().toISOString().split('T')[0]
+        });
+      } catch (err) {
+        console.error('Error loading last assessment:', err);
+      }
+    };
+
+    loadLastAssessment();
+  }, [trainee?.traineeId, isOpen]);
+
+
 
   const handleInputChange = (field, value) => {
     setAssessmentData(prev => ({ ...prev, [field]: value }));
@@ -84,7 +143,7 @@ const AssessmentEntryModal = ({
 
       // Reset form
       setAssessmentData({
-        traineeId: trainee?.id || '',
+        traineeId: trainee?.traineeId || '',
         assessmentType: '',
         marks: '',
         maxMarks: '100',
@@ -101,6 +160,12 @@ const AssessmentEntryModal = ({
   };
 
   if (!isOpen) return null;
+  console.log(
+    "Dropdown value:",
+    assessmentData.assessmentType,
+    typeof assessmentData.assessmentType
+  );
+
 
   return (
     <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4">
@@ -239,7 +304,7 @@ const AssessmentEntryModal = ({
             >
               Cancel
             </Button>
-            <Button
+            {/* <Button
               type="submit"
               variant="default"
               loading={isSubmitting}
@@ -247,7 +312,7 @@ const AssessmentEntryModal = ({
               iconPosition="left"
             >
               Save Assessment
-            </Button>
+            </Button> */}
           </div>
         </form>
       </div>
