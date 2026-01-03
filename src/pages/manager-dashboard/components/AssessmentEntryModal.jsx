@@ -4,11 +4,11 @@ import Button from '../../../components/ui/Button';
 import Input from '../../../components/ui/Input';
 import Select from '../../../components/ui/Select';
 
-const AssessmentEntryModal = ({ 
-  isOpen, 
-  onClose, 
-  trainee, 
-  onSubmitAssessment 
+const AssessmentEntryModal = ({
+  isOpen,
+  onClose,
+  trainee,
+  onSubmitAssessment
 }) => {
   const [assessmentData, setAssessmentData] = useState({
     traineeId: trainee?.id || '',
@@ -18,7 +18,7 @@ const AssessmentEntryModal = ({
     remarks: '',
     assessmentDate: new Date()?.toISOString()?.split('T')?.[0]
   });
-  
+
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -38,11 +38,11 @@ const AssessmentEntryModal = ({
 
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (!assessmentData?.assessmentType) {
       newErrors.assessmentType = 'Assessment type is required';
     }
-    
+
     if (!assessmentData?.marks) {
       newErrors.marks = 'Marks are required';
     } else if (isNaN(assessmentData?.marks) || assessmentData?.marks < 0) {
@@ -50,13 +50,13 @@ const AssessmentEntryModal = ({
     } else if (parseInt(assessmentData?.marks) > parseInt(assessmentData?.maxMarks)) {
       newErrors.marks = `Marks cannot exceed ${assessmentData?.maxMarks}`;
     }
-    
+
     if (!assessmentData?.remarks?.trim()) {
       newErrors.remarks = 'Remarks are required';
     } else if (assessmentData?.remarks?.trim()?.length < 10) {
       newErrors.remarks = 'Remarks must be at least 10 characters';
     }
-    
+
     if (!assessmentData?.assessmentDate) {
       newErrors.assessmentDate = 'Assessment date is required';
     }
@@ -67,13 +67,13 @@ const AssessmentEntryModal = ({
 
   const handleSubmit = async (e) => {
     e?.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
 
     setIsSubmitting(true);
-    
+
     try {
       await onSubmitAssessment({
         ...assessmentData,
@@ -81,7 +81,7 @@ const AssessmentEntryModal = ({
         maxMarks: parseInt(assessmentData?.maxMarks),
         percentage: Math.round((parseInt(assessmentData?.marks) / parseInt(assessmentData?.maxMarks)) * 100)
       });
-      
+
       // Reset form
       setAssessmentData({
         traineeId: trainee?.id || '',
@@ -91,7 +91,7 @@ const AssessmentEntryModal = ({
         remarks: '',
         assessmentDate: new Date()?.toISOString()?.split('T')?.[0]
       });
-      
+
       onClose();
     } catch (error) {
       console.error('Error submitting assessment:', error);
@@ -198,10 +198,10 @@ const AssessmentEntryModal = ({
                 </span>
               </div>
               <div className="mt-2 bg-muted rounded-full h-2">
-                <div 
+                <div
                   className="bg-primary h-2 rounded-full transition-all duration-300"
-                  style={{ 
-                    width: `${Math.round((parseInt(assessmentData?.marks) / parseInt(assessmentData?.maxMarks)) * 100)}%` 
+                  style={{
+                    width: `${Math.round((parseInt(assessmentData?.marks) / parseInt(assessmentData?.maxMarks)) * 100)}%`
                   }}
                 />
               </div>
@@ -218,9 +218,8 @@ const AssessmentEntryModal = ({
               placeholder="Enter detailed remarks about the trainee's performance..."
               value={assessmentData?.remarks}
               onChange={(e) => handleInputChange('remarks', e?.target?.value)}
-              className={`w-full px-3 py-2 border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent ${
-                errors?.remarks ? 'border-error' : 'border-border'
-              }`}
+              className={`w-full px-3 py-2 border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent ${errors?.remarks ? 'border-error' : 'border-border'
+                }`}
             />
             {errors?.remarks && (
               <p className="mt-1 text-sm text-error">{errors?.remarks}</p>
