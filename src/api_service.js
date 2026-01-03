@@ -1,7 +1,8 @@
 import axios from "axios";
 
-// const API_URL = process.env.REACT_APP_API_URL;
-const API_URL = "http://192.168.0.21:8085/TMS/api";
+// const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080/api";
+// const API_URL = "http://192.168.0.21:8085/TMS/api";
+const API_URL = "http://localhost:8080/api";
 
 console.log("API URL:", API_URL);
 
@@ -67,6 +68,7 @@ export const fetchAllTrainees = async () => {
       "lastname": "A",
       "emailid": "abs@gmail.bom",
       "phonenumber": "9787255965",
+      "roleId": "R001",
 
     },
     {
@@ -78,7 +80,7 @@ export const fetchAllTrainees = async () => {
       "lastname": "A",
       "emailid": "wwm@gmail.com",
       "phonenumber": "987635616",
-
+"roleId": "R001",
     },
     {
       "userid": "2019WS1155",
@@ -89,7 +91,7 @@ export const fetchAllTrainees = async () => {
       "lastname": null,
       "emailid": "aswathi.ravindran@whitestones.co.in",
       "phonenumber": "09787255964",
-
+"roleId": "R001",
     },
     {
       "userid": "2019WS1122",
