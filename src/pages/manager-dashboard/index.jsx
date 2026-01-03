@@ -821,7 +821,9 @@ const ManagerDashboard = () => {
   };
 
   const handleAddAssessment = (traineeId) => {
-    const trainee = trainees?.find(t => t?.id === traineeId);
+   console.log("traineesHHHHH:",traineeId);
+    const trainee = trainees?.find(t => t?.traineeId === traineeId);
+    console.log("Selected Trainee for Assessment:", trainee);
     setSelectedTraineeForAssessment(trainee);
     setShowAssessmentModal(true);
   };

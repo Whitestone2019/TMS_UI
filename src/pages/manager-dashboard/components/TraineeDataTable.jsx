@@ -13,6 +13,7 @@ const TraineeDataTable = ({
   onScheduleInterview,
   onSort
 }) => {
+  console.log("trainees:", trainees);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
 
   const handleSort = (key) => {
@@ -183,7 +184,7 @@ const TraineeDataTable = ({
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() => onAddAssessment(trainee?.id)}
+                      onClick={() => onAddAssessment(trainee?.traineeId)}
                       iconName="ClipboardCheck"
                       iconSize={16}
                       title="Add Assessment"
