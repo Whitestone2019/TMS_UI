@@ -39,7 +39,7 @@ export const sendOtp = async (trngId) => {
 
 export const resetPassword = async (data) => {
   try {
-    const response = await axios.post(`${API_URL}/users/verify-otp`, data); 
+    const response = await axios.post(`${API_URL}/users/verify-otp`, data);
     return response.data;
   } catch (error) {
     console.error("Error resetting password:", error);
