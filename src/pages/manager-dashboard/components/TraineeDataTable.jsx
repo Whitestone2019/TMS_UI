@@ -3,15 +3,15 @@ import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 import Checkbox from '../../../components/ui/Checkbox';
 
-const TraineeDataTable = ({ 
-  trainees, 
-  selectedTrainees, 
-  onSelectTrainee, 
-  onSelectAll, 
-  onViewProfile, 
-  onAddAssessment, 
+const TraineeDataTable = ({
+  trainees,
+  selectedTrainees,
+  onSelectTrainee,
+  onSelectAll,
+  onViewProfile,
+  onAddAssessment,
   onScheduleInterview,
-  onSort 
+  onSort
 }) => {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
 
@@ -28,7 +28,7 @@ const TraineeDataTable = ({
     if (sortConfig?.key !== key) {
       return <Icon name="ArrowUpDown" size={16} className="text-muted-foreground" />;
     }
-    return sortConfig?.direction === 'asc' 
+    return sortConfig?.direction === 'asc'
       ? <Icon name="ArrowUp" size={16} className="text-foreground" />
       : <Icon name="ArrowDown" size={16} className="text-foreground" />;
   };
@@ -39,9 +39,9 @@ const TraineeDataTable = ({
       'in-progress': { bg: 'bg-blue-100', text: 'text-blue-700', label: 'In Progress' },
       'completed': { bg: 'bg-green-100', text: 'text-green-700', label: 'Completed' }
     };
-    
+
     const config = statusConfig?.[status] || statusConfig?.['not-started'];
-    
+
     return (
       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${config?.bg} ${config?.text}`}>
         {config?.label}
@@ -56,9 +56,9 @@ const TraineeDataTable = ({
       'completed': { bg: 'bg-green-100', text: 'text-green-700', label: 'Completed' },
       'cancelled': { bg: 'bg-red-100', text: 'text-red-700', label: 'Cancelled' }
     };
-    
+
     const config = statusConfig?.[status] || statusConfig?.['pending'];
-    
+
     return (
       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${config?.bg} ${config?.text}`}>
         {config?.label}
@@ -150,7 +150,7 @@ const TraineeDataTable = ({
                 <td className="px-6 py-4">
                   <div className="flex items-center space-x-3">
                     <div className="flex-1 bg-muted rounded-full h-2">
-                      <div 
+                      <div
                         className="bg-primary h-2 rounded-full transition-all duration-300"
                         style={{ width: `${trainee?.completionPercentage}%` }}
                       />
@@ -172,14 +172,14 @@ const TraineeDataTable = ({
                 </td>
                 <td className="px-6 py-4">
                   <div className="flex items-center justify-center space-x-2">
-                    <Button
+                    {/* <Button
                       variant="ghost"
                       size="icon"
                       onClick={() => onViewProfile(trainee?.id)}
                       iconName="Eye"
                       iconSize={16}
                       title="View Profile"
-                    />
+                    /> */}
                     <Button
                       variant="ghost"
                       size="icon"
@@ -224,18 +224,18 @@ const TraineeDataTable = ({
                 </div>
               </div>
             </div>
-            
+
             <div className="space-y-3">
               <div>
                 <p className="text-xs text-muted-foreground mb-1">Current Step</p>
                 <p className="text-sm font-medium text-foreground">{trainee?.currentStep}</p>
               </div>
-              
+
               <div>
                 <p className="text-xs text-muted-foreground mb-1">Progress</p>
                 <div className="flex items-center space-x-3">
                   <div className="flex-1 bg-muted rounded-full h-2">
-                    <div 
+                    <div
                       className="bg-primary h-2 rounded-full transition-all duration-300"
                       style={{ width: `${trainee?.completionPercentage}%` }}
                     />
@@ -248,7 +248,7 @@ const TraineeDataTable = ({
                   {getStatusBadge(trainee?.status)}
                 </div>
               </div>
-              
+
               <div className="flex justify-between items-center">
                 <div>
                   <p className="text-xs text-muted-foreground">Last Assessment</p>
@@ -258,7 +258,7 @@ const TraineeDataTable = ({
                   {getInterviewStatusBadge(trainee?.interviewStatus)}
                 </div>
               </div>
-              
+
               <div className="flex space-x-2 pt-2 border-t border-border">
                 <Button
                   variant="outline"

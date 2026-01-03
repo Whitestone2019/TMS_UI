@@ -12,7 +12,7 @@ import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
 import { fetchAssessmentsByTrainee } from '../../api_service';
 import { fetchUserByEmpId } from "../../api_service";
-import { fetchInterviewScheduleByEmpId,fetchSyllabusProgressByEmpId } from "../../api_service"
+import { fetchInterviewScheduleByEmpId, fetchSyllabusProgressByEmpId } from "../../api_service"
 
 const TraineeDashboard = () => {
   const navigate = useNavigate();
@@ -29,7 +29,6 @@ const TraineeDashboard = () => {
   const [loading, setLoading] = useState(false);
 
 
-  const empId = sessionStorage.setItem("empid", "TRN001");
 
   // const [traineeInfo] = useState({
   //   name: 'John Doe',
@@ -115,11 +114,11 @@ const TraineeDashboard = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const empId = sessionStorage.getItem("empid") || "WS10009";
+        const empId = sessionStorage.getItem("empid");
 
         // 🔥 Interview schedule API call
         const response = await fetchInterviewScheduleByEmpId(empId);
-        
+
         console.log("Fetched interview schedule response:", response);
         if (response?.data) {
           // API returns: { status, success, message, data:[ ... ] }
@@ -156,7 +155,7 @@ const TraineeDashboard = () => {
               trainerApproval: item?.trainerApproval
             };
           });
-          
+
           console.log("Loaded interviews:", cleanData);
           setInterviews(cleanData);
         }
@@ -260,52 +259,51 @@ const TraineeDashboard = () => {
     handleLogout();
   };
 
-  
-  sessionStorage.setItem("empid", "TRN001");
+
   const empid = sessionStorage.getItem("empid");
   useEffect(() => {
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-      const result = await fetchSyllabusProgressByEmpId(empid);
-  
-      const apiData = result?.data || result || [];
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const result = await fetchSyllabusProgressByEmpId(empid);
 
-      const formattedSteps = apiData.map((item, index, arr) => {
-        // ✔ current step completed
-        const isCompleted = item?.subTopics?.every(sub =>
-          sub?.stepProgress?.some(p => p.complete === true && p.checker === true)
-        );
+        const apiData = result?.data || result || [];
 
-        // ✔ previous step completed
-        const prevCompleted =
-          index === 0
-            ? true
-            : arr[index - 1]?.subTopics?.every(sub =>
+        const formattedSteps = apiData.map((item, index, arr) => {
+          // ✔ current step completed
+          const isCompleted = item?.subTopics?.every(sub =>
+            sub?.stepProgress?.some(p => p.complete === true && p.checker === true)
+          );
+
+          // ✔ previous step completed
+          const prevCompleted =
+            index === 0
+              ? true
+              : arr[index - 1]?.subTopics?.every(sub =>
                 sub?.stepProgress?.some(
                   p => p.complete === true && p.checker === true
                 )
               );
 
-        return {
-          stepNumber: index + 1,
-          title: item?.title || `Step ${index + 1}`,
-          description: item?.topic || '',
-          completed: isCompleted,
-          locked: !prevCompleted
-        };
-      });
+          return {
+            stepNumber: index + 1,
+            title: item?.title || `Step ${index + 1}`,
+            description: item?.topic || '',
+            completed: isCompleted,
+            locked: !prevCompleted
+          };
+        });
 
-      setStepsStatus(formattedSteps);
-      setLoading(false);
-    } catch (err) {
-      console.error(err);
-      setLoading(false);
-    }
-  };
+        setStepsStatus(formattedSteps);
+        setLoading(false);
+      } catch (err) {
+        console.error(err);
+        setLoading(false);
+      }
+    };
 
-  if (empid) fetchData();
-}, [empid]);
+    if (empid) fetchData();
+  }, [empid]);
 
 
   if (isLoading) {
@@ -398,12 +396,12 @@ const TraineeDashboard = () => {
                 stepsStatus={stepsStatus}
               /> */}
 
-<ProgressTracker
-  stepsStatus={stepsStatus}
-  onStepClick={(stepId) => {
-    console.log('Clicked step:', stepId);
-  }}
-/>
+              <ProgressTracker
+                stepsStatus={stepsStatus}
+                onStepClick={(stepId) => {
+                  console.log('Clicked step:', stepId);
+                }}
+              />
 
 
               {/* Current Step Content */}

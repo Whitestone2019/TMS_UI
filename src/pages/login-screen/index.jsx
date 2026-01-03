@@ -9,16 +9,15 @@ import { login } from '../../api_service';
 
 const LoginScreen = () => {
   const navigate = useNavigate();
-  
+
   // Form state
   const [formData, setFormData] = useState({
-    email: '',
-    traineeId: '',
+
+    trngId: '',
     password: '',
-    role: '',
     rememberMe: false
   });
-  
+
   // UI state
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -26,27 +25,7 @@ const LoginScreen = () => {
   const [failedAttempts, setFailedAttempts] = useState(0);
   const [isLocked, setIsLocked] = useState(false);
   const [lockTimeRemaining, setLockTimeRemaining] = useState(0);
-  
-  const roleOptions = [
-    { value: 'manager', label: 'Manager', description: 'Administrative access' },
-    { value: 'trainee', label: 'Trainee', description: 'Learning access' }
-  ];
-  
-  // Mock user data for demonstration
-  // const mockUsers = {
-  //   manager: {
-  //     email: 'admin@traineesystem.com',
-  //     password: 'Manager123!',
-  //     redirectPath: '/manager-dashboard'
-  //   },
-  //   trainee: {
-  //     email: 'john.doe@company.com',
-  //     traineeId: 'TRN001',
-  //     password: 'Trainee123!',
-  //     redirectPath: '/trainee-dashboard'
-  //   }
-  // };
-  
+
   // Account lockout timer
   useEffect(() => {
     let timer;
@@ -64,13 +43,13 @@ const LoginScreen = () => {
     }
     return () => clearInterval(timer);
   }, [isLocked, lockTimeRemaining]);
-  
+
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
     }));
-    
+
     // Clear field-specific error when user starts typing
     if (errors?.[field]) {
       setErrors(prev => ({
@@ -79,88 +58,102 @@ const LoginScreen = () => {
       }));
     }
   };
-  
+
   const validateForm = () => {
     const newErrors = {};
-    
-    // Role validation
-    if (!formData?.role) {
-      newErrors.role = 'Please select your role';
-    }
-    
+
+    // // Role validation
+    // if (!formData?.role) {
+    //   newErrors.role = 'Please select your role';
+    // }
+
     // Email validation for both roles
-    if (!formData?.email) {
-      newErrors.email = 'Email is required';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/?.test(formData?.email)) {
-      newErrors.email = 'Please enter a valid email address';
-    }
-    
+    // if (!formData?.email) {
+    //   newErrors.email = 'Email is required';
+    // } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/?.test(formData?.email)) {
+    //   newErrors.email = 'Please enter a valid email address';
+    // }
+
     // Trainee ID validation for trainee role
-    if (formData?.role === 'trainee' && !formData?.traineeId) {
-      newErrors.traineeId = 'Trainee ID is required';
+    if (!formData?.trngId) {
+      newErrors.trngId = 'Trainee ID is required';
     }
-    
+
     // Password validation
     if (!formData?.password) {
       newErrors.password = 'Password is required';
     } else if (formData?.password?.length < 8) {
       newErrors.password = 'Password must be at least 8 characters';
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors)?.length === 0;
   };
-  
+
   const handleLogin = async (e) => {
     e?.preventDefault();
-    
+
+
     if (isLocked) {
       return;
     }
-    
+
     if (!validateForm()) {
       return;
     }
-    
+
     setIsLoading(true);
-    
+
     try {
       // Simulate API call delay
       // await new Promise(resolve => setTimeout(resolve, 1500));
-      
+
       // Mock authentication logic
       // const mockUser = mockUsers?.[formData?.role];
+
       console.log('Creating account with data:', formData);
 
       const response = await login(formData);
       console.log('Login response:', response);
-      
+
+      console.log("Response Status:", response?.status);
 
       const isValidCredentials = response?.status === 200;
-        
-      
+
+
       if (isValidCredentials) {
         // Successful login
+        console.log('Login successful', response?.data?.redirect);
+
         setFailedAttempts(0);
-  
+
         if (formData?.rememberMe) {
           localStorage.setItem('userSession', JSON.stringify({
-            role: formData?.role,
-            email: formData?.email,
-            traineeId: formData?.traineeId,
+            trngId: formData?.trngId,
             timestamp: Date.now()
-          }));          
+          }));
         }
-        
-        // Redirect to appropriate dashboard
 
+        const empId = sessionStorage.setItem("empid", `${formData?.trngId}`);
+        navigate(response?.data?.redirect || '/');
 
-        navigate(response?.redirect || '/');
       } else {
+        if (response?.status === 401) {
+          setErrors({
+            general: response?.message || 'Invalid credentials. Please try again.'
+          });
+          return;
+        }
+        // if (response?.status === 402) {
+        //   setErrors({
+        //     general: response?.message || 'Invalid credentials. Please try again.'
+        //   });
+        //   return;
+        // }
         // Failed login
         const newFailedAttempts = failedAttempts + 1;
         setFailedAttempts(newFailedAttempts);
-        
+
         if (newFailedAttempts >= 3) {
           setIsLocked(true);
           setLockTimeRemaining(300); // 5 minutes lockout
@@ -176,25 +169,27 @@ const LoginScreen = () => {
 
 
     } catch (error) {
+      console.error('Login error:', error);
       setErrors({
-        general: 'Connection error. Please check your internet connection and try again.'
+        general: 'An error occurred during login. Please try again later.'
       });
     } finally {
       setIsLoading(false);
     }
   };
-  
+
   const handleForgotPassword = () => {
     // In real app, trigger password reset flow
     alert('Password reset instructions would be sent to your email.');
+    navigate('/reset-password');
   };
-  
+
   const formatLockTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs?.toString()?.padStart(2, '0')}`;
   };
-  
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 px-4">
       {/* Background Pattern */}
@@ -204,7 +199,7 @@ const LoginScreen = () => {
           backgroundSize: '40px 40px'
         }} />
       </div>
-      
+
       <div className="relative w-full max-w-md">
         {/* Brand Header */}
         <div className="text-center mb-8">
@@ -218,14 +213,14 @@ const LoginScreen = () => {
             Secure access to your training portal
           </p>
         </div>
-        
+
         {/* Login Form */}
         <div className="bg-card rounded-xl shadow-lg border border-border overflow-hidden">
           <div className="p-8">
             <h2 className="text-xl font-semibold text-card-foreground mb-6 text-center">
               Sign In to Your Account
             </h2>
-            
+
             <form onSubmit={handleLogin} className="space-y-6">
               {/* General Error */}
               {errors?.general && (
@@ -243,9 +238,9 @@ const LoginScreen = () => {
                   </div>
                 </div>
               )}
-              
+
               {/* Role Selection */}
-              <Select
+              {/* <Select
                 label="Select Your Role"
                 required
                 options={roleOptions}
@@ -254,10 +249,10 @@ const LoginScreen = () => {
                 error={errors?.role}
                 placeholder="Choose your access level"
                 className="w-full"
-              />
-              
+              /> */}
+
               {/* Email Field */}
-              <div className="relative">
+              {/* <div className="relative">
                 <Input
                   label="Email Address"
                   type="email"
@@ -269,25 +264,30 @@ const LoginScreen = () => {
                   className="pl-10"
                 />
                 <Mail className="absolute left-3 top-9 w-4 h-4 text-muted-foreground" />
-              </div>
-              
+              </div> */}
+
               {/* Trainee ID Field (conditional) */}
-              {formData?.role === 'trainee' && (
-                <div className="relative">
-                  <Input
-                    label="Trainee ID"
-                    type="text"
-                    required
-                    value={formData?.traineeId}
-                    onChange={(e) => handleInputChange('traineeId', e?.target?.value)}
-                    error={errors?.traineeId}
-                    placeholder="Enter your trainee ID"
-                    className="pl-10"
-                  />
-                  <User className="absolute left-3 top-9 w-4 h-4 text-muted-foreground" />
-                </div>
-              )}
-              
+              {/* {formData?.role === 'trainee' && ( */}
+
+
+              <div className="relative">
+                <Input
+                  label="Trainee/Manager ID"
+                  type="text"
+                  required
+                  value={formData?.trngId}
+                  onChange={(e) => handleInputChange('trngId', e?.target?.value)}
+                  error={errors?.trngId}
+                  placeholder="Enter your trainee ID"
+                  className="pl-10"
+                  autoComplete="username"
+                />
+                <User className="absolute left-3 top-9 w-4 h-4 text-muted-foreground" />
+              </div>
+
+
+              {/* )} */}
+
               {/* Password Field */}
               <div className="relative">
                 <Input
@@ -299,6 +299,8 @@ const LoginScreen = () => {
                   error={errors?.password}
                   placeholder="Enter your password"
                   className="pl-10 pr-10"
+
+                  autoComplete="current-password"
                 />
                 <Lock className="absolute left-3 top-9 w-4 h-4 text-muted-foreground" />
                 <button
@@ -313,7 +315,7 @@ const LoginScreen = () => {
                   )}
                 </button>
               </div>
-              
+
               {/* Remember Me & Forgot Password */}
               <div className="flex items-center justify-between">
                 <label className="flex items-center space-x-2 cursor-pointer">
@@ -323,7 +325,7 @@ const LoginScreen = () => {
                   />
                   <span className="text-sm text-muted-foreground">Remember me</span>
                 </label>
-                
+
                 <button
                   type="button"
                   onClick={handleForgotPassword}
@@ -332,19 +334,19 @@ const LoginScreen = () => {
                   Forgot password?
                 </button>
               </div>
-              
+
               {/* Login Button */}
               <Button
                 type="submit"
                 loading={isLoading}
-                disabled={isLocked}
+                // disabled={isLocked}
                 className="w-full"
                 size="lg"
               >
                 {isLoading ? 'Signing In...' : 'Sign In'}
               </Button>
             </form>
-            
+
             {/* Demo Credentials */}
             {/* <div className="mt-8 pt-6 border-t border-border">
               <h3 className="text-sm font-medium text-muted-foreground mb-3 text-center">
@@ -365,7 +367,7 @@ const LoginScreen = () => {
               </div>
             </div> */}
           </div>
-          
+
           {/* Security Footer */}
           <div className="bg-muted/30 px-8 py-4">
             <div className="flex items-center justify-center text-xs text-muted-foreground">
@@ -374,7 +376,7 @@ const LoginScreen = () => {
             </div>
           </div>
         </div>
-        
+
         {/* Footer */}
         <div className="text-center mt-6 text-xs text-muted-foreground">
           <p>© 2025 Trainee Management System. All rights reserved.</p>

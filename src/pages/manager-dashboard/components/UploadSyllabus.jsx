@@ -4,7 +4,6 @@ import NavigationBreadcrumb from "../../../components/ui/NavigationBreadcrumb";
 import Button from "../../../components/ui/Button";
 import Input from "../../../components/ui/Input";
 import Icon from "../../../components/AppIcon";
-import Select from "../../../components/ui/Select";
 import { uploadSyllabusAPI, getAllSyllabusAPI, updateSyllabusAPI, getAllTrainers } from "../../../api_service";
 
 const UploadSyllabus = ({ onCancel }) => {
@@ -71,19 +70,10 @@ const UploadSyllabus = ({ onCancel }) => {
     };
 
     const deleteSubTopic = (index) => {
-
-        if (!window.confirm("This will permanently delete this subtopic. Continue?")) return;
         const updated = [...formData.subTopics];
         updated.splice(index, 1);
         setFormData((prev) => ({ ...prev, subTopics: updated }));
     };
-
-    const interviewerOptions = Array.isArray(trainerList)
-        ? (trainerList).map((t) => ({
-            value: t.trainerId,
-            label: `${t.name}${t.title ? " - " + t.title : ""}`,
-        }))
-        : [];
 
     const validateForm = () => {
         const newErrors = {};
@@ -100,6 +90,60 @@ const UploadSyllabus = ({ onCancel }) => {
         return Object.keys(newErrors).length === 0;
     };
 
+    // const handleSubmit = async () => {
+    //     if (!validateForm()) return;
+    //     setLoading(true);
+
+    //     try {
+    //         const fd = new FormData();
+    //         fd.append("title", formData.title);
+    //         fd.append("topic", formData.topic);
+
+
+    //         formData.subTopics.forEach((sub, i) => {
+    //             console.log("Appending subtopic:", sub);
+    //             fd.append(`subTopics[${i}].name`, sub.name);
+    //             fd.append(`subTopics[${i}].description`, sub.description);
+
+    //             if (sub.file instanceof File) {
+    //                 fd.append(`subTopics[${i}].file`, sub.file, sub.file.name);
+    //             } else if (typeof sub.file === "string") {
+    //                 // send existing file path so backend knows to keep it
+    //                 fd.append(`subTopics[${i}].filePath`, sub.file);
+    //             }
+    //         });
+
+
+    //         // console.log(fd);
+    //         // console.log(formData);
+    //         let res;
+    //         if (editingId) {
+    //             res = await updateSyllabusAPI(editingId, fd);
+    //             setSyllabusList(prev => prev.map(it => it.id === editingId ? res.data : it));
+    //             alert("Updated Successfully!");
+    //         } else {
+    //             console.log(formData);
+    //             res = await uploadSyllabusAPI(formData);
+    //             setSyllabusList(prev => [...prev, res.data]);
+    //             alert("Uploaded Successfully!");
+
+    //         }
+
+    //         // reset form
+    //         setEditingId(null);
+    //         // setFormData({
+    //         //     title: "",
+
+    //         //     topic: "",
+    //         //     subTopics: [{ name: "", description: "", file: null }],
+    //         // });
+    //     } catch (err) {
+    //         console.error("Upload error", err);
+    //         alert(err?.response?.data || err.message || "Upload failed");
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // };
 
 
     const handleSubmit = async () => {
@@ -114,16 +158,16 @@ const UploadSyllabus = ({ onCancel }) => {
                 durationInDays: Number(formData.durationInDays),
                 //subTopics: formData.subTopics.map(st => ({ name: st.name, description: st.description }))
                 subTopics: formData.subTopics.map(st => ({
-                    id: st.id,
+                    id: st.id || null,
                     name: st.name,
                     description: st.description,
                     filePath: typeof st.file === "string" ? st.file : null,
-                    trainer: st.trainerId ? { trainerId: st.trainerId } : null
+                    trainer: {
+                        trainerId: Number(st.trainerId)
+                    }
                 }))
 
             };
-
-            console.log("Prepared Syllabus JSON:", syllabusJson);
 
             // const fd = new FormData();
             // fd.append("syllabus", new Blob([JSON.stringify(syllabusJson)], { type: "application/json" }));
@@ -150,6 +194,9 @@ const UploadSyllabus = ({ onCancel }) => {
                 }
             });
 
+
+
+
             // Send to backend
             const res = editingId
                 ? await updateSyllabusAPI(editingId, fd)
@@ -173,7 +220,6 @@ const UploadSyllabus = ({ onCancel }) => {
         }
     };
 
-    console.log("Trainer List:", trainerList);
     const editSyllabus = (item) => {
         setEditingId(item.id);
 
@@ -183,7 +229,6 @@ const UploadSyllabus = ({ onCancel }) => {
             durationInDays: item.durationInDays,
             subTopics: (item.subTopics && item.subTopics.length > 0)
                 ? item.subTopics.map(sub => ({
-                    id: sub.id,
                     name: sub.name,
                     description: sub.description,
                     file: sub.filePath || null,
@@ -191,7 +236,6 @@ const UploadSyllabus = ({ onCancel }) => {
 
                     // store the existing file path
 
-                    // store the existing file path
                 }))
                 : [{ name: "", description: "", file: null, trainerId: "" }]
         });
@@ -206,19 +250,15 @@ const UploadSyllabus = ({ onCancel }) => {
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-10">
                     {/* LEFT FORM */}
-                    {/* <div className="bg-white/50 backdrop-blur-lg shadow-xl rounded-2xl border border-blue-200"> */}
-                    <div className="bg-white/50 backdrop-blur-lg shadow-xl rounded-2xl border border-blue-200 
-                          flex flex-col max-h-[calc(100vh-140px)]">
-                        {/* <div className="p-8 border-b bg-blue-100 rounded-t-2xl"> */}
-                        <div className="p-8 border-b bg-blue-100 rounded-t-2xl sticky top-0 z-10">
-
+                    <div className="bg-white/50 backdrop-blur-lg shadow-xl rounded-2xl border border-blue-200">
+                        <div className="p-8 border-b bg-blue-100 rounded-t-2xl">
                             <h2 className="text-3xl font-bold text-black">
                                 <Icon name="BookOpen" size={28} className="inline mr-2 text-blue-700" />
                                 {editingId ? "Edit Syllabus" : "Upload Syllabus"}
                             </h2>
                         </div>
 
-                        <div className="p-8 space-y-8 overflow-y-auto">
+                        <div className="p-8 space-y-8">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-7">
                                 <Input
                                     label="Title"
@@ -260,7 +300,7 @@ const UploadSyllabus = ({ onCancel }) => {
                             </div>
 
                             {/* SUBTOPICS */}
-                            <div className="space-y-6 h-[500px] ">
+                            <div className="space-y-6 h-[500px] overflow-y-scroll pr-3 custom-scroll">
 
 
                                 <h3 className="text-xl font-semibold text-blue-700">Subtopics</h3>
@@ -336,16 +376,24 @@ const UploadSyllabus = ({ onCancel }) => {
                                                 }
                                             />
                                             <div>
-                                                <br></br>
+                                                <label className="text-sm font-medium text-gray-700 mb-1 block">
+                                                    Select Trainer *
+                                                </label>
 
-                                                <Select
-                                                    label="Select Interviewer"
-                                                    required
-                                                    options={interviewerOptions}
+                                                <select
+                                                    className="w-full h-12 px-4 rounded-xl border border-blue-300 bg-white shadow-sm text-gray-800"
                                                     value={sub.trainerId}
-                                                    onChange={(value) => handleSubTopicChange(index, "trainerId", value)}
-                                                    searchable
-                                                />
+                                                    onChange={(e) => handleSubTopicChange(index, "trainerId", e.target.value)}
+                                                >
+                                                    <option value="">Select Trainer</option>
+
+                                                    {trainerList?.map((t) => (
+                                                        <option key={t.trainerId} value={t.trainerId}>
+                                                            {t.name}
+                                                        </option>
+                                                    ))}
+
+                                                </select>
 
                                             </div>
 
