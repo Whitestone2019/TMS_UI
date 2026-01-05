@@ -82,7 +82,7 @@ export const fetchAllTrainees = async () => {
       "lastname": "A",
       "emailid": "wwm@gmail.com",
       "phonenumber": "987635616",
-"roleId": "R001",
+      "roleId": "R001",
     },
     {
       "userid": "2019WS1155",
@@ -93,7 +93,7 @@ export const fetchAllTrainees = async () => {
       "lastname": null,
       "emailid": "aswathi.ravindran@whitestones.co.in",
       "phonenumber": "09787255964",
-"roleId": "R001",
+      "roleId": "R001",
     },
     {
       "userid": "2019WS1122",
@@ -150,6 +150,19 @@ export const createAssessment = async (empId, data) => {
     return response.data;
   } catch (error) {
     console.error("Error creating assessment:", error);
+    throw error;
+  }
+};
+
+export const updateAssessment = async (assessmentId, data) => {
+  try {
+    const response = await axios.put(
+      `${API_URL}/assessments/update/${assessmentId}`,
+      data
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error updating assessment:", error);
     throw error;
   }
 };
