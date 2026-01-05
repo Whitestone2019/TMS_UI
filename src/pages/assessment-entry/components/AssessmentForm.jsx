@@ -601,7 +601,7 @@ const AssessmentForm = ({
 
     if (isDraft) {
       onSaveDraft(assessmentData);
-    } 
+    }
     // else {
     //   onSave(assessmentData);
     // }
@@ -611,21 +611,21 @@ const AssessmentForm = ({
 
 
   const resetForm = () => {
-  setFormData({
-    marks: '',
-    maxMarks: '100',
-    assessmentDate: new Date().toISOString().split('T')[0],
-    assessmentType: 'weekly',
-    remarks: '',
-    strengths: '',
-    improvements: '',
-    recommendations: ''
-  });
+    setFormData({
+      marks: '',
+      maxMarks: '100',
+      assessmentDate: new Date().toISOString().split('T')[0],
+      assessmentType: 'weekly',
+      remarks: '',
+      strengths: '',
+      improvements: '',
+      recommendations: ''
+    });
 
-  setErrors({});
-  setHasUnsavedChanges(false);
-  setAutoSaveStatus('');
-};
+    setErrors({});
+    setHasUnsavedChanges(false);
+    setAutoSaveStatus('');
+  };
   const handleCancel = () => {
     if (hasUnsavedChanges) {
       if (window.confirm('You have unsaved changes. Are you sure you want to cancel?')) {

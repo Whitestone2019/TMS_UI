@@ -1,33 +1,92 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import Button from '../../../components/ui/Button';
 import Input from '../../../components/ui/Input';
 import Select from '../../../components/ui/Select';
+import { fetchAssessmentsByTrainee } from "../../../api_service"
 
-const AssessmentEntryModal = ({ 
-  isOpen, 
-  onClose, 
-  trainee, 
-  onSubmitAssessment 
+const AssessmentEntryModal = ({
+  isOpen,
+  onClose,
+  trainee,
+  onSubmitAssessment
 }) => {
   const [assessmentData, setAssessmentData] = useState({
-    traineeId: trainee?.id || '',
+    traineeId: trainee?.traineeId || '',
     assessmentType: '',
     marks: '',
     maxMarks: '100',
     remarks: '',
     assessmentDate: new Date()?.toISOString()?.split('T')?.[0]
   });
-  
+
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // const assessmentTypeOptions = [
+  //   { value: 'weekly', label: 'Weekly Assessment' },
+  //   { value: 'module', label: 'Module Assessment' },
+  //   { value: 'practical', label: 'Practical Assessment' },
+  //   { value: 'project', label: 'Project Assessment' }
+  // ];
+
   const assessmentTypeOptions = [
     { value: 'weekly', label: 'Weekly Assessment' },
+    { value: 'monthly', label: 'Monthly Assessment' }, // ✅ ADD THIS
     { value: 'module', label: 'Module Assessment' },
     { value: 'practical', label: 'Practical Assessment' },
     { value: 'project', label: 'Project Assessment' }
   ];
+
+
+  useEffect(() => {
+    if (!trainee?.traineeId || !isOpen) return;
+    console.log(trainee.traineeId);
+    if (!isOpen) return null;
+
+    // 👇👇 YAHAN ADD KARO
+    console.log(
+      "Dropdown value:",
+      assessmentData.assessmentType,
+      typeof assessmentData.assessmentType
+    );
+
+    const loadLastAssessment = async () => {
+      try {
+        const res = await fetchAssessmentsByTrainee(trainee.traineeId);
+
+        console.log("Assessment API response:", res);
+
+        // const list = Array.isArray(res?.data?.data) ? res.data.data : [];
+        const list = Array.isArray(res?.data) ? res.data : [];
+
+        console.log("Assessment list:", list);
+
+        if (list.length === 0) return;
+
+        const lastAssessment = list[list.length - 1];
+
+        console.log("Last assessment:", lastAssessment);
+
+        setAssessmentData({
+          traineeId: trainee.traineeId,
+          assessmentType: lastAssessment.assessmentType?.toLowerCase() || '',
+          marks: String(lastAssessment.marks || ''),
+          maxMarks: String(lastAssessment.maxMarks || '100'),
+          remarks: lastAssessment.remarks || '',
+          assessmentDate: lastAssessment.assessmentDate
+            ? new Date(lastAssessment.assessmentDate).toISOString().split('T')[0]
+            : new Date().toISOString().split('T')[0]
+        });
+      } catch (err) {
+        console.error('Error loading last assessment:', err);
+      }
+    };
+
+    loadLastAssessment();
+  }, [trainee?.traineeId, isOpen]);
+
+
 
   const handleInputChange = (field, value) => {
     setAssessmentData(prev => ({ ...prev, [field]: value }));
@@ -38,11 +97,11 @@ const AssessmentEntryModal = ({
 
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (!assessmentData?.assessmentType) {
       newErrors.assessmentType = 'Assessment type is required';
     }
-    
+
     if (!assessmentData?.marks) {
       newErrors.marks = 'Marks are required';
     } else if (isNaN(assessmentData?.marks) || assessmentData?.marks < 0) {
@@ -50,13 +109,13 @@ const AssessmentEntryModal = ({
     } else if (parseInt(assessmentData?.marks) > parseInt(assessmentData?.maxMarks)) {
       newErrors.marks = `Marks cannot exceed ${assessmentData?.maxMarks}`;
     }
-    
+
     if (!assessmentData?.remarks?.trim()) {
       newErrors.remarks = 'Remarks are required';
     } else if (assessmentData?.remarks?.trim()?.length < 10) {
       newErrors.remarks = 'Remarks must be at least 10 characters';
     }
-    
+
     if (!assessmentData?.assessmentDate) {
       newErrors.assessmentDate = 'Assessment date is required';
     }
@@ -67,13 +126,13 @@ const AssessmentEntryModal = ({
 
   const handleSubmit = async (e) => {
     e?.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
 
     setIsSubmitting(true);
-    
+
     try {
       await onSubmitAssessment({
         ...assessmentData,
@@ -81,17 +140,17 @@ const AssessmentEntryModal = ({
         maxMarks: parseInt(assessmentData?.maxMarks),
         percentage: Math.round((parseInt(assessmentData?.marks) / parseInt(assessmentData?.maxMarks)) * 100)
       });
-      
+
       // Reset form
       setAssessmentData({
-        traineeId: trainee?.id || '',
+        traineeId: trainee?.traineeId || '',
         assessmentType: '',
         marks: '',
         maxMarks: '100',
         remarks: '',
         assessmentDate: new Date()?.toISOString()?.split('T')?.[0]
       });
-      
+
       onClose();
     } catch (error) {
       console.error('Error submitting assessment:', error);
@@ -101,6 +160,12 @@ const AssessmentEntryModal = ({
   };
 
   if (!isOpen) return null;
+  console.log(
+    "Dropdown value:",
+    assessmentData.assessmentType,
+    typeof assessmentData.assessmentType
+  );
+
 
   return (
     <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4">
@@ -198,10 +263,10 @@ const AssessmentEntryModal = ({
                 </span>
               </div>
               <div className="mt-2 bg-muted rounded-full h-2">
-                <div 
+                <div
                   className="bg-primary h-2 rounded-full transition-all duration-300"
-                  style={{ 
-                    width: `${Math.round((parseInt(assessmentData?.marks) / parseInt(assessmentData?.maxMarks)) * 100)}%` 
+                  style={{
+                    width: `${Math.round((parseInt(assessmentData?.marks) / parseInt(assessmentData?.maxMarks)) * 100)}%`
                   }}
                 />
               </div>
@@ -218,9 +283,8 @@ const AssessmentEntryModal = ({
               placeholder="Enter detailed remarks about the trainee's performance..."
               value={assessmentData?.remarks}
               onChange={(e) => handleInputChange('remarks', e?.target?.value)}
-              className={`w-full px-3 py-2 border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent ${
-                errors?.remarks ? 'border-error' : 'border-border'
-              }`}
+              className={`w-full px-3 py-2 border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent ${errors?.remarks ? 'border-error' : 'border-border'
+                }`}
             />
             {errors?.remarks && (
               <p className="mt-1 text-sm text-error">{errors?.remarks}</p>
@@ -240,7 +304,7 @@ const AssessmentEntryModal = ({
             >
               Cancel
             </Button>
-            <Button
+            {/* <Button
               type="submit"
               variant="default"
               loading={isSubmitting}
@@ -248,7 +312,7 @@ const AssessmentEntryModal = ({
               iconPosition="left"
             >
               Save Assessment
-            </Button>
+            </Button> */}
           </div>
         </form>
       </div>

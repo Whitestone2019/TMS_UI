@@ -27,6 +27,8 @@ export const login = async (credentials) => {
 };
 
 
+
+
 export const sendOtp = async (trngId) => {
   try {
     const response = await axios.post(`${API_URL}/users/send-otp`, { trngId });
@@ -506,6 +508,21 @@ const fetchSyllabusProgress = async (empId) => {
     const text = await res.text();
     console.error("Backend error:", text);
     throw new Error("Failed to fetch syllabus progress");
+  }
+
+  return await res.json(); // ✅ guaranteed JSON
+};
+
+
+export const fetchTraineeById = async (traineeId) => {
+  const res = await fetch(
+    `http://localhost:8080/api/assessments/trainee/${traineeId}`
+  );
+
+  if (!res.ok) {
+    const text = await res.text();
+    console.error("Backend error:", text);
+    throw new Error("Failed to fetch trainee details");
   }
 
   return await res.json(); // ✅ guaranteed JSON
