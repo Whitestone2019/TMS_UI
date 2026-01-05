@@ -908,7 +908,7 @@ const ManagerDashboard = () => {
     <div className="min-h-screen bg-background">
       <Header
         userRole="manager"
-        userName="Manager Smith"
+        userName="x "
         onLogout={handleLogout}
       />
       <main className="pt-16">
