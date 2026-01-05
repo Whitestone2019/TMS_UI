@@ -122,11 +122,11 @@ const TraineeDataTable = ({
           </thead>
           <tbody className="divide-y divide-border">
             {trainees?.map((trainee) => (
-              <tr key={trainee?.id} className="hover:bg-muted/30 transition-colors">
+              <tr key={trainee?.traineeId} className="hover:bg-muted/30 transition-colors">
                 <td className="px-6 py-4">
                   <Checkbox
-                    checked={selectedTrainees?.includes(trainee?.id)}
-                    onChange={(e) => onSelectTrainee(trainee?.id, e?.target?.checked)}
+                    checked={selectedTrainees?.includes(trainee?.traineeId)}
+                    onChange={(e) => onSelectTrainee(trainee?.traineeId, e?.target?.checked)}
                   />
                 </td>
                 <td className="px-6 py-4">

@@ -469,7 +469,10 @@ const AssessmentForm = ({
     strengths: '',
     improvements: '',
     recommendations: '',
-    subTopicId: null
+    subTopicId: null,
+    interviewDone: "no", // ✅ new field
+    reviewNotes: "",     // ✅ review text (show only if Yes)
+
   });
   const [errors, setErrors] = useState({});
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
@@ -561,6 +564,10 @@ const AssessmentForm = ({
       newErrors.remarks = 'Remarks are required';
     } else if (formData?.remarks?.trim()?.length < 10) {
       newErrors.remarks = 'Remarks must be at least 10 characters';
+    }
+
+    if (formData.interviewDone === "yes" && !formData.reviewNotes.trim()) {
+      newErrors.reviewNotes = "Please enter review notes";
     }
 
     setErrors(newErrors);
@@ -861,6 +868,55 @@ const AssessmentForm = ({
               onChange={(e) => handleInputChange('recommendations', e?.target?.value)}
             />
           </div>
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-2">
+              Interview Completed?
+            </label>
+            <div className="flex items-center space-x-6">
+              <label className="flex items-center space-x-2">
+                <input
+                  type="radio"
+                  name="interviewDone"
+                  value="yes"
+                  checked={formData.interviewDone === "yes"}
+                  onChange={() => handleInputChange("interviewDone", "yes")}
+                  className="form-radio"
+                />
+                <span>Yes</span>
+              </label>
+
+              <label className="flex items-center space-x-2">
+                <input
+                  type="radio"
+                  name="interviewDone"
+                  value="no"
+                  checked={formData.interviewDone === "no"}
+                  onChange={() => handleInputChange("interviewDone", "no")}
+                  className="form-radio"
+                />
+                <span>No</span>
+              </label>
+            </div>
+          </div>
+
+          {/* Conditional Review Notes */}
+          {formData.interviewDone === "yes" && (
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-2">
+                Review Notes
+              </label>
+              <textarea
+                rows={3}
+                className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+                placeholder="Enter review notes..."
+                value={formData.reviewNotes}
+                onChange={(e) => handleInputChange("reviewNotes", e.target.value)}
+              />
+              {errors.reviewNotes && (
+                <p className="text-error text-sm">{errors.reviewNotes}</p>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Action Buttons */}
@@ -875,7 +931,7 @@ const AssessmentForm = ({
           >
             Save Assessment
           </Button>
-          <Button
+          {/* <Button
             variant="outline"
             onClick={() => handleSubmit(true)}
             iconName="FileText"
@@ -883,7 +939,7 @@ const AssessmentForm = ({
             className="flex-1 sm:flex-none"
           >
             Save as Draft
-          </Button>
+          </Button> */}
           <Button
             variant="ghost"
             onClick={handleCancel}
