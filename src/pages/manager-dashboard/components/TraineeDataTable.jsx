@@ -34,15 +34,24 @@ const TraineeDataTable = ({
       : <Icon name="ArrowDown" size={16} className="text-foreground" />;
   };
 
-  const getStatusBadge = (status) => {
+  const getStatusBadge = (percentage) => {
     const statusConfig = {
       'not-started': { bg: 'bg-gray-100', text: 'text-gray-700', label: 'Not Started' },
       'in-progress': { bg: 'bg-blue-100', text: 'text-blue-700', label: 'In Progress' },
       'completed': { bg: 'bg-green-100', text: 'text-green-700', label: 'Completed' }
     };
 
-    const config = statusConfig?.[status] || statusConfig?.['not-started'];
+    // const config = statusConfig?.[status] || statusConfig?.['not-started'];
 
+    let config;
+    console.log("percentage in badge", percentage);
+   if (percentage >= 85) {
+    config = statusConfig['completed'];
+  } else if (percentage > 0 && percentage < 85) {
+    config = statusConfig['in-progress'];
+  } else {
+    config = statusConfig['not-started'];
+  }
     return (
       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${config?.bg} ${config?.text}`}>
         {config?.label}
@@ -50,22 +59,31 @@ const TraineeDataTable = ({
     );
   };
 
-  const getInterviewStatusBadge = (status) => {
+  const getInterviewStatusBadge = (interviewDone) => {
+
     const statusConfig = {
       'pending': { bg: 'bg-yellow-100', text: 'text-yellow-700', label: 'Pending' },
       'scheduled': { bg: 'bg-blue-100', text: 'text-blue-700', label: 'Scheduled' },
       'completed': { bg: 'bg-green-100', text: 'text-green-700', label: 'Completed' },
       'cancelled': { bg: 'bg-red-100', text: 'text-red-700', label: 'Cancelled' }
     };
-
-    const config = statusConfig?.[status] || statusConfig?.['pending'];
-
+    let config;
+    if (interviewDone === true) {
+        config = statusConfig.completed;
+      } else if (interviewDone === false) {
+        config = statusConfig.pending;
+      } else {
+        config = statusConfig.cancelled;
+      }
+    
     return (
       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${config?.bg} ${config?.text}`}>
         {config?.label}
       </span>
     );
   };
+
+  console.log("selectedTrainees:", selectedTrainees);
 
   return (
     <div className="bg-card border border-border rounded-lg overflow-hidden">
@@ -94,7 +112,7 @@ const TraineeDataTable = ({
                   onClick={() => handleSort('currentStep')}
                   className="flex items-center space-x-2 text-sm font-medium text-foreground hover:text-primary"
                 >
-                  <span>Current Step</span>
+                  <span>Current Syllabus</span>
                   {getSortIcon('currentStep')}
                 </button>
               </th>
@@ -121,6 +139,7 @@ const TraineeDataTable = ({
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
+
             {trainees?.map((trainee) => (
               <tr key={trainee?.traineeId} className="hover:bg-muted/30 transition-colors">
                 <td className="px-6 py-4">
@@ -144,7 +163,10 @@ const TraineeDataTable = ({
                 </td>
                 <td className="px-6 py-4">
                   <div>
-                    <p className="text-sm font-medium text-foreground">{trainee?.currentStep}</p>
+                    <p className="text-sm font-medium text-foreground">
+                      {trainee?.subtopics && trainee.subtopics.length > 0
+                      ? `${trainee.subtopics[trainee.subtopics.length - 1]} - ${trainee.subtopics.length}`
+                      : "No Assessment Yet"}</p>
                     <p className="text-xs text-muted-foreground">{trainee?.stepDescription}</p>
                   </div>
                 </td>
@@ -160,7 +182,7 @@ const TraineeDataTable = ({
                       {trainee?.completionPercentage}%
                     </span>
                   </div>
-                  {getStatusBadge(trainee?.status)}
+                  {getStatusBadge(trainee?.completionPercentage)}
                 </td>
                 <td className="px-6 py-4">
                   <div>
@@ -246,7 +268,7 @@ const TraineeDataTable = ({
                   </span>
                 </div>
                 <div className="mt-2">
-                  {getStatusBadge(trainee?.status)}
+                  {getStatusBadge(trainee?.completionPercentage)}
                 </div>
               </div>
 

@@ -471,13 +471,21 @@ const AssessmentForm = ({
     recommendations: '',
     // subTopicId: null,
     subTopicIds: [],
-    interviewDone: false, 
+    // syllabusTitles: []
+    interviewDone: null,
     reviewNotes: "",     // ✅ review text (show only if Yes)
 
   });
+
+
   const [errors, setErrors] = useState({});
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [autoSaveStatus, setAutoSaveStatus] = useState('');
+
+  const [selectedSyllabus, setSelectedSyllabus] = useState([]);
+  const [selectedSubTopics, setSelectedSubTopics] = useState([]);
+
+  const [syllabusData, setSyllabusData] = useState([]);
   const [completedSubTopics, setCompletedSubTopics] = useState([]);
 
 
@@ -525,6 +533,34 @@ const AssessmentForm = ({
     }
   };
 
+  
+  // ✅ helper function – syllabus + subtopic filtering
+  const getCompletedSyllabusData = (data, traineeId) => {
+    return data
+      .map(syllabus => {
+        const completedSubTopics = syllabus.subTopics?.filter(subTopic =>
+          subTopic.stepProgress?.some(
+            progress =>
+              progress.checker === true &&
+              progress.complete === true &&
+              progress.user?.empid === traineeId
+          )
+        );
+
+        // ❌ syllabus hide if no valid subtopics
+        if (!completedSubTopics || completedSubTopics.length === 0) {
+          return null;
+        }
+
+        return {
+          ...syllabus,
+          subTopics: completedSubTopics
+        };
+      })
+      .filter(Boolean);
+  };
+
+
   const validateForm = () => {
     const newErrors = {};
     // Subtopic validation
@@ -532,8 +568,8 @@ const AssessmentForm = ({
     //   newErrors.subTopic = 'Subtopic is required';
     // }
 
-    if (!formData?.subTopicId) {
-      newErrors.subTopicId = 'Subtopic is required';
+    if (!formData?.subTopicIds || formData?.subTopicIds.length === 0) {
+      newErrors.subTopicIds = 'Subtopic is required';
     }
 
     // Marks validation
@@ -585,7 +621,7 @@ const AssessmentForm = ({
       empid: trainee?.trngid,
       traineeName: trainee?.name,
       currentStep: trainee?.currentStep,
-      subTopicId: formData.subTopicId,
+      subTopicIds: formData.subTopicIds,
       // isDraft,
       submittedAt: new Date()?.toISOString(),
       percentage: Math.round((parseFloat(formData?.marks) / parseFloat(formData?.maxMarks)) * 100)
@@ -662,42 +698,95 @@ const AssessmentForm = ({
       try {
         const response = await fetchCompletedSubTopics();
 
-        const data = Array.isArray(response)
+        const rawData = Array.isArray(response)
           ? response
           : Array.isArray(response?.data)
             ? response.data
             : [];
 
-        const filteredSubTopics = data.flatMap(syllabus =>
-          syllabus.subTopics?.flatMap(subTopic =>
-            subTopic.stepProgress
-              ?.filter(progress =>
-                progress.checker === true &&
-                progress.user?.empid === trainee.trngid
-              )
-              ?.map(() => ({
-                value: subTopic.subTopicId,
-                label: `${syllabus.title}-${subTopic.stepNumber}. ${subTopic.name}`
-              })) || []
-          ) || []
+        // ✅ APPLY SAME LOGIC TO SYLLABUS
+        const completedSyllabus = getCompletedSyllabusData(
+          rawData,
+          trainee.trngid
         );
 
-        console.log(
-          "Filtered SubTopics for",
-          trainee.trngid,
-          filteredSubTopics
+        setSyllabusData(completedSyllabus);
+
+        // ✅ dropdown ke liye flat subtopic list
+        const subTopicOptions = completedSyllabus.flatMap(syllabus =>
+          syllabus.subTopics.map(subTopic => ({
+            value: subTopic.subTopicId,
+            label: `${syllabus.title} - ${subTopic.stepNumber}. ${subTopic.name}`,
+            title: syllabus.title
+          }))
         );
 
-        setCompletedSubTopics(filteredSubTopics);
-
-      } catch (err) {
-        console.error("Error fetching completed subtopics", err);
+        setCompletedSubTopics(subTopicOptions);
+      } catch (error) {
+        console.error("Error fetching completed syllabus", error);
+        setSyllabusData([]);
         setCompletedSubTopics([]);
       }
     };
 
     loadData();
   }, [trainee?.trngid]);
+
+  const syllabusOptions = [
+    { value: "ALL", label: "All Syllabus" },
+    ...syllabusData.map(s => ({
+      value: s.title,
+      label: s.title
+    }))
+  ];
+
+  const filteredSubTopicOptions = (() => {
+    if (
+      selectedSyllabus.length === 0 ||
+      selectedSyllabus.includes("ALL")
+    ) {
+      return [
+        { value: "ALL_SUBTOPICS", label: "All Subtopics" },
+        ...completedSubTopics
+      ];
+    }
+
+    return [
+      { value: "ALL_SUBTOPICS", label: "All Subtopics" },
+      ...completedSubTopics.filter(sub =>
+        selectedSyllabus.includes(sub.title)
+      )
+    ];
+  })();
+
+  const handleSyllabusChange = values => {
+    let selected = Array.isArray(values) ? values : [values];
+
+    if (selected.includes("ALL")) {
+      selected = syllabusOptions
+        .filter(opt => opt.value !== "ALL")
+        .map(opt => opt.value);
+    }
+
+    setSelectedSyllabus(selected);
+    //handleInputChange("syllabusTitles", selected);
+    setSelectedSubTopics([]);
+    handleInputChange("subTopicIds", []);
+  };
+
+  const handleSubTopicChange = values => {
+    let selected = Array.isArray(values) ? values : [values];
+
+    if (selected.includes("ALL_SUBTOPICS")) {
+      selected = filteredSubTopicOptions
+        .filter(opt => opt.value !== "ALL_SUBTOPICS")
+        .map(opt => opt.value);
+    }
+
+    setSelectedSubTopics(selected);
+    handleInputChange("subTopicIds", selected);
+  };
+
 
   const calculatePercentage = () => {
     const marks = parseFloat(formData?.marks);
@@ -805,7 +894,7 @@ const AssessmentForm = ({
         </div>
 
 
-        <Select
+        {/* <Select
           label="Select Sub Topic"
           required
           options={completedSubTopics}
@@ -818,7 +907,89 @@ const AssessmentForm = ({
   }
    multiple 
           searchable
-        />
+        />  */}
+
+        {/* 🔹 TITLE DROPDOWN */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="flex flex-col gap-2">
+            {/* SYLLABUS MULTI SELECT */}
+            <Select
+              label="Syllabus"
+              options={syllabusOptions}
+              value={selectedSyllabus}
+              onChange={handleSyllabusChange}
+              multiple
+              searchable
+            />
+
+            {/* ✅ SELECTED SYLLABUS CHIPS – JUST BELOW */}
+            {selectedSyllabus.length > 0 && (
+              <div className="mt-1">
+                <p className="text-xs font-medium text-muted-foreground mb-1">
+                  Selected Syllabus
+                </p>
+
+                <div className="flex flex-wrap gap-2">
+                  {selectedSyllabus.map(title => (
+                    <span
+                      key={title}
+                      className="px-3 py-1 text-xs rounded-full
+          bg-secondary/10 text-secondary
+          border border-secondary/30"
+                    >
+                      {title}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+          </div>
+
+
+          <div className="space-y-3">
+            {/* 🔹 DROPDOWN */}
+            <Select
+              label="Completed Sub Topics"
+              options={filteredSubTopicOptions}
+              value={selectedSubTopics}
+              onChange={handleSubTopicChange}
+              multiple
+              searchable
+            />
+
+
+
+            {/* 🔹 SELECTED SUBTOPICS DISPLAY */}
+            {selectedSubTopics.length > 0 && (
+              <div>
+                <p className="text-sm font-medium text-foreground mb-1">
+                  Selected Sub Topics:
+                </p>
+
+                <div className="flex flex-wrap gap-2">
+                  {selectedSubTopics.map(id => {
+                    const sub = completedSubTopics.find(s => s.value === id);
+                    if (!sub) return null;
+
+                    return (
+                      <span
+                        key={id}
+                        className="px-3 py-1 text-xs rounded-full 
+                         bg-primary/10 text-primary 
+                         border border-primary/30"
+                      >
+                        {sub.label}
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+
+        </div>
+
 
         <div>
           <label className="block text-sm font-medium text-foreground mb-2">

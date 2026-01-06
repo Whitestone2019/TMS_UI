@@ -345,9 +345,12 @@ import {
 const AssessmentEntryModal = ({ isOpen, onClose, trainee }) => {
   const [assessmentList, setAssessmentList] = useState([]);
   const [existingAssessmentId, setExistingAssessmentId] = useState(null);
-  const [syllabusOptions, setSyllabusOptions] = useState([]);
+  const [selectedSyllabus, setSelectedSyllabus] = useState([]);
+  const [selectedSubTopics, setSelectedSubTopics] = useState([]);
+
+  const [syllabusData, setSyllabusData] = useState([]);
   const [completedSubTopics, setCompletedSubTopics] = useState([]);
-  const [syllabusList, setSyllabusList] = useState([]);
+  ;
   const [assessmentData, setAssessmentData] = useState({
     traineeId: '',
     assessmentType: '',
@@ -355,7 +358,7 @@ const AssessmentEntryModal = ({ isOpen, onClose, trainee }) => {
     maxMarks: '100',
     remarks: '',
     assessmentDate: new Date().toISOString().split('T')[0],
-    subTopicId: '',
+    subTopicIds: '',
     syllabusId: '',
   });
   const [errors, setErrors] = useState({});
@@ -370,49 +373,6 @@ const AssessmentEntryModal = ({ isOpen, onClose, trainee }) => {
     { value: 'project', label: 'Project Assessment' }
   ];
 
-  // ---------------- LOAD SYLLABUS ----------------
-  useEffect(() => {
-    if (!isOpen || !trainee?.traineeId) return;
-
-    const loadSyllabus = async () => {
-      try {
-        const res = await fetchCompletedSubTopics(trainee.traineeId);
-        const fetchedSyllabusList = Array.isArray(res?.data) ? res.data : [];
-        setSyllabusList(fetchedSyllabusList);
-
-        // Build dropdown options with nested subtopics
-        const options = fetchedSyllabusList.map(s => ({
-          value: s.syllabusId,
-          label: s.title,
-          subOptions: [
-            { value: 'all', label: 'All Subtopics' }, // Add All Subtopics option
-            ...s.subTopics.map(st => ({ value: st.subTopicId, label: st.name }))
-          ]
-        }));
-        setSyllabusOptions(options);
-
-        // Preselect first syllabus & subtopic
-        if (!assessmentData.syllabusId && fetchedSyllabusList.length > 0) {
-          const firstSyllabus = fetchedSyllabusList[0];
-          setAssessmentData(prev => ({
-            ...prev,
-            syllabusId: firstSyllabus.syllabusId,
-            subTopicId: firstSyllabus.subTopics[0]?.subTopicId || ''
-          }));
-          setCompletedSubTopics(
-            firstSyllabus.subTopics.map(st => ({ id: st.subTopicId, name: st.name }))
-          );
-        }
-      } catch (err) {
-        console.error(err);
-        setSyllabusList([]);
-        setSyllabusOptions([]);
-        setCompletedSubTopics([]);
-      }
-    };
-
-    loadSyllabus();
-  }, [isOpen, trainee?.traineeId]);
 
   // ---------------- LOAD ASSESSMENTS ----------------
   useEffect(() => {
@@ -420,9 +380,14 @@ const AssessmentEntryModal = ({ isOpen, onClose, trainee }) => {
 
     const loadAssessments = async () => {
       try {
+        console.log("Fetching assessments for traineeId:", trainee.traineeId);
         const res = await fetchAssessmentsByTrainee(trainee.traineeId);
+        console.log("Assessments response:", res);
         const list = Array.isArray(res?.data) ? res.data : [];
-        setAssessmentList(list);
+        const sortedList = list.sort((a, b) =>
+          new Date(b.createdAt) - new Date(a.createdAt)
+        );
+        setAssessmentList(sortedList);
 
         if (list.length > 0) populateForm(list[0]);
       } catch (err) {
@@ -434,36 +399,8 @@ const AssessmentEntryModal = ({ isOpen, onClose, trainee }) => {
     loadAssessments();
   }, [isOpen, trainee?.traineeId]);
 
-  // ---------------- HANDLERS ----------------
-  const handleSyllabusChange = (syllabusId) => {
-    setAssessmentData(prev => ({
-      ...prev,
-      syllabusId,
-      subTopicId: ''
-    }));
 
-    const syllabus = syllabusList.find(s => s.syllabusId === syllabusId);
-    setCompletedSubTopics(
-      syllabus?.subTopics.map(st => ({ id: st.subTopicId, name: st.name })) || []
-    );
-  };
 
-  const handleSubTopicChange = (subTopicId) => {
-    if (subTopicId === 'all') {
-      // Multi-select all subtopics
-      const parentSyllabus = syllabusList.find(s =>
-        s.subTopics.length > 0 && s.syllabusId === assessmentData.syllabusId
-      );
-      if (parentSyllabus) {
-        setAssessmentData(prev => ({
-          ...prev,
-          subTopicId: parentSyllabus.subTopics.map(st => st.subTopicId)
-        }));
-      }
-    } else {
-      setAssessmentData(prev => ({ ...prev, subTopicId }));
-    }
-  };
 
   const populateForm = (assessment) => {
     if (!assessment?.assessmentId) return;
@@ -487,13 +424,6 @@ const AssessmentEntryModal = ({ isOpen, onClose, trainee }) => {
       subTopicId,
       syllabusId: assessment.syllabusId,
     });
-
-    const parentSyllabus = syllabusList.find(s => s.syllabusId === assessment.syllabusId);
-    if (parentSyllabus) {
-      setCompletedSubTopics(
-        parentSyllabus.subTopics.map(st => ({ id: st.subTopicId, name: st.name }))
-      );
-    }
   };
 
   const handleInputChange = (field, value) => {
@@ -540,7 +470,134 @@ const AssessmentEntryModal = ({ isOpen, onClose, trainee }) => {
     }
   };
 
+useEffect(() => {
+    if (!trainee?.traineeId) {
+      setCompletedSubTopics([]);
+      return;
+    }
+
+    const loadData = async () => {
+      try {
+        const response = await fetchCompletedSubTopics();
+
+        const rawData = Array.isArray(response)
+          ? response
+          : Array.isArray(response?.data)
+            ? response.data
+            : [];
+
+        // ✅ APPLY SAME LOGIC TO SYLLABUS
+        const completedSyllabus = getCompletedSyllabusData(
+          rawData,
+          trainee.traineeId
+        );
+
+        setSyllabusData(completedSyllabus);
+
+        // ✅ dropdown ke liye flat subtopic list
+        const subTopicOptions = completedSyllabus.flatMap(syllabus =>
+          syllabus.subTopics.map(subTopic => ({
+            value: subTopic.subTopicId,
+            label: `${syllabus.title} - ${subTopic.stepNumber}. ${subTopic.name}`,
+            title: syllabus.title
+          }))
+        );
+
+        setCompletedSubTopics(subTopicOptions);
+      } catch (error) {
+        console.error("Error fetching completed syllabus", error);
+        setSyllabusData([]);
+        setCompletedSubTopics([]);
+      }
+    };
+
+    loadData();
+  }, [trainee?.traineeId]);
+
+
   if (!isOpen) return null;
+
+
+  
+  const syllabusOptions = [
+    { value: "ALL", label: "All Syllabus" },
+    ...syllabusData.map(s => ({
+      value: s.title,
+      label: s.title
+    }))
+  ];
+
+  const filteredSubTopicOptions = (() => {
+    if (
+      selectedSyllabus.length === 0 ||
+      selectedSyllabus.includes("ALL")
+    ) {
+      return [
+        { value: "ALL_SUBTOPICS", label: "All Subtopics" },
+        ...completedSubTopics
+      ];
+    }
+
+    return [
+      { value: "ALL_SUBTOPICS", label: "All Subtopics" },
+      ...completedSubTopics.filter(sub =>
+        selectedSyllabus.includes(sub.title)
+      )
+    ];
+  })();
+
+  const handleSyllabusChange = values => {
+    let selected = Array.isArray(values) ? values : [values];
+
+    if (selected.includes("ALL")) {
+      selected = syllabusOptions
+        .filter(opt => opt.value !== "ALL")
+        .map(opt => opt.value);
+    }
+
+    setSelectedSyllabus(selected);
+    //handleInputChange("syllabusTitles", selected);
+    setSelectedSubTopics([]);
+    handleInputChange("subTopicIds", []);
+  };
+
+  const handleSubTopicChange = values => {
+    let selected = Array.isArray(values) ? values : [values];
+
+    if (selected.includes("ALL_SUBTOPICS")) {
+      selected = filteredSubTopicOptions
+        .filter(opt => opt.value !== "ALL_SUBTOPICS")
+        .map(opt => opt.value);
+    }
+
+    setSelectedSubTopics(selected);
+    handleInputChange("subTopicIds", selected);
+  };
+
+  const getCompletedSyllabusData = (data, traineeId) => {
+    return data
+      .map(syllabus => {
+        const completedSubTopics = syllabus.subTopics?.filter(subTopic =>
+          subTopic.stepProgress?.some(
+            progress =>
+              progress.checker === true &&
+              progress.complete === true &&
+              progress.user?.empid === traineeId
+          )
+        );
+
+        // ❌ syllabus hide if no valid subtopics
+        if (!completedSubTopics || completedSubTopics.length === 0) {
+          return null;
+        }
+
+        return {
+          ...syllabus,
+          subTopics: completedSubTopics
+        };
+      })
+      .filter(Boolean);
+  };
 
   // ---------------- UI ----------------
   return (
@@ -609,23 +666,7 @@ const AssessmentEntryModal = ({ isOpen, onClose, trainee }) => {
                   value={assessmentData.maxMarks}
                   onChange={(e) => handleInputChange('maxMarks', e.target.value)}
                 />
-                <Select
-                  label="Select Syllabus"
-                  options={syllabusOptions.map(s => ({ value: s.value, label: s.label }))}
-                  value={assessmentData.syllabusId}
-                  onChange={handleSyllabusChange}
-                  searchable
-                />
-                <Select
-                  label="Select Sub Topic"
-                  options={[
-                    { value: 'all', label: 'All Subtopics' },
-                    ...completedSubTopics.map(st => ({ value: st.id, label: st.name }))
-                  ]}
-                  value={assessmentData.subTopicId}
-                  onChange={handleSubTopicChange}
-                  searchable
-                />
+
               </div>
 
               {assessmentData?.marks && assessmentData?.maxMarks && (
@@ -646,7 +687,85 @@ const AssessmentEntryModal = ({ isOpen, onClose, trainee }) => {
                   </div>
                 </div>
               )}
+<div className="grid grid-cols-2 gap-4">
+          <div className="flex flex-col gap-2">
+            {/* SYLLABUS MULTI SELECT */}
+            <Select
+              label="Syllabus"
+              options={syllabusOptions}
+              value={selectedSyllabus}
+              onChange={handleSyllabusChange}
+              multiple
+              searchable
+            />
 
+            {/* ✅ SELECTED SYLLABUS CHIPS – JUST BELOW */}
+            {selectedSyllabus.length > 0 && (
+              <div className="mt-1">
+                <p className="text-xs font-medium text-muted-foreground mb-1">
+                  Selected Syllabus
+                </p>
+
+                <div className="flex flex-wrap gap-2">
+                  {selectedSyllabus.map(title => (
+                    <span
+                      key={title}
+                      className="px-3 py-1 text-xs rounded-full
+          bg-secondary/10 text-secondary
+          border border-secondary/30"
+                    >
+                      {title}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+          </div>
+
+
+          <div className="space-y-3">
+            {/* 🔹 DROPDOWN */}
+            <Select
+              label="Completed Sub Topics"
+              options={filteredSubTopicOptions}
+              value={selectedSubTopics}
+              onChange={handleSubTopicChange}
+              multiple
+              searchable
+            />
+
+
+
+            {/* 🔹 SELECTED SUBTOPICS DISPLAY */}
+            {selectedSubTopics.length > 0 && (
+              <div>
+                <p className="text-sm font-medium text-foreground mb-1">
+                  Selected Sub Topics:
+                </p>
+
+                <div className="flex flex-wrap gap-2">
+                  {selectedSubTopics.map(id => {
+                    const sub = completedSubTopics.find(s => s.value === id);
+                    if (!sub) return null;
+
+                    return (
+                      <span
+                        key={id}
+                        className="px-3 py-1 text-xs rounded-full 
+                         bg-primary/10 text-primary 
+                         border border-primary/30"
+                      >
+                        {sub.label}
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+
+        </div>
               <textarea
                 rows={4}
                 className="w-full border rounded-lg p-2"

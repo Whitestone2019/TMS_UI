@@ -73,6 +73,7 @@ const Select = React.forwardRef(({
                 ? newValue?.filter(v => v !== option?.value)
                 : [...newValue, option?.value];
             onChange?.(updatedValue);
+            setIsOpen(false);
         } else {
             onChange?.(option?.value);
             setIsOpen(false);

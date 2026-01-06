@@ -261,7 +261,7 @@ const InterviewScheduling = () => {
         time: scheduleData.time,
         interviewType: scheduleData.interviewType,
         location: scheduleData.location,
-        meetingLink: scheduleData.meetingLink,
+        subTopicIds: scheduleData.subTopicIds,
         duration: scheduleData.duration,
         notes: scheduleData.notes
       });
