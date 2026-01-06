@@ -533,7 +533,7 @@ const AssessmentForm = ({
     // }
 
     if (!formData?.subTopicIds || formData.subTopicIds.length === 0) {
-      newErrors.subTopicIds    = 'Subtopic is required';
+      newErrors.subTopicIds = 'Subtopic is required';
     }
 
     // Marks validation
@@ -585,7 +585,7 @@ const AssessmentForm = ({
       empid: trainee?.trngid,
       traineeName: trainee?.name,
       currentStep: trainee?.currentStep,
-      subTopicId: formData.subTopicId,
+      subTopicIds: formData.subTopicIds,
       // isDraft,
       submittedAt: new Date()?.toISOString(),
       percentage: Math.round((parseFloat(formData?.marks) / parseFloat(formData?.maxMarks)) * 100)
