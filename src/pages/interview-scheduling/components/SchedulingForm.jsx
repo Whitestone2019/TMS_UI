@@ -3,7 +3,7 @@ import Icon from "../../../components/AppIcon";
 import Button from "../../../components/ui/Button";
 import Input from "../../../components/ui/Input";
 import Select from "../../../components/ui/Select";
-import { getAllTrainers } from "../../../api_service";
+import { getAllTrainers,fetchCompletedSubTopics } from "../../../api_service";
 
 
 const SchedulingForm = ({
@@ -22,12 +22,14 @@ const SchedulingForm = ({
     // meetingLink: "",
     duration: "60",
     notes: "",
-    emailTemplate: "default",
+    // emailTemplate: "default",
   });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [trainerList, setTrainerList] = useState([]);
-
+  
+    const [completedSubTopics, setCompletedSubTopics] = useState([]);
+console.log("selected trainees in form",selectedTrainees);
   // ✅ Fetch trainers dynamically (optional)
   useEffect(() => {
     const fetchTrainers = async () => {
@@ -77,6 +79,56 @@ const SchedulingForm = ({
     // Reset errors when new selection occurs
     setErrors({});
   }, [selectedDate, selectedTime, selectedTrainees]);
+
+
+    useEffect(() => {
+      if (!selectedTrainees || selectedTrainees.length === 0) {
+        setCompletedSubTopics([]);
+        return;
+      }
+  
+      const loadData = async () => {
+        try {
+          const response = await fetchCompletedSubTopics();
+  
+          const data = Array.isArray(response)
+            ? response
+            : Array.isArray(response?.data)
+              ? response.data
+              : [];
+  
+              console.log("Completed SubTopics API response:", response);
+          const filteredSubTopics = data.flatMap(syllabus =>
+            syllabus.subTopics?.flatMap(subTopic =>
+              subTopic.stepProgress
+                ?.filter(progress =>
+                  progress.checker === true &&
+                  selectedTrainees.includes(progress.user?.empid)
+                )
+                ?.map(() => ({
+                  value: subTopic.subTopicId,
+                  label: `${subTopic.stepNumber}. ${subTopic.name}`
+                })) || []
+            ) || []
+          );
+  
+          console.log(
+            "Filtered SubTopics for",
+            selectedTrainees,
+            filteredSubTopics
+          );
+  
+          setCompletedSubTopics(filteredSubTopics);
+  
+        } catch (err) {
+          console.error("Error fetching completed subtopics", err);
+          setCompletedSubTopics([]);
+        }
+      };
+  
+      loadData();
+    }, [selectedTrainees]);
+  
 
   const isValidUrl = (string) => {
     try {
@@ -261,6 +313,18 @@ const SchedulingForm = ({
             error={errors.meetingLink}
             description="Virtual meeting link"
           /> */}
+
+           <Select
+                    label="Select Sub Topic"
+                    required
+                    options={completedSubTopics}
+                    value={formData.subTopicId}
+                    onChange={(value) =>
+                      handleInputChange('subTopicId', value)
+                    }
+          
+                    searchable
+                  />
         </div>
 
         {/* Notes */}

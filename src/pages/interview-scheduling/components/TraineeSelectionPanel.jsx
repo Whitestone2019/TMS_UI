@@ -14,7 +14,7 @@ const TraineeSelectionPanel = ({
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [priorityFilter, setPriorityFilter] = useState('all');
-
+console.log("trainees in panel",trainees);
   const statusOptions = [
     { value: 'all', label: 'All Status' },
     { value: 'due', label: 'Due for Interview' },
@@ -196,6 +196,7 @@ const TraineeSelectionPanel = ({
                         {isTraineeSelected(trainee?.id) && (
                           <Icon name="Check" size={12} className="text-primary-foreground" />
                         )}
+                        
                       </div>
                     </div>
 
@@ -205,7 +206,7 @@ const TraineeSelectionPanel = ({
                         <h4 className="text-sm font-medium text-foreground truncate">
                           {trainee?.name}
                         </h4>
-                        {getPriorityIcon(trainee?.priority)}
+                        {/* {getPriorityIcon(trainee?.priority)} */}
                       </div>
 
                       <p className="text-xs text-muted-foreground mb-2 truncate">

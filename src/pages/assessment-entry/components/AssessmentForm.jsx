@@ -469,8 +469,9 @@ const AssessmentForm = ({
     strengths: '',
     improvements: '',
     recommendations: '',
-    subTopicId: null,
-    interviewDone: "no", // ✅ new field
+    // subTopicId: null,
+    subTopicIds: [],
+    interviewDone: false, 
     reviewNotes: "",     // ✅ review text (show only if Yes)
 
   });
@@ -531,8 +532,8 @@ const AssessmentForm = ({
     //   newErrors.subTopic = 'Subtopic is required';
     // }
 
-    if (!formData?.subTopicId) {
-      newErrors.subTopicId = 'Subtopic is required';
+    if (!formData?.subTopicIds || formData.subTopicIds.length === 0) {
+      newErrors.subTopicIds    = 'Subtopic is required';
     }
 
     // Marks validation
@@ -676,7 +677,7 @@ const AssessmentForm = ({
               )
               ?.map(() => ({
                 value: subTopic.subTopicId,
-                label: `${subTopic.stepNumber}. ${subTopic.name}`
+                label: `${syllabus.title} - ${subTopic.stepNumber}. ${subTopic.name}`
               })) || []
           ) || []
         );
@@ -808,13 +809,45 @@ const AssessmentForm = ({
           label="Select Sub Topic"
           required
           options={completedSubTopics}
-          value={formData.subTopicId}
-          onChange={(value) =>
-            handleInputChange('subTopicId', value)
-          }
-
+          value={formData.subTopicIds}
+          // onChange={(value) =>
+          //   handleInputChange('subTopicId', value)
+          // }
+          onChange={(values) =>
+    handleInputChange('subTopicIds', Array.isArray(values) ? values : [values])
+  }
+   multiple 
           searchable
         />
+
+        <div>
+          <label className="block text-sm font-medium text-foreground mb-2">
+            Interview Completed?
+          </label>
+          <div className="flex items-center space-x-6">
+            <label className="flex items-center space-x-2">
+              <input
+                type="radio"
+                name="interviewDone"
+                checked={formData.interviewDone === true }
+                onChange={() => handleInputChange("interviewDone", true)}
+                className="form-radio"
+              />
+              <span>Yes</span>
+            </label>
+
+            <label className="flex items-center space-x-2">
+              <input
+                type="radio"
+                name="interviewDone"
+                checked={formData.interviewDone === false}
+                onChange={() => handleInputChange("interviewDone", false)}
+                className="form-radio"
+              />
+              <span>No</span>
+            </label>
+          </div>
+        </div>
 
 
         {/* Remarks Section */}
@@ -868,42 +901,13 @@ const AssessmentForm = ({
               onChange={(e) => handleInputChange('recommendations', e?.target?.value)}
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-2">
-              Interview Completed?
-            </label>
-            <div className="flex items-center space-x-6">
-              <label className="flex items-center space-x-2">
-                <input
-                  type="radio"
-                  name="interviewDone"
-                  value="yes"
-                  checked={formData.interviewDone === "yes"}
-                  onChange={() => handleInputChange("interviewDone", "yes")}
-                  className="form-radio"
-                />
-                <span>Yes</span>
-              </label>
 
-              <label className="flex items-center space-x-2">
-                <input
-                  type="radio"
-                  name="interviewDone"
-                  value="no"
-                  checked={formData.interviewDone === "no"}
-                  onChange={() => handleInputChange("interviewDone", "no")}
-                  className="form-radio"
-                />
-                <span>No</span>
-              </label>
-            </div>
-          </div>
 
-          {/* Conditional Review Notes */}
+          {/* Conditional Review Notes
           {formData.interviewDone === "yes" && (
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">
-                Review Notes
+                Interview Review    
               </label>
               <textarea
                 rows={3}
@@ -916,7 +920,7 @@ const AssessmentForm = ({
                 <p className="text-error text-sm">{errors.reviewNotes}</p>
               )}
             </div>
-          )}
+          )} */}
         </div>
 
         {/* Action Buttons */}
