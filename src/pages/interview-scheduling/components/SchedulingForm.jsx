@@ -23,19 +23,67 @@ const SchedulingForm = ({
     duration: "60",
     notes: "",
     // emailTemplate: "default",
+    subTopicIds: [],
+    //syllabusTitles: []
   });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [trainerList, setTrainerList] = useState([]);
 
+  const [selectedSyllabus, setSelectedSyllabus] = useState([]);
 
   const [syllabusData, setSyllabusData] = useState([]);
   const [completedSubTopics, setCompletedSubTopics] = useState([]);
   const [selectedTitle, setSelectedTitle] = useState("ALL");
   const [selectedSubTopics, setSelectedSubTopics] = useState([]);
 
+  // const getCompletedSyllabusData = (data, traineeIds) => {
+  //   return data
+  //     .map(syllabus => {
+  //       const completedSubTopics = syllabus.subTopics?.filter(subTopic =>
+  //         subTopic.stepProgress?.some(
+  //           progress =>
+  //             progress.complete === true &&
+  //             progress.checker === true &&
+  //             traineeIds.includes(progress.user?.trngid)
+  //         )
+  //       );
+
+  //       if (!completedSubTopics?.length) return null;
+
+  //       return {
+  //         ...syllabus,
+  //         subTopics: completedSubTopics
+  //       };
+  //     })
+  //     .filter(Boolean);
+  // };
+
 
   // const [completedSubTopics, setCompletedSubTopics] = useState([]);
+
+  const getCompletedSyllabusData = (data, traineeIds) => {
+    return data
+      .map(syllabus => {
+        const completedSubTopics = syllabus.subTopics?.filter(subTopic =>
+          subTopic.stepProgress?.some(
+            progress =>
+              progress.complete === true &&
+              progress.checker === true &&
+              traineeIds.includes(progress.user?.empid)
+          )
+        );
+
+        if (!completedSubTopics?.length) return null;
+
+        return {
+          ...syllabus,
+          subTopics: completedSubTopics
+        };
+      })
+      .filter(Boolean);
+  };
+
   console.log("selected trainees in form", selectedTrainees);
   // ✅ Fetch trainers dynamically (optional)
   useEffect(() => {
@@ -138,7 +186,7 @@ const SchedulingForm = ({
 
 
   useEffect(() => {
-    if (!selectedTrainees || selectedTrainees.length === 0) {
+    if (!selectedTrainees?.length) {
       setSyllabusData([]);
       setCompletedSubTopics([]);
       return;
@@ -148,32 +196,30 @@ const SchedulingForm = ({
       try {
         const response = await fetchCompletedSubTopics();
 
-        const data = Array.isArray(response)
+        const rawData = Array.isArray(response)
           ? response
-          : Array.isArray(response?.data)
-            ? response.data
-            : [];
+          : response?.data || [];
 
-        setSyllabusData(data);
-
-        // 🔹 FILTER COMPLETED SUBTOPICS FOR ALL SELECTED TRAINEES
-        const filtered = data.flatMap(syllabus =>
-          syllabus.subTopics?.filter(subTopic =>
-            subTopic.stepProgress?.some(
-              progress =>
-                progress.checker === true &&
-                selectedTrainees.includes(progress.user?.empid)
-            )
-          ).map(subTopic => ({
-            value: subTopic.subTopicId,
-            label: `${syllabus.title} - ${subTopic.stepNumber}. ${subTopic.name}`,
-            title: syllabus.title
-          })) || []
+        const completedSyllabus = getCompletedSyllabusData(
+          rawData,
+          selectedTrainees
         );
 
-        setCompletedSubTopics(filtered);
-      } catch (error) {
-        console.error("Error fetching completed subtopics", error);
+        setSyllabusData(completedSyllabus);
+
+        // 🔹 Flat subtopic dropdown list
+        const subTopicOptions = completedSyllabus.flatMap(syllabus =>
+          syllabus.subTopics.map(sub => ({
+            value: sub.subTopicId,
+            label: `${syllabus.title} - ${sub.stepNumber}. ${sub.name}`,
+            title: syllabus.title
+          }))
+        );
+
+        setCompletedSubTopics(subTopicOptions);
+      } catch (err) {
+        console.error("Error loading syllabus", err);
+        setSyllabusData([]);
         setCompletedSubTopics([]);
       }
     };
@@ -182,8 +228,7 @@ const SchedulingForm = ({
   }, [selectedTrainees]);
 
 
-  // ✅ TITLE OPTIONS
-  const titleOptions = [
+  const syllabusOptions = [
     { value: "ALL", label: "All Syllabus" },
     ...syllabusData.map(s => ({
       value: s.title,
@@ -191,34 +236,68 @@ const SchedulingForm = ({
     }))
   ];
 
-  // ✅ FILTER SUBTOPICS BASED ON TITLE
-  const filteredSubTopicOptions =
-    selectedTitle === "ALL"
-      ? [{ value: "ALL_SUBTOPICS", label: "All Subtopics" }, ...completedSubTopics]
-      : [
+
+  const filteredSubTopicOptions = (() => {
+    if (
+      selectedSyllabus.length === 0 ||
+      selectedSyllabus.includes("ALL")
+    ) {
+      return [
         { value: "ALL_SUBTOPICS", label: "All Subtopics" },
-        ...completedSubTopics.filter(sub => sub.title === selectedTitle)
+        ...completedSubTopics
       ];
+    }
+
+    return [
+      { value: "ALL_SUBTOPICS", label: "All Subtopics" },
+      ...completedSubTopics.filter(sub =>
+        selectedSyllabus.includes(sub.title)
+      )
+    ];
+  })();
 
 
-  const handleTitleChange = value => {
-    setSelectedTitle(value);
-    setSelectedSubTopics([]);
-  };
+  // const handleSyllabusChange = values => {
+  //   let selected = Array.isArray(values) ? values : [values];
 
+  //   if (selected.includes("ALL")) {
+  //     selected = syllabusOptions
+  //       .filter(o => o.value !== "ALL")
+  //       .map(o => o.value);
+  //   }
 
-  const handleSubTopicChange = (values) => {
+  //   setSelectedSyllabus(selected);
+  //   setSelectedSubTopics([]);
+  //   handleInputChange("subTopicIds", []);
+  // };
+
+  const handleSyllabusChange = values => {
     let selected = Array.isArray(values) ? values : [values];
 
-    // If "All Subtopics" is selected, select all filtered subtopics
-    if (selected.includes("ALL_SUBTOPICS")) {
-      selected = filteredSubTopicOptions
-        .filter(opt => opt.value !== "ALL_SUBTOPICS")
+    if (selected.includes("ALL")) {
+      selected = syllabusOptions
+        .filter(opt => opt.value !== "ALL")
         .map(opt => opt.value);
     }
 
-    setSelectedSubTopics(selected);              // dropdown state
-    handleInputChange("subTopicIds", selected);  // formData state
+    setSelectedSyllabus(selected);
+    //handleInputChange("syllabusTitles", selected)
+    setSelectedSubTopics([]);
+    handleInputChange("subTopicIds", []);
+  };
+
+
+  const handleSubTopicChange = values => {
+    let selected = Array.isArray(values) ? values : [values];
+
+    if (selected.includes("ALL_SUBTOPICS")) {
+      selected = filteredSubTopicOptions
+        .filter(o => o.value !== "ALL_SUBTOPICS")
+        .map(o => o.value);
+    }
+
+    setSelectedSubTopics(selected);
+    handleInputChange("subTopicIds", selected);
   };
 
   const isValidUrl = (string) => {
@@ -278,6 +357,9 @@ const SchedulingForm = ({
         trainees: selectedTrainees,
         ...formData,
         duration: parseInt(formData.duration),
+        syllabusTitles: formData.syllabusTitles,
+        //     subTopicIds: formData.subTopicIds,
+
       };
       console.log("Scheduling data:", scheduleData);
 
@@ -409,24 +491,37 @@ const SchedulingForm = ({
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-          <Select
-            label="Syllabus Title"
-            options={titleOptions}
-            value={selectedTitle}
-            onChange={handleTitleChange}
-          />
 
-          {/* <Select
-                    label="Completed Sub Topics"
-                    options={filteredSubTopicOptions}
-                    value={selectedSubTopics}
-                    onChange={handleSubTopicChange}
-                    multiple
-                    searchable
-                  /> */}
+          {/* 🔹 SYLLABUS MULTI SELECT */}
+          <div className="space-y-2">
+            <Select
+              label="Syllabus"
+              options={syllabusOptions}
+              value={selectedSyllabus}
+              onChange={handleSyllabusChange}
+              multiple
+              searchable
+            />
 
+            {/* ✅ Selected syllabus chips */}
+            {selectedSyllabus.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {selectedSyllabus.map(title => (
+                  <span
+                    key={title}
+                    className="px-3 py-1 text-xs rounded-full
+            bg-secondary/10 text-secondary
+            border border-secondary/30"
+                  >
+                    {title}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* 🔹 SUBTOPIC MULTI SELECT */}
           <div className="space-y-3">
-            {/* 🔹 DROPDOWN */}
             <Select
               label="Completed Sub Topics"
               options={filteredSubTopicOptions}
@@ -434,15 +529,8 @@ const SchedulingForm = ({
               onChange={handleSubTopicChange}
               multiple
               searchable
-            //required
             />
 
-            {/* ❌ Validation error */}
-            {errors?.subTopicIds && (
-              <p className="text-sm text-error">{errors.subTopicIds}</p>
-            )}
-
-            {/* 🔹 SELECTED SUBTOPICS DISPLAY */}
             {selectedSubTopics.length > 0 && (
               <div>
                 <p className="text-sm font-medium text-foreground mb-1">
@@ -457,9 +545,9 @@ const SchedulingForm = ({
                     return (
                       <span
                         key={id}
-                        className="px-3 py-1 text-xs rounded-full 
-                                 bg-primary/10 text-primary 
-                                 border border-primary/30"
+                        className="px-3 py-1 text-xs rounded-full
+                bg-primary/10 text-primary
+                border border-primary/30"
                       >
                         {sub.label}
                       </span>
@@ -469,8 +557,8 @@ const SchedulingForm = ({
               </div>
             )}
           </div>
-
         </div>
+
 
         {/* Notes */}
         <div>

@@ -471,13 +471,43 @@ const AssessmentForm = ({
     recommendations: '',
     // subTopicId: null,
     subTopicIds: [],
+    // syllabusTitles: []
     interviewDone: false,
     reviewNotes: "",     // ✅ review text (show only if Yes)
 
   });
+
+  // ✅ helper function – syllabus + subtopic filtering
+  const getCompletedSyllabusData = (data, traineeId) => {
+    return data
+      .map(syllabus => {
+        const completedSubTopics = syllabus.subTopics?.filter(subTopic =>
+          subTopic.stepProgress?.some(
+            progress =>
+              progress.checker === true &&
+              progress.complete === true &&
+              progress.user?.empid === traineeId
+          )
+        );
+
+        // ❌ syllabus hide if no valid subtopics
+        if (!completedSubTopics || completedSubTopics.length === 0) {
+          return null;
+        }
+
+        return {
+          ...syllabus,
+          subTopics: completedSubTopics
+        };
+      })
+      .filter(Boolean);
+  };
+
   const [errors, setErrors] = useState({});
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [autoSaveStatus, setAutoSaveStatus] = useState('');
+
+  const [selectedSyllabus, setSelectedSyllabus] = useState([]);
 
 
   const [syllabusData, setSyllabusData] = useState([]);
@@ -718,32 +748,33 @@ const AssessmentForm = ({
       try {
         const response = await fetchCompletedSubTopics();
 
-        const data = Array.isArray(response)
+        const rawData = Array.isArray(response)
           ? response
           : Array.isArray(response?.data)
             ? response.data
             : [];
 
-        setSyllabusData(data);
+        // ✅ APPLY SAME LOGIC TO SYLLABUS
+        const completedSyllabus = getCompletedSyllabusData(
+          rawData,
+          trainee.trngid
+        );
 
-        // 🔥 SIRF COMPLETED SUBTOPICS
-        const filtered = data.flatMap(syllabus =>
-          syllabus.subTopics?.filter(subTopic =>
-            subTopic.stepProgress?.some(
-              progress =>
-                progress.checker === true &&
-                progress.user?.empid === trainee.trngid
-            )
-          ).map(subTopic => ({
+        setSyllabusData(completedSyllabus);
+
+        // ✅ dropdown ke liye flat subtopic list
+        const subTopicOptions = completedSyllabus.flatMap(syllabus =>
+          syllabus.subTopics.map(subTopic => ({
             value: subTopic.subTopicId,
             label: `${syllabus.title} - ${subTopic.stepNumber}. ${subTopic.name}`,
             title: syllabus.title
-          })) || []
+          }))
         );
 
-        setCompletedSubTopics(filtered);
+        setCompletedSubTopics(subTopicOptions);
       } catch (error) {
-        console.error("Error fetching completed subtopics", error);
+        console.error("Error fetching completed syllabus", error);
+        setSyllabusData([]);
         setCompletedSubTopics([]);
       }
     };
@@ -751,8 +782,17 @@ const AssessmentForm = ({
     loadData();
   }, [trainee?.trngid]);
 
+
   // ✅ TITLE OPTIONS
-  const titleOptions = [
+  // const titleOptions = [
+  //   { value: "ALL", label: "All Syllabus" },
+  //   ...syllabusData.map(s => ({
+  //     value: s.title,
+  //     label: s.title
+  //   }))
+  // ];
+
+  const syllabusOptions = [
     { value: "ALL", label: "All Syllabus" },
     ...syllabusData.map(s => ({
       value: s.title,
@@ -760,33 +800,74 @@ const AssessmentForm = ({
     }))
   ];
 
-  // ✅ FILTER SUBTOPICS BASED ON TITLE
-  const filteredSubTopicOptions =
-    selectedTitle === "ALL"
-      ? [{ value: "ALL_SUBTOPICS", label: "All Subtopics" }, ...completedSubTopics]
-      : [
+  const filteredSubTopicOptions = (() => {
+    if (
+      selectedSyllabus.length === 0 ||
+      selectedSyllabus.includes("ALL")
+    ) {
+      return [
         { value: "ALL_SUBTOPICS", label: "All Subtopics" },
-        ...completedSubTopics.filter(sub => sub.title === selectedTitle)
+        ...completedSubTopics
       ];
+    }
 
-  const handleTitleChange = value => {
-    setSelectedTitle(value);
-    setSelectedSubTopics([]);
-  };
+    return [
+      { value: "ALL_SUBTOPICS", label: "All Subtopics" },
+      ...completedSubTopics.filter(sub =>
+        selectedSyllabus.includes(sub.title)
+      )
+    ];
+  })();
+
+  // =========================
+  // ✅ HANDLERS
+
+  // const handleTitleChange = value => {
+  //   setSelectedTitle(value);
+  //   setSelectedSubTopics([]);
+  // };
 
 
-  const handleSubTopicChange = (values) => {
+  // const handleSubTopicChange = (values) => {
+  //   let selected = Array.isArray(values) ? values : [values];
+
+  //   // If "All Subtopics" is selected, select all filtered subtopics
+  //   if (selected.includes("ALL_SUBTOPICS")) {
+  //     selected = filteredSubTopicOptions
+  //       .filter(opt => opt.value !== "ALL_SUBTOPICS")
+  //       .map(opt => opt.value);
+  //   }
+
+  //   setSelectedSubTopics(selected);              // dropdown state
+  //   handleInputChange("subTopicIds", selected);  // formData state
+  // };
+
+  const handleSyllabusChange = values => {
     let selected = Array.isArray(values) ? values : [values];
 
-    // If "All Subtopics" is selected, select all filtered subtopics
+    if (selected.includes("ALL")) {
+      selected = syllabusOptions
+        .filter(opt => opt.value !== "ALL")
+        .map(opt => opt.value);
+    }
+
+    setSelectedSyllabus(selected);
+    //handleInputChange("syllabusTitles", selected);
+    setSelectedSubTopics([]);
+    handleInputChange("subTopicIds", []);
+  };
+
+  const handleSubTopicChange = values => {
+    let selected = Array.isArray(values) ? values : [values];
+
     if (selected.includes("ALL_SUBTOPICS")) {
       selected = filteredSubTopicOptions
         .filter(opt => opt.value !== "ALL_SUBTOPICS")
         .map(opt => opt.value);
     }
 
-    setSelectedSubTopics(selected);              // dropdown state
-    handleInputChange("subTopicIds", selected);  // formData state
+    setSelectedSubTopics(selected);
+    handleInputChange("subTopicIds", selected);
   };
 
 
@@ -913,21 +994,41 @@ const AssessmentForm = ({
 
         {/* 🔹 TITLE DROPDOWN */}
         <div className="grid grid-cols-2 gap-4">
-          <Select
-            label="Syllabus Title"
-            options={titleOptions}
-            value={selectedTitle}
-            onChange={handleTitleChange}
-          />
+          <div className="flex flex-col gap-2">
+            {/* SYLLABUS MULTI SELECT */}
+            <Select
+              label="Syllabus"
+              options={syllabusOptions}
+              value={selectedSyllabus}
+              onChange={handleSyllabusChange}
+              multiple
+              searchable
+            />
 
-          {/* <Select
-            label="Completed Sub Topics"
-            options={filteredSubTopicOptions}
-            value={selectedSubTopics}
-            onChange={handleSubTopicChange}
-            multiple
-            searchable
-          /> */}
+            {/* ✅ SELECTED SYLLABUS CHIPS – JUST BELOW */}
+            {selectedSyllabus.length > 0 && (
+              <div className="mt-1">
+                <p className="text-xs font-medium text-muted-foreground mb-1">
+                  Selected Syllabus
+                </p>
+
+                <div className="flex flex-wrap gap-2">
+                  {selectedSyllabus.map(title => (
+                    <span
+                      key={title}
+                      className="px-3 py-1 text-xs rounded-full
+          bg-secondary/10 text-secondary
+          border border-secondary/30"
+                    >
+                      {title}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+          </div>
+
 
           <div className="space-y-3">
             {/* 🔹 DROPDOWN */}
@@ -938,13 +1039,9 @@ const AssessmentForm = ({
               onChange={handleSubTopicChange}
               multiple
               searchable
-            //required
             />
 
-            {/* ❌ Validation error */}
-            {errors?.subTopicIds && (
-              <p className="text-sm text-error">{errors.subTopicIds}</p>
-            )}
+
 
             {/* 🔹 SELECTED SUBTOPICS DISPLAY */}
             {selectedSubTopics.length > 0 && (
