@@ -3,7 +3,7 @@ import Icon from "../../../components/AppIcon";
 import Button from "../../../components/ui/Button";
 import Input from "../../../components/ui/Input";
 import Select from "../../../components/ui/Select";
-import { getAllTrainers,fetchCompletedSubTopics } from "../../../api_service";
+import { getAllTrainers, fetchCompletedSubTopics } from "../../../api_service";
 
 
 const SchedulingForm = ({
@@ -27,9 +27,16 @@ const SchedulingForm = ({
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [trainerList, setTrainerList] = useState([]);
-  
-    const [completedSubTopics, setCompletedSubTopics] = useState([]);
-console.log("selected trainees in form",selectedTrainees);
+
+
+  const [syllabusData, setSyllabusData] = useState([]);
+  const [completedSubTopics, setCompletedSubTopics] = useState([]);
+  const [selectedTitle, setSelectedTitle] = useState("ALL");
+  const [selectedSubTopics, setSelectedSubTopics] = useState([]);
+
+
+  // const [completedSubTopics, setCompletedSubTopics] = useState([]);
+  console.log("selected trainees in form", selectedTrainees);
   // ✅ Fetch trainers dynamically (optional)
   useEffect(() => {
     const fetchTrainers = async () => {
@@ -81,54 +88,138 @@ console.log("selected trainees in form",selectedTrainees);
   }, [selectedDate, selectedTime, selectedTrainees]);
 
 
-    useEffect(() => {
-      if (!selectedTrainees || selectedTrainees.length === 0) {
+  // useEffect(() => {
+  //   if (!selectedTrainees || selectedTrainees.length === 0) {
+  //     setCompletedSubTopics([]);
+  //     return;
+  //   }
+
+  //   const loadData = async () => {
+  //     try {
+  //       const response = await fetchCompletedSubTopics();
+
+  //       const data = Array.isArray(response)
+  //         ? response
+  //         : Array.isArray(response?.data)
+  //           ? response.data
+  //           : [];
+
+  //       console.log("Completed SubTopics API response:", response);
+  //       const filteredSubTopics = data.flatMap(syllabus =>
+  //         syllabus.subTopics?.flatMap(subTopic =>
+  //           subTopic.stepProgress
+  //             ?.filter(progress =>
+  //               progress.checker === true &&
+  //               selectedTrainees.includes(progress.user?.empid)
+  //             )
+  //             ?.map(() => ({
+  //               value: subTopic.subTopicId,
+  //               label: `${subTopic.stepNumber}. ${subTopic.name}`
+  //             })) || []
+  //         ) || []
+  //       );
+
+  //       console.log(
+  //         "Filtered SubTopics for",
+  //         selectedTrainees,
+  //         filteredSubTopics
+  //       );
+
+  //       setCompletedSubTopics(filteredSubTopics);
+
+  //     } catch (err) {
+  //       console.error("Error fetching completed subtopics", err);
+  //       setCompletedSubTopics([]);
+  //     }
+  //   };
+
+  //   loadData();
+  // }, [selectedTrainees]);
+
+
+  useEffect(() => {
+    if (!selectedTrainees || selectedTrainees.length === 0) {
+      setSyllabusData([]);
+      setCompletedSubTopics([]);
+      return;
+    }
+
+    const loadData = async () => {
+      try {
+        const response = await fetchCompletedSubTopics();
+
+        const data = Array.isArray(response)
+          ? response
+          : Array.isArray(response?.data)
+            ? response.data
+            : [];
+
+        setSyllabusData(data);
+
+        // 🔹 FILTER COMPLETED SUBTOPICS FOR ALL SELECTED TRAINEES
+        const filtered = data.flatMap(syllabus =>
+          syllabus.subTopics?.filter(subTopic =>
+            subTopic.stepProgress?.some(
+              progress =>
+                progress.checker === true &&
+                selectedTrainees.includes(progress.user?.empid)
+            )
+          ).map(subTopic => ({
+            value: subTopic.subTopicId,
+            label: `${syllabus.title} - ${subTopic.stepNumber}. ${subTopic.name}`,
+            title: syllabus.title
+          })) || []
+        );
+
+        setCompletedSubTopics(filtered);
+      } catch (error) {
+        console.error("Error fetching completed subtopics", error);
         setCompletedSubTopics([]);
-        return;
       }
-  
-      const loadData = async () => {
-        try {
-          const response = await fetchCompletedSubTopics();
-  
-          const data = Array.isArray(response)
-            ? response
-            : Array.isArray(response?.data)
-              ? response.data
-              : [];
-  
-              console.log("Completed SubTopics API response:", response);
-          const filteredSubTopics = data.flatMap(syllabus =>
-            syllabus.subTopics?.flatMap(subTopic =>
-              subTopic.stepProgress
-                ?.filter(progress =>
-                  progress.checker === true &&
-                  selectedTrainees.includes(progress.user?.empid)
-                )
-                ?.map(() => ({
-                  value: subTopic.subTopicId,
-                  label: `${subTopic.stepNumber}. ${subTopic.name}`
-                })) || []
-            ) || []
-          );
-  
-          console.log(
-            "Filtered SubTopics for",
-            selectedTrainees,
-            filteredSubTopics
-          );
-  
-          setCompletedSubTopics(filteredSubTopics);
-  
-        } catch (err) {
-          console.error("Error fetching completed subtopics", err);
-          setCompletedSubTopics([]);
-        }
-      };
-  
-      loadData();
-    }, [selectedTrainees]);
-  
+    };
+
+    loadData();
+  }, [selectedTrainees]);
+
+
+  // ✅ TITLE OPTIONS
+  const titleOptions = [
+    { value: "ALL", label: "All Syllabus" },
+    ...syllabusData.map(s => ({
+      value: s.title,
+      label: s.title
+    }))
+  ];
+
+  // ✅ FILTER SUBTOPICS BASED ON TITLE
+  const filteredSubTopicOptions =
+    selectedTitle === "ALL"
+      ? [{ value: "ALL_SUBTOPICS", label: "All Subtopics" }, ...completedSubTopics]
+      : [
+        { value: "ALL_SUBTOPICS", label: "All Subtopics" },
+        ...completedSubTopics.filter(sub => sub.title === selectedTitle)
+      ];
+
+
+  const handleTitleChange = value => {
+    setSelectedTitle(value);
+    setSelectedSubTopics([]);
+  };
+
+
+  const handleSubTopicChange = (values) => {
+    let selected = Array.isArray(values) ? values : [values];
+
+    // If "All Subtopics" is selected, select all filtered subtopics
+    if (selected.includes("ALL_SUBTOPICS")) {
+      selected = filteredSubTopicOptions
+        .filter(opt => opt.value !== "ALL_SUBTOPICS")
+        .map(opt => opt.value);
+    }
+
+    setSelectedSubTopics(selected);              // dropdown state
+    handleInputChange("subTopicIds", selected);  // formData state
+  };
 
   const isValidUrl = (string) => {
     try {
@@ -314,17 +405,71 @@ console.log("selected trainees in form",selectedTrainees);
             description="Virtual meeting link"
           /> */}
 
-           <Select
-                    label="Select Sub Topic"
-                    required
-                    options={completedSubTopics}
-                    value={formData.subTopicId}
-                    onChange={(value) =>
-                      handleInputChange('subTopicId', value)
-                    }
-          
+
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <Select
+            label="Syllabus Title"
+            options={titleOptions}
+            value={selectedTitle}
+            onChange={handleTitleChange}
+          />
+
+          {/* <Select
+                    label="Completed Sub Topics"
+                    options={filteredSubTopicOptions}
+                    value={selectedSubTopics}
+                    onChange={handleSubTopicChange}
+                    multiple
                     searchable
-                  />
+                  /> */}
+
+          <div className="space-y-3">
+            {/* 🔹 DROPDOWN */}
+            <Select
+              label="Completed Sub Topics"
+              options={filteredSubTopicOptions}
+              value={selectedSubTopics}
+              onChange={handleSubTopicChange}
+              multiple
+              searchable
+            //required
+            />
+
+            {/* ❌ Validation error */}
+            {errors?.subTopicIds && (
+              <p className="text-sm text-error">{errors.subTopicIds}</p>
+            )}
+
+            {/* 🔹 SELECTED SUBTOPICS DISPLAY */}
+            {selectedSubTopics.length > 0 && (
+              <div>
+                <p className="text-sm font-medium text-foreground mb-1">
+                  Selected Sub Topics:
+                </p>
+
+                <div className="flex flex-wrap gap-2">
+                  {selectedSubTopics.map(id => {
+                    const sub = completedSubTopics.find(s => s.value === id);
+                    if (!sub) return null;
+
+                    return (
+                      <span
+                        key={id}
+                        className="px-3 py-1 text-xs rounded-full 
+                                 bg-primary/10 text-primary 
+                                 border border-primary/30"
+                      >
+                        {sub.label}
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+
         </div>
 
         {/* Notes */}
