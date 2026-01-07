@@ -44,7 +44,7 @@ const TraineeDataTable = ({
     // const config = statusConfig?.[status] || statusConfig?.['not-started'];
 
     let config;
-    console.log("percentage in badge", percentage);
+    // console.log("percentage in badge", percentage);
    if (percentage >= 85) {
     config = statusConfig['completed'];
   } else if (percentage > 0 && percentage < 85) {

@@ -665,6 +665,7 @@ const ManagerDashboard = () => {
 
 
   const fetchAllSyllabus = async () => {
+    try {
     const res = await fetchCompletedSubTopics();
     const list = res?.data || [];
 
@@ -684,6 +685,9 @@ const ManagerDashboard = () => {
     options.sort((a, b) => a.stepNo - b.stepNo);
 
     setSyllabusOptions(options);
+    } catch (e) {
+      console.error('Error fetching syllabus', e);
+    }
   };
 
 
