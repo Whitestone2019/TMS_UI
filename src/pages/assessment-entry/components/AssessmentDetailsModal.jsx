@@ -248,6 +248,7 @@ const AssessmentDetailsModal = ({
 }) => {
   if (!isOpen || !assessment) return null;
 
+  console.log('AssessmentDetailsModal assessment:', assessment);  
   const formatDate = (dateString) => {
     return new Date(dateString)?.toLocaleDateString('en-US', {
       weekday: 'long',
@@ -333,14 +334,14 @@ const AssessmentDetailsModal = ({
                 </div>
                 <div className="text-sm text-muted-foreground">Assessment Type</div>
               </div>
-              {assessment?.isDraft && (
+              {/* {assessment?.isDraft && (
                 <div className="text-center">
                   <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-warning/10 text-warning">
                     <Icon name="Edit" size={14} className="mr-1" />
                     Draft
                   </span>
                 </div>
-              )}
+              )} */}
             </div>
           </div>
 
@@ -402,48 +403,48 @@ const AssessmentDetailsModal = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Assessment ID:</span>
-                <span className="text-foreground font-medium">{assessment?.id}</span>
+                <span className="text-foreground font-medium">{assessment?.assessmentId}</span>
               </div>
-              <div className="flex justify-between">
+              {/* <div className="flex justify-between">
                 <span className="text-muted-foreground">Trainee Step:</span>
                 <span className="text-foreground font-medium">Step {assessment?.currentStep || trainee?.currentStep}</span>
-              </div>
+              </div> */}
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Submitted:</span>
                 <span className="text-foreground font-medium">
                   {assessment?.submittedAt ? new Date(assessment.submittedAt)?.toLocaleString() : 'Not submitted'}
                 </span>
               </div>
-              <div className="flex justify-between">
+              {/* <div className="flex justify-between">
                 <span className="text-muted-foreground">Status:</span>
                 <span className={`font-medium ${assessment?.isDraft ? 'text-warning' : 'text-success'}`}>
                   {assessment?.isDraft ? 'Draft' : 'Submitted'}
                 </span>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="flex justify-end space-x-3 p-6 border-t border-border">
+        <div className="flex justify-end space-x-3 p-6">
           {/* {assessment?.isDraft && onEdit && ( */}
-          <Button
+          {/* <Button
             variant="default"
             onClick={() => onEdit(assessment)}
             iconName="Edit"
             iconPosition="left"
           >
             Edit Assessment
-          </Button>
+          </Button> */}
           {/* )} */}
-          <Button
+          {/* <Button
             variant="outline"
             onClick={onClose}
             iconName="X"
             iconPosition="left"
           >
             Close
-          </Button>
+          </Button> */}
         </div>
       </div>
     </div>

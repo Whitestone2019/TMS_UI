@@ -632,8 +632,9 @@ const AssessmentEntry = () => {
 
     setSelectedTrainee(trainee);
     try {
-      const data = await getTraineeAssessments(trainee?.id);
+      const data = await getTraineeAssessments(trainee?.trngid);
       setHistoryAssessments(data);
+      console.log("Assessment data set:", data);
     } catch (error) {
       console.error("Error fetching assessments:", error);
       setHistoryAssessments([]);
@@ -716,9 +717,9 @@ const AssessmentEntry = () => {
         strengths: a.strengths ?? '',
         improvements: a.improvements ?? '',
         recommendations: a.recommendations ?? '',
-        isDraft: a.currentStep !== 4,
+        
         submittedAt: a.submittedAt,
-        currentStep: a.currentStep,
+        currentStep: a.subTopics,
         user: a.user
       }));
       console.log('Normalized assessments:', normalized);

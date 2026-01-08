@@ -905,14 +905,17 @@ const ManagerDashboard = () => {
   };
 
   const handleLogout = () => {
+    
+    sessionStorage.clear();
     navigate('/');
   };
 
+  const userName = sessionStorage.getItem('userName') || '';
   return (
     <div className="min-h-screen bg-background">
       <Header
         userRole="manager"
-        userName="x "
+        userName={userName}
         onLogout={handleLogout}
       />
       <main className="pt-16">

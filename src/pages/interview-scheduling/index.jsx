@@ -356,7 +356,7 @@ const InterviewScheduling = () => {
   const viewTabs = [
     { id: 'calendar', label: 'Calendar View', icon: 'Calendar' },
     { id: 'tracker', label: 'Status Tracker', icon: 'List' },
-    { id: 'conflicts', label: 'Conflicts', icon: 'AlertTriangle', badge: conflicts?.length }
+    // { id: 'conflicts', label: 'Conflicts', icon: 'AlertTriangle', badge: conflicts?.length }
   ];
 
 
@@ -457,22 +457,22 @@ const InterviewScheduling = () => {
             </div>
 
             <div className="flex items-center space-x-3">
-              <Button
+              {/* <Button
                 variant="outline"
                 iconName="Download"
                 iconPosition="left"
                 onClick={() => console.log('Export schedule')}
               >
                 Export Schedule
-              </Button>
-              <Button
+              </Button> */}
+              {/* <Button
                 variant="default"
                 iconName="Plus"
                 iconPosition="left"
                 onClick={() => setActiveView('calendar')}
               >
                 New Interview
-              </Button>
+              </Button> */}
             </div>
           </div>
 

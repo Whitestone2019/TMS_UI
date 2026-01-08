@@ -133,21 +133,21 @@ console.log("trainees in panel",trainees);
             className="w-full"
           />
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Select
-              placeholder="Filter by status"
-              options={statusOptions}
-              value={statusFilter}
-              onChange={setStatusFilter}
-            />
+            {/* <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Select
+                placeholder="Filter by status"
+                options={statusOptions}
+                value={statusFilter}
+                onChange={setStatusFilter}
+              />
 
-            <Select
-              placeholder="Filter by priority"
-              options={priorityOptions}
-              value={priorityFilter}
-              onChange={setPriorityFilter}
-            />
-          </div>
+              <Select
+                placeholder="Filter by priority"
+                options={priorityOptions}
+                value={priorityFilter}
+                onChange={setPriorityFilter}
+              />
+            </div> */}
         </div>
 
         {/* Selection Summary */}
