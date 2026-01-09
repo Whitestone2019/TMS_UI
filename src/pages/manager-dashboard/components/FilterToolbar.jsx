@@ -180,16 +180,7 @@ const FilterToolbar = ({
             onChange={(e) => handleInputChange('searchName', e.target.value)}
           />
 
-          {/* 🔹 Syllabus Dropdown */}
 
-
-          {/* 🔹 Step Dropdown (syllabusId se aata hai) */}
-          {/* <Select
-            label="Syllabus"
-            options={syllabusOptions}
-            value={filters?.syllabusId}
-            onChange={onSyllabusChange}
-          /> */}
           <Select
             label="Syllabus Step"
             options={syllabusOptions}
@@ -228,9 +219,9 @@ const FilterToolbar = ({
             Export Reports
           </Button>
 
-          <Button variant="outline" onClick={onScheduleInterview} iconName="Calendar" size="sm">
+          {/* <Button variant="outline" onClick={onScheduleInterview} iconName="Calendar" size="sm">
             Schedule Interview
-          </Button>
+          </Button> */}
 
           <Button variant="default" onClick={onAddAssessment} iconName="Plus" size="sm">
             Add Assessment
