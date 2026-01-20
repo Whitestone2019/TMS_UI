@@ -4,17 +4,38 @@ import Button from '../../../components/ui/Button';
 import Select from '../../../components/ui/Select';
 import Input from '../../../components/ui/Input';
 
-const InterviewStatusTracker = ({ 
-  interviews, 
-  onStatusUpdate, 
+const InterviewStatusTracker = ({
+  interviews,
+  onStatusUpdate,
   onViewDetails,
   onReschedule,
-  className = '' 
+  className = ''
 }) => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('date');
 
+
+  console.log('Interviews:', interviews);
+
+  const data = interviews;
+
+  const transformedSchedules = Object.values(interviews).map(item => {
+    return {
+      id: item.interviewSchedule?.scheduleId,
+      traineeName: item.user?.firstname || "Trainee",
+      interviewerName: item.interviewSchedule?.trainer?.name || "N/A",
+      scheduledDate: item.interviewSchedule?.date,
+      time: item.interviewSchedule?.time,
+      duration: item.interviewSchedule?.duration,
+      type: item.interviewSchedule?.interviewType,
+      location: item.interviewSchedule?.location,
+      status: item.rsvpStatus || "PENDING",
+      notes: item.interviewSchedule?.notes || ""
+    };
+  });
+
+  interviews = transformedSchedules;
   const statusOptions = [
     { value: 'all', label: 'All Status' },
     { value: 'pending', label: 'Pending Confirmation' },
@@ -75,11 +96,11 @@ const InterviewStatusTracker = ({
   const filteredAndSortedInterviews = React.useMemo(() => {
     let filtered = interviews?.filter(interview => {
       const matchesStatus = statusFilter === 'all' || interview?.status === statusFilter;
-      const matchesSearch = 
+      const matchesSearch =
         interview?.traineeName?.toLowerCase()?.includes(searchTerm?.toLowerCase()) ||
         interview?.interviewerName?.toLowerCase()?.includes(searchTerm?.toLowerCase()) ||
         interview?.type?.toLowerCase()?.includes(searchTerm?.toLowerCase());
-      
+
       return matchesStatus && matchesSearch;
     });
 
@@ -104,15 +125,15 @@ const InterviewStatusTracker = ({
 
   const getStatusActions = (interview) => {
     const actions = [];
-    
-    switch (interview?.status) {
+
+    switch (interview?.status.toLowerCase()) {
       case 'pending':
         actions?.push(
           { label: 'Confirm', action: 'confirm', variant: 'default', icon: 'Check' },
           { label: 'Cancel', action: 'cancel', variant: 'outline', icon: 'X' }
         );
         break;
-      case 'confirmed':
+      case 'tentative':
         actions?.push(
           { label: 'Complete', action: 'complete', variant: 'default', icon: 'CheckCircle' },
           { label: 'Reschedule', action: 'reschedule', variant: 'outline', icon: 'Calendar' }
@@ -129,19 +150,24 @@ const InterviewStatusTracker = ({
         );
         break;
     }
-    
+
     return actions;
   };
 
   const handleActionClick = (interview, action) => {
     switch (action) {
-      case 'confirm': case'cancel': case'complete':
+      case 'pending': case 'cancel': case 'complete':
+        console.log(`Action: ${action} for Interview ID: ${interview?.id}`);
         onStatusUpdate(interview?.id, action);
         break;
       case 'reschedule':
-        onReschedule(interview);
+        const selected = data.find(
+          item => item.interviewSchedule?.scheduleId === interview?.id
+        );
+        onReschedule(selected);
+        console.log('Rescheduling Interview ID:', selected);
         break;
-      case 'feedback': onViewDetails(interview?.id,'feedback');
+      case 'feedback': onViewDetails(interview?.id, 'feedback');
         break;
       default:
         onViewDetails(interview?.id);
@@ -158,10 +184,10 @@ const InterviewStatusTracker = ({
     const now = new Date();
     const diffMs = interviewDateTime - now;
     const diffHours = Math.ceil(diffMs / (1000 * 60 * 60));
-    
+
     if (diffHours < 0) return 'Past due';
     if (diffHours < 24) return `In ${diffHours} hour${diffHours > 1 ? 's' : ''}`;
-    
+
     const diffDays = Math.ceil(diffHours / 24);
     return `In ${diffDays} day${diffDays > 1 ? 's' : ''}`;
   };
@@ -187,14 +213,14 @@ const InterviewStatusTracker = ({
             value={searchTerm}
             onChange={(e) => setSearchTerm(e?.target?.value)}
           />
-          
+
           <Select
             options={statusOptions}
             value={statusFilter}
             onChange={setStatusFilter}
             placeholder="Filter by status"
           />
-          
+
           <Select
             options={sortOptions}
             value={sortBy}
@@ -215,7 +241,7 @@ const InterviewStatusTracker = ({
             {filteredAndSortedInterviews?.map(interview => {
               const statusConfig = getStatusConfig(interview?.status);
               const actions = getStatusActions(interview);
-              
+              // console.log('Interview Actions:', interview);
               return (
                 <div key={interview?.id} className="p-4 hover:bg-muted/50 transition-colors duration-150">
                   <div className="flex items-start justify-between">
@@ -225,7 +251,7 @@ const InterviewStatusTracker = ({
                         <div className={`w-8 h-8 rounded-full ${statusConfig?.bgColor} flex items-center justify-center`}>
                           <Icon name={statusConfig?.icon} size={16} className={statusConfig?.color} />
                         </div>
-                        
+
                         <div className="flex-1 min-w-0">
                           <h4 className="text-sm font-medium text-foreground truncate">
                             {interview?.traineeName} - {interview?.type}
@@ -234,7 +260,7 @@ const InterviewStatusTracker = ({
                             with {interview?.interviewerName}
                           </p>
                         </div>
-                        
+
                         <span className={`px-2 py-1 text-xs font-medium rounded-full ${statusConfig?.bgColor} ${statusConfig?.color}`}>
                           {statusConfig?.label}
                         </span>
@@ -256,7 +282,7 @@ const InterviewStatusTracker = ({
                             <span>{interview?.location || 'Virtual'}</span>
                           </span>
                         </div>
-                        
+
                         {interview?.status !== 'completed' && interview?.status !== 'cancelled' && (
                           <div className="text-xs text-primary font-medium">
                             {getTimeUntilInterview(interview?.scheduledDate, interview?.time)}
@@ -280,7 +306,7 @@ const InterviewStatusTracker = ({
                           {action?.label}
                         </Button>
                       ))}
-                      
+
                       <Button
                         variant="ghost"
                         size="sm"
@@ -311,7 +337,7 @@ const InterviewStatusTracker = ({
           {statusOptions?.slice(1)?.map(status => {
             const count = interviews?.filter(i => i?.status === status?.value)?.length;
             const config = getStatusConfig(status?.value);
-            
+
             return (
               <div key={status?.value} className="flex flex-col items-center space-y-1">
                 <div className={`w-8 h-8 rounded-full ${config?.bgColor} flex items-center justify-center`}>

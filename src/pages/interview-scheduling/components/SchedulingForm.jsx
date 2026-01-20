@@ -11,27 +11,39 @@ const SchedulingForm = ({
   selectedTime,
   selectedTrainees,
   onSchedule,
+  Formdata,
   onCancel,
   conflicts = [],
   className = "",
 }) => {
+  const parsedSubTopics =
+    typeof Formdata?.subTopics === "string"
+      ? Formdata.subTopics.split("|").map(Number)
+      : [];
+  // const [formData, setFormData] = useState({
+  //   interviewer: "" || Formdata?.trainer.trainerId,
+  //   interviewType: "" || Formdata?.interviewType,
+  //   location: "" || Formdata?.location,
+  //   // meetingLink: "",
+  //   duration: "60" || Formdata?.duration,
+  //   notes: "" || Formdata?.notes,
+  //   // emailTemplate: "default",
+  //   subTopics: [] || parsedSubTopics,
+  //   //syllabusTitles: []
+  // });
   const [formData, setFormData] = useState({
-    interviewer: "",
-    interviewType: "",
-    location: "",
-    // meetingLink: "",
-    duration: "60",
-    notes: "",
-    // emailTemplate: "default",
-    subTopicIds: [],
-    //syllabusTitles: []
+    interviewer: Formdata?.trainer?.trainerId || "",
+    interviewType: Formdata?.interviewType || "",
+    location: Formdata?.location || "",
+    duration: Formdata?.duration?.toString() || "60",
+    notes: Formdata?.notes || "",
+    subTopics: parsedSubTopics || [],
   });
+
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [trainerList, setTrainerList] = useState([]);
-
   const [selectedSyllabus, setSelectedSyllabus] = useState([]);
-
   const [syllabusData, setSyllabusData] = useState([]);
   const [completedSubTopics, setCompletedSubTopics] = useState([]);
   const [selectedTitle, setSelectedTitle] = useState("ALL");
@@ -61,7 +73,7 @@ const SchedulingForm = ({
 
 
   // const [completedSubTopics, setCompletedSubTopics] = useState([]);
-
+  console.log("Formdata in Scheduling Form:", Formdata);
   const getCompletedSyllabusData = (data, traineeIds) => {
     return data
       .map(syllabus => {
@@ -131,6 +143,22 @@ const SchedulingForm = ({
     : [];
 
   useEffect(() => {
+    setSelectedSubTopics(formData.subTopics || []);
+
+    if (!syllabusData.length || !formData.subTopics?.length) return;
+
+    const matchedSyllabusTitles = syllabusData
+      .filter(syllabus =>
+        syllabus.subTopics.some(sub =>
+          formData.subTopics.includes(sub.subTopicId)
+        )
+      )
+      .map(syllabus => syllabus.title);
+
+    setSelectedSyllabus(matchedSyllabusTitles);
+  }, [syllabusData, formData.subTopics]);
+
+  useEffect(() => {
     // Reset errors when new selection occurs
     setErrors({});
   }, [selectedDate, selectedTime, selectedTrainees]);
@@ -191,6 +219,8 @@ const SchedulingForm = ({
       setCompletedSubTopics([]);
       return;
     }
+
+
 
     const loadData = async () => {
       try {
@@ -297,7 +327,7 @@ const SchedulingForm = ({
     }
 
     setSelectedSubTopics(selected);
-    handleInputChange("subTopicIds", selected);
+    handleInputChange("subTopics", selected);
   };
 
   const isValidUrl = (string) => {
@@ -352,12 +382,15 @@ const SchedulingForm = ({
     setIsSubmitting(true);
     try {
       const scheduleData = {
+        scheduleId: Formdata?.scheduleId ,
         date: selectedDate,
         time: selectedTime,
         trainees: selectedTrainees,
         ...formData,
         duration: parseInt(formData.duration),
         syllabusTitles: formData.syllabusTitles,
+        subTopicIds: formData.subTopics,
+        
         //     subTopicIds: formData.subTopicIds,
 
       };

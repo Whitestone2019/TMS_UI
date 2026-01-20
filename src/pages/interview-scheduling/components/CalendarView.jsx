@@ -4,6 +4,7 @@ import Button from '../../../components/ui/Button';
 
 const CalendarView = ({ 
   selectedDate, 
+  selectedTime,
   onDateSelect, 
   interviews, 
   onTimeSlotSelect,
@@ -12,11 +13,14 @@ const CalendarView = ({
 }) => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
-
+console.log("INTERVIEWS IN CALENDAR VIEW:",interviews);
   const timeSlots = [
     '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
     '14:00', '14:30', '15:00', '15:30', '16:00', '16:30'
   ];
+useEffect(() => {
+  setSelectedTimeSlot(selectedTime);
+}, [selectedTime]);
 
   const getDaysInMonth = (date) => {
     const year = date?.getFullYear();
@@ -41,13 +45,38 @@ const CalendarView = ({
     return days;
   };
 
+  // const getInterviewsForDate = (date) => {
+  //   console.log("GET INTERVIEWS FOR DATE CALLED WITH DATE:",date);
+  //   if (!date) return [];
+  //   const interviewArray = Array.isArray(interviews) ? interviews : [];
+  //   interviewArray && console.log("INTERVIEW ARRAY:",interviewArray);
+  //   return  interviewArray?.filter(interview => {
+  //     const interviewDate = new Date(interview?.interviewSchedule?.date);
+  //     console.log("CHECKING INTERVIEW DATE:",interviewDate);
+  //     return interviewDate?.toDateString() === date?.toDateString();
+  //   });
+
+  // };
+
   const getInterviewsForDate = (date) => {
-    if (!date) return [];
-    return interviews?.filter(interview => {
-      const interviewDate = new Date(interview.scheduledDate);
-      return interviewDate?.toDateString() === date?.toDateString();
-    });
-  };
+  // console.log("GET INTERVIEWS FOR DATE CALLED WITH DATE:", date);
+  if (!date) return [];
+  const interviewArray = Array.isArray(interviews) ? interviews : [];
+
+  return interviewArray.filter(interview => {
+    const schedule = interview?.interviewSchedule;
+
+    if (!schedule?.date) return false;
+    // console.log("CHECKING INTERVIEW SCHEDULE DATE:", schedule.date);
+    const interviewDate = new Date(schedule.date); 
+    // this is fine
+    return (
+      interviewDate.getFullYear() === date.getFullYear() &&
+      interviewDate.getMonth() === date.getMonth() &&
+      interviewDate.getDate() === date.getDate()
+    );
+  });
+};
 
   const hasConflict = (date, time) => {
     if (!date) return false;
@@ -58,9 +87,23 @@ const CalendarView = ({
     });
   };
 
+  const formatTime = (timeStr) => {
+  if (!timeStr) return "";
+  const [hours, minutes] = timeStr.split(":");
+  return `${hours.padStart(2, "0")}:${minutes}`;
+};
+
   const isTimeSlotBooked = (date, time) => {
+    // console.log(date,time)
     const dayInterviews = getInterviewsForDate(date);
-    return dayInterviews?.some(interview => interview?.time === time);
+
+    console.log("DAY INTERVIEWS:",dayInterviews);
+    // console.log("CHECKING IF TIME SLOT IS BOOKED FOR TIME:",interviews?.interviewSchedule?.time);
+    // return dayInterviews?.some(interview => interview?.interviewSchedule?.time.slice(0, 5) === time);
+    return dayInterviews.some(interview => {
+    const interviewTime = formatTime(interview?.interviewSchedule?.time);
+    return interviewTime === time;
+  });
   };
 
   const handleTimeSlotClick = (time) => {
@@ -191,7 +234,7 @@ const CalendarView = ({
                   className={`
                     p-2 text-sm rounded-lg border transition-colors duration-150
                     ${isSelectedTime ? 'bg-primary text-primary-foreground border-primary' : ''}
-                    ${isBooked ? 'bg-muted text-muted-foreground border-border cursor-not-allowed' : ''}
+                    ${isBooked ? 'bg-muted text-muted-foreground text-primary border-border border-primary cursor-not-allowed' : ''}
                     ${hasConflictAtTime ? 'bg-error/10 text-error border-error cursor-not-allowed' : ''}
                     ${!isBooked && !hasConflictAtTime && !isSelectedTime ? 'bg-background border-border hover:bg-muted' : ''}
                   `}
