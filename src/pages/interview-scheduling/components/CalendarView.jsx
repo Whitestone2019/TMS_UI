@@ -55,7 +55,6 @@ useEffect(() => {
   //     console.log("CHECKING INTERVIEW DATE:",interviewDate);
   //     return interviewDate?.toDateString() === date?.toDateString();
   //   });
-
   // };
 
   const getInterviewsForDate = (date) => {
@@ -98,8 +97,7 @@ useEffect(() => {
     const dayInterviews = getInterviewsForDate(date);
 
     console.log("DAY INTERVIEWS:",dayInterviews);
-    // console.log("CHECKING IF TIME SLOT IS BOOKED FOR TIME:",interviews?.interviewSchedule?.time);
-    // return dayInterviews?.some(interview => interview?.interviewSchedule?.time.slice(0, 5) === time);
+   
     return dayInterviews.some(interview => {
     const interviewTime = formatTime(interview?.interviewSchedule?.time);
     return interviewTime === time;
