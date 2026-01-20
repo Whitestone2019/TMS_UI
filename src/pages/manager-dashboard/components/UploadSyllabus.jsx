@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Header from "../../../components/ui/Header";
+import { useNavigate } from 'react-router-dom';
 import NavigationBreadcrumb from "../../../components/ui/NavigationBreadcrumb";
 import Button from "../../../components/ui/Button";
 import Input from "../../../components/ui/Input";
@@ -13,7 +14,7 @@ const UploadSyllabus = ({ onCancel }) => {
         durationInDays: "",
         subTopics: [{ name: "", description: "", file: null, trainerId: "" }],
     });
-
+    const navigate = useNavigate();
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
     const [syllabusList, setSyllabusList] = useState([]);
@@ -88,6 +89,10 @@ const UploadSyllabus = ({ onCancel }) => {
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
+    };
+
+    const handleLogout = () => {
+        navigate('/');
     };
 
     // const handleSubmit = async () => {
@@ -244,21 +249,32 @@ const UploadSyllabus = ({ onCancel }) => {
 
     return (
         <div className="min-h-screen bg-blue-50">
-            <Header userRole="manager" userName="Manager Smith" />
+            <Header
+
+                userName={sessionStorage.getItem("userName") || "User"}
+                userRole="manager"
+                onLogout={handleLogout}
+            />
             <main className="pt-20 max-w-7xl mx-auto px-4">
                 <NavigationBreadcrumb userRole="manager" />
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-10">
                     {/* LEFT FORM */}
-                    <div className="bg-white/50 backdrop-blur-lg shadow-xl rounded-2xl border border-blue-200">
-                        <div className="p-8 border-b bg-blue-100 rounded-t-2xl">
+                    {/* <div className="bg-white/50 backdrop-blur-lg shadow-xl rounded-2xl border border-blue-200 h-fit sticky top-24"> */}
+                    <div className="bg-white/50 backdrop-blur-lg shadow-xl rounded-2xl border border-blue-200 sticky top-24 max-h-[calc(100vh-120px)] flex flex-col">
+
+                        {/* <div className="p-8 border-b bg-blue-100 rounded-t-2xl"> */}
+                        <div className="p-8 border-b bg-blue-100 rounded-t-2xl flex-none">
+
                             <h2 className="text-3xl font-bold text-black">
                                 <Icon name="BookOpen" size={28} className="inline mr-2 text-blue-700" />
                                 {editingId ? "Edit Syllabus" : "Upload Syllabus"}
                             </h2>
                         </div>
 
-                        <div className="p-8 space-y-8">
+                        {/* <div className="p-8 space-y-8"> */}
+                        <div className="p-8 space-y-8 flex-1 flex flex-col overflow-hidden">
+
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-7">
                                 <Input
                                     label="Title"
@@ -300,7 +316,10 @@ const UploadSyllabus = ({ onCancel }) => {
                             </div>
 
                             {/* SUBTOPICS */}
-                            <div className="space-y-6 h-[500px] overflow-y-scroll pr-3 custom-scroll">
+                            {/* <div className="space-y-6 h-[500px] overflow-y-scroll pr-3 custom-scroll"> */}
+                            <div className="space-y-6 flex-1 overflow-y-auto pr-3 custom-scroll min-h-[200px]">
+
+
 
 
                                 <h3 className="text-xl font-semibold text-blue-700">Subtopics</h3>
@@ -420,7 +439,9 @@ const UploadSyllabus = ({ onCancel }) => {
                                 </Button>
                             </div>
 
-                            <div className="pt-6 border-t flex flex-col sm:flex-row gap-4">
+                            {/* <div className="pt-6 border-t flex flex-col sm:flex-row gap-4"> */}
+                            <div className="pt-6 border-t flex flex-col sm:flex-row gap-4 flex-none">
+
                                 <button
                                     onClick={handleSubmit}
                                     className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl"

@@ -1,0 +1,222 @@
+// package whitestone.trainee_management.service;
+
+// import org.springframework.beans.factory.annotation.Autowired;
+// import org.springframework.mail.SimpleMailMessage;
+// import org.springframework.mail.javamail.JavaMailSender;
+// import org.springframework.scheduling.annotation.Scheduled;
+// import org.springframework.stereotype.Service;
+// import whitestone.trainee_management.models.*;
+// import whitestone.trainee_management.repository.*;
+
+// import java.time.LocalDateTime;
+// import java.time.temporal.ChronoUnit;
+// import java.util.*;
+
+// @Service
+// public class DeadlineService {
+
+//     @Autowired
+//     private UserRepository userRepository;
+
+//     @Autowired
+//     private SyllabusRepository syllabusRepository;
+
+//     @Autowired
+//     private StepProgressRepository stepProgressRepository;
+
+//     @Autowired
+//     private JavaMailSender mailSender;
+
+//     @Scheduled(cron = "0 0 8 * * ?")   // everyday at 8 AM
+    
+//     public void checkSyllabusDeadlines() {
+
+//         List<User> trainees = userRepository.findByRole_IsManagerFalse();
+//         List<Syllabus> syllabusList = syllabusRepository.findAll();
+
+//         System.out.println("Starting deadline check for trainees: " + trainees.size());
+
+//         for (User trainee : trainees) {
+
+//             LocalDateTime startDate = trainee.getCreatedAt();
+//             System.out.println("Checking trainee: " + trainee.getFirstname() + ", CreatedAt: " + startDate);
+
+//             for (Syllabus syllabus : syllabusList) {
+
+//                 long totalDays = syllabus.getDurationInDays();
+//                 LocalDateTime deadlineDate = startDate.plusDays(totalDays);
+//                 long daysLeft = LocalDateTime.now().until(deadlineDate, ChronoUnit.DAYS);
+
+//                 boolean completed = stepProgressRepository
+//                         .existsByUser_UseridAndSubTopic_Syllabus_IdAndCompleteTrue(
+//                                 trainee.getUserid(),
+//                                 syllabus.getId()
+//                         );
+
+//                 System.out.println("Syllabus: " + syllabus.getTitle() +
+//                         ", Days Left: " + daysLeft +
+//                         ", Completed: " + completed);
+
+// //                if (!completed && daysLeft <= 0) {
+// //                    sendDeadlineMail(trainee, syllabus, daysLeft);
+// //                }
+                
+//                 if (!completed && daysLeft <= 0) {
+//                     sendDeadlineMail(trainee, syllabus, daysLeft);
+//                 }
+//             }
+//         }
+//     }
+
+//     private void sendDeadlineMail(User trainee, Syllabus syllabus, long delayDays) {
+
+//         // hard-coded for now (manual role)
+//         String managerEmail = "shuklalaxmi73@gmail.com";
+
+//         String subject = "Deadline Missed - " + syllabus.getTitle();
+//         String message =
+//                 "Trainee: " + trainee.getFirstname() + " " + trainee.getLastname() + "\n" +
+//                 "Syllabus: " + syllabus.getTitle() + "\n" +
+//                 "Status: Deadline Missed\n" +
+//                 "Delayed By: " + Math.abs(delayDays) + " days\n";
+
+//         SimpleMailMessage mail = new SimpleMailMessage();
+//         mail.setTo(managerEmail);
+//         mail.setSubject(subject);
+//         mail.setText(message);
+
+//         mailSender.send(mail);
+
+//         System.out.println("Deadline mail sent to Manager for trainee: " + trainee.getFirstname());
+        
+//         try {
+//             mailSender.send(mail);
+//             System.out.println("✅ Mail sent successfully to: " + managerEmail);
+//         } catch (Exception e) {
+//             System.out.println("❌ Failed to send mail: " + e.getMessage());
+//             e.printStackTrace();
+//         }
+//     }
+// }
+
+
+// package whitestone.trainee_management.service;
+
+// import org.springframework.beans.factory.annotation.Autowired;
+// import org.springframework.boot.context.event.ApplicationReadyEvent;
+// import org.springframework.context.event.EventListener;
+// import org.springframework.mail.SimpleMailMessage;
+// import org.springframework.mail.javamail.JavaMailSender;
+// import org.springframework.scheduling.annotation.Scheduled;
+// import org.springframework.stereotype.Service;
+// import whitestone.trainee_management.models.*;
+// import whitestone.trainee_management.repository.*;
+
+// import java.time.LocalDateTime;
+// import java.time.temporal.ChronoUnit;
+// import java.util.List;
+
+// @Service
+// public class DeadlineService {
+
+//     @Autowired
+//     private UserRepository userRepository;
+
+//     @Autowired
+//     private SyllabusRepository syllabusRepository;
+
+//     @Autowired
+//     private StepProgressRepository stepProgressRepository;
+
+//     @Autowired
+//     private JavaMailSender mailSender;
+    
+//     @EventListener(ApplicationReadyEvent.class)
+//     public void runOnStartup() {
+//         System.out.println("🚀 Application Ready — Running Deadline Scheduler First Time");
+//         checkSyllabusDeadlines();
+//     }
+
+
+//     @Scheduled(cron = "0 0 8 * * ?")   // everyday at 8 AM
+//     public void checkSyllabusDeadlines() {
+
+//         List<User> trainees = userRepository.findByRole_IsManagerFalse();
+//         List<Syllabus> syllabusList = syllabusRepository.findAll();
+
+//         System.out.println("Starting deadline check for trainees: " + trainees.size());
+
+//         for (User trainee : trainees) {
+
+//             LocalDateTime startDate = trainee.getCreatedAt();
+//             System.out.println("Checking trainee: " + trainee.getFirstname() + ", CreatedAt: " + startDate);
+
+//             for (Syllabus syllabus : syllabusList) {
+
+//                 long totalDays = syllabus.getDurationInDays();
+//                 LocalDateTime deadlineDate = startDate.plusDays(totalDays);
+//                 long daysLeft = LocalDateTime.now().until(deadlineDate, ChronoUnit.DAYS);
+
+//                 boolean completed = stepProgressRepository
+//                         .existsByUser_UseridAndSubTopic_Syllabus_IdAndCompleteTrue(
+//                                 trainee.getUserid(),
+//                                 syllabus.getId()
+//                         );
+
+//                 System.out.println("Syllabus: " + syllabus.getTitle() +
+//                         ", Days Left: " + daysLeft +
+//                         ", Completed: " + completed);
+
+//                 // If not completed and deadline passed
+//                 if (!completed && daysLeft <= 0) {
+//                     sendDeadlineMail(trainee, syllabus, daysLeft);
+//                 }
+//             }
+//         }
+//     }
+
+//     private void sendDeadlineMail(User trainee, Syllabus syllabus, long delayDays) {
+
+//         // Fetch manager dynamically
+//         User manager = trainee.getManager(); // assuming you have a manager mapping in Role
+//         String managerEmail = manager != null ? manager.getEmailid() : null;
+
+//         String traineeEmail = trainee.getEmailid();
+
+//         String subject = "Deadline Missed - " + syllabus.getTitle();
+//         String message =
+//                 "Trainee: " + trainee.getFirstname() + " " + trainee.getLastname() + "\n" +
+//                 "Syllabus: " + syllabus.getTitle() + "\n" +
+//                 "Status: Deadline Missed\n" +
+//                 "Delayed By: " + Math.abs(delayDays) + " days\n";
+
+//         try {
+//             if (managerEmail != null) {
+//                 sendMail(managerEmail, subject, message);
+//                 System.out.println("✅ Mail sent to Manager: " + managerEmail);
+//             } else {
+//                 System.out.println("⚠️ Manager email not found for trainee: " + trainee.getFirstname());
+//             }
+
+//             // Also send to trainee
+//             if (traineeEmail != null) {
+//                 sendMail(traineeEmail, subject, message);
+//                 System.out.println("✅ Mail sent to Trainee: " + traineeEmail);
+//             } else {
+//                 System.out.println("⚠️ Trainee email not found for: " + trainee.getFirstname());
+//             }
+
+//         } catch (Exception e) {
+//             System.out.println("❌ Failed to send mail: " + e.getMessage());
+//             e.printStackTrace();
+//         }
+//     }
+
+//     private void sendMail(String to, String subject, String text) {
+//         SimpleMailMessage mail = new SimpleMailMessage();
+//         mail.setTo(to);
+//         mail.setSubject(subject);
+//         mail.setText(text);
+//         mailSender.send(mail);
+//     }
+// }

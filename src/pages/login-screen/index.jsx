@@ -136,7 +136,7 @@ const LoginScreen = () => {
 
         const empId = sessionStorage.setItem("empid", `${formData?.trngId}`);
         const userRole = sessionStorage.setItem("userRole", `${response?.data?.role}`);
-        const userName = sessionStorage.setItem("userName", `${response?.data?.user?.firstname } ${response?.data?.user?.lastname}`);
+        const userName = sessionStorage.setItem("userName", `${response?.data?.user?.firstname} ${response?.data?.user?.lastname}`);
         navigate(response?.data?.redirect || '/');
 
       } else {
@@ -382,7 +382,7 @@ const LoginScreen = () => {
         {/* Footer */}
         <div className="text-center mt-6 text-xs text-muted-foreground">
           <p>© 2025 Trainee Management System. All rights reserved.</p>
-          <p className="mt-1">Session timeout: 30 minutes | Max login attempts: 3</p>
+          <p className="mt-1">Session timeout: 30 minutes | Max login attempts: 5</p>
         </div>
       </div>
     </div>

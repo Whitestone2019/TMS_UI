@@ -717,7 +717,7 @@ const AssessmentEntry = () => {
         strengths: a.strengths ?? '',
         improvements: a.improvements ?? '',
         recommendations: a.recommendations ?? '',
-        
+
         submittedAt: a.submittedAt,
         currentStep: a.subTopics,
         user: a.user
@@ -733,8 +733,9 @@ const AssessmentEntry = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header
+
+        userName={sessionStorage.getItem("userName") || "User"}
         userRole="manager"
-        userName="Manager Smith"
         onLogout={handleLogout}
       />
       <SessionTimeoutHandler

@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from "react";
 import Header from "../../../components/ui/Header";
+import { useNavigate } from 'react-router-dom';
 import NavigationBreadcrumb from "../../../components/ui/NavigationBreadcrumb";
 import Icon from "../../../components/AppIcon";
 import {
@@ -14,6 +15,7 @@ export default function TraineeStepsPage() {
     const [selectedTrainee, setSelectedTrainee] = useState(null);
     const [expandedSyllabus, setExpandedSyllabus] = useState({});
     const [reviewInput, setReviewInput] = useState({});
+    const navigate = useNavigate();
 
     // ----------------------------------------------------
     // BUILD STRUCTURE
@@ -53,6 +55,9 @@ export default function TraineeStepsPage() {
                         managerDecision,
                         time: `${progress.timeSpentSeconds || 0}s`,
                         review: progress.review || "",
+                        startDateTime: progress.startDateTime,
+                        endDateTime: progress.endDateTime,
+
                     });
                 });
             });
@@ -63,6 +68,16 @@ export default function TraineeStepsPage() {
             syllabi: Object.values(t.syllabi),
         }));
     };
+
+    const handleLogout = () => {
+        navigate('/');
+    };
+    const formatCombinedDT = (dt) => {
+        if (!dt) return "-";
+        const d = new Date(dt);
+        return `${d.toLocaleDateString()} ${d.toLocaleTimeString()}`;
+    };
+
 
     // ----------------------------------------------------
     // LOAD DATA
@@ -88,25 +103,25 @@ export default function TraineeStepsPage() {
     useEffect(() => {
 
 
-  loadData();
-}, []);
-  const loadData = async () => {
-    try {
-      const response = await fetchCompletedSubTopics();
-      const list = Array.isArray(response?.data)
-        ? response.data
-        : [];
+        loadData();
+    }, []);
+    const loadData = async () => {
+        try {
+            const response = await fetchCompletedSubTopics();
+            const list = Array.isArray(response?.data)
+                ? response.data
+                : [];
 
-      const structured = buildTraineeStructure(list);
-      setTrainees(structured);
-      setSelectedTrainee(structured[0] || null);
+            const structured = buildTraineeStructure(list);
+            setTrainees(structured);
+            setSelectedTrainee(structured[0] || null);
 
-    } catch (error) {
-      console.error("API ERROR:", error);
-      console.error("MESSAGE:", error.message);
-      console.error("CONFIG:", error.config);
-    }
-  };
+        } catch (error) {
+            console.error("API ERROR:", error);
+            console.error("MESSAGE:", error.message);
+            console.error("CONFIG:", error.config);
+        }
+    };
 
     // ----------------------------------------------------
     // DECISION HANDLER
@@ -138,12 +153,17 @@ export default function TraineeStepsPage() {
     // ----------------------------------------------------
     return (
         <div className="min-h-screen bg-blue-50">
-            <Header userRole="manager" userName="Checker" />
 
-            <main className="pt-20 max-w-7xl mx-auto px-4">
+            <Header
+
+                userName={sessionStorage.getItem("userName") || "User"}
+                userRole="manager"
+                onLogout={handleLogout}
+            />
+            <main className="pt-20 max-w-7xl mx-auto px-1">
                 <NavigationBreadcrumb userRole="manager" />
 
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mt-8">
+                <div className="grid grid-cols-1 lg:grid-cols-5 gap-2 mt-8">
 
                     {/* LEFT PANEL */}
                     <div className="bg-white/70 backdrop-blur border border-blue-200 rounded-2xl shadow-lg">
@@ -165,21 +185,25 @@ export default function TraineeStepsPage() {
                     </div>
 
                     {/* RIGHT PANEL */}
-                    <div className="lg:col-span-3 bg-white/70 backdrop-blur border border-blue-200 rounded-2xl shadow-lg">
+                    <div className="lg:col-span-3 bg-white/70 backdrop-blur border border-blue-200 rounded-2xl shadow-lg w-[1200px]">
                         <div className="p-5 bg-blue-100 rounded-t-2xl text-xl font-bold text-blue-800">
                             Syllabus – {selectedTrainee?.name}
                         </div>
 
-                        <div className="p-4 ">
-                            <table className="w-full min-w-[900px]">
+                        <div className="p-4  ">
+                            <table className="w-full min-w-[1100px] table-fixed">
                                 <thead>
                                     <tr className="bg-blue-100">
-                                        <th className="p-3 text-left">Topic</th>
-                                        <th className="p-3 text-center">Status</th>
-                                        <th className="p-3 text-center">Time</th>
-                                        <th className="p-3 text-left">Review</th>
-                                        <th className="p-3 text-center">Accept</th>
-                                        <th className="p-3 text-center">Reject</th>
+                                        <th className="p-3 text-left w-[100px]">Topic</th>
+                                        <th className="p-3 text-center w-[100px]">Status</th>
+                                        <th className="p-3 text-center w-[200px]">Start Date/Time</th>
+                                        <th className="p-3 text-center w-[200px]">End Date/Time</th>
+
+
+                                        {/* <th className="p-3 text-center">Time</th> */}
+                                        <th className="p-3 text-left w-[100px]">Review</th>
+                                        <th className="p-3 text-center w-[100px]">Accept</th>
+                                        <th className="p-3 text-center w-[100px]">Reject</th>
                                     </tr>
                                 </thead>
 
@@ -208,8 +232,12 @@ export default function TraineeStepsPage() {
                                                 </tr>
 
                                                 {expandedSyllabus[syllabusKey] &&
+
                                                     syllabus.subTopics.map((st) => {
                                                         const subKey = `${syllabusKey}-${st.id}`;
+                                                        // const { date: sd, time: stime } = formatDT(st.startDateTime);
+                                                        // const { date: ed, time: etime } = formatDT(st.endDateTime);
+
 
                                                         return (
                                                             <tr key={subKey} className="border-b hover:bg-blue-50">
@@ -233,7 +261,12 @@ export default function TraineeStepsPage() {
                                                                     )}
                                                                 </td>
 
-                                                                <td className="p-3 text-center">{st.time}</td>
+
+                                                                <td className="p-3 text-center">{formatCombinedDT(st.startDateTime)}</td>
+                                                                <td className="p-3 text-center">{formatCombinedDT(st.endDateTime)}</td>
+
+                                                                {/* <td className="p-3 text-center">{st.time}</td> */}
+
 
                                                                 <td className="p-3">
                                                                     <input
