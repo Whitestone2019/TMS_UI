@@ -24,6 +24,36 @@ const TraineeDataTable = ({
     setSortConfig({ key, direction });
     onSort(key, direction);
   };
+  // const sortedTrainees = React.useMemo(() => {
+  //   if (!sortConfig.key) return trainees;
+  //   return [...trainees].sort((a, b) => {
+  //     let valA = a[sortConfig.key];
+  //     let valB = b[sortConfig.key];
+
+  //     // Agar string hai to lowercase karke compare karo
+  //     if (typeof valA === 'string') valA = valA.toLowerCase();
+  //     if (typeof valB === 'string') valB = valB.toLowerCase();
+
+  //     if (valA < valB) return sortConfig.direction === 'asc' ? -1 : 1;
+  //     if (valA > valB) return sortConfig.direction === 'asc' ? 1 : -1;
+  //     return 0;
+  //   });
+  // }, [trainees, sortConfig]);
+
+  const sortedTrainees = React.useMemo(() => {
+    if (!sortConfig.key) return trainees;
+    return [...trainees].sort((a, b) => {
+      let valA = a[sortConfig.key];
+      let valB = b[sortConfig.key];
+
+      if (typeof valA === 'string') valA = valA.toLowerCase();
+      if (typeof valB === 'string') valB = valB.toLowerCase();
+
+      if (valA < valB) return sortConfig.direction === 'asc' ? -1 : 1;
+      if (valA > valB) return sortConfig.direction === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }, [trainees, sortConfig]);
 
   const getSortIcon = (key) => {
     if (sortConfig?.key !== key) {
@@ -45,13 +75,13 @@ const TraineeDataTable = ({
 
     let config;
     // console.log("percentage in badge", percentage);
-   if (percentage >= 85) {
-    config = statusConfig['completed'];
-  } else if (percentage > 0 && percentage < 85) {
-    config = statusConfig['in-progress'];
-  } else {
-    config = statusConfig['not-started'];
-  }
+    if (percentage >= 85) {
+      config = statusConfig['completed'];
+    } else if (percentage > 0 && percentage < 85) {
+      config = statusConfig['in-progress'];
+    } else {
+      config = statusConfig['not-started'];
+    }
     return (
       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${config?.bg} ${config?.text}`}>
         {config?.label}
@@ -69,13 +99,13 @@ const TraineeDataTable = ({
     };
     let config;
     if (interviewDone === true) {
-        config = statusConfig.completed;
-      } else if (interviewDone === false) {
-        config = statusConfig.pending;
-      } else {
-        config = statusConfig.cancelled;
-      }
-    
+      config = statusConfig.completed;
+    } else if (interviewDone === false) {
+      config = statusConfig.pending;
+    } else {
+      config = statusConfig.cancelled;
+    }
+
     return (
       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${config?.bg} ${config?.text}`}>
         {config?.label}
@@ -140,7 +170,7 @@ const TraineeDataTable = ({
           </thead>
           <tbody className="divide-y divide-border">
 
-            {trainees?.map((trainee) => (
+            {sortedTrainees.map((trainee) => (
               <tr key={trainee?.traineeId} className="hover:bg-muted/30 transition-colors">
                 <td className="px-6 py-4">
                   <Checkbox
@@ -163,10 +193,12 @@ const TraineeDataTable = ({
                 </td>
                 <td className="px-6 py-4">
                   <div>
-                    <p className="text-sm font-medium text-foreground">
+                    {/* <p className="text-sm font-medium text-foreground">
                       {trainee?.subtopics && trainee.subtopics.length > 0
-                      ? `${trainee.subtopics[trainee.subtopics.length - 1]} - ${trainee.subtopics.length}`
-                      : "No Assessment Yet"}</p>
+                        ? `Step ${trainee.subtopics.length} :${trainee.subtopics[trainee.subtopics.length - 1]} `
+                        : "No Assessment Yet"}</p> */}
+
+                    <p className="text-sm font-medium text-foreground">{trainee?.currentStep}</p>
                     <p className="text-xs text-muted-foreground">{trainee?.stepDescription}</p>
                   </div>
                 </td>

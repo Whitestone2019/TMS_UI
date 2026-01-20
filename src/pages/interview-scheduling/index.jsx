@@ -387,7 +387,7 @@ const InterviewScheduling = () => {
         // priority: t.priority || "medium"
       }));
 
-      console.log("hsjjjjjjjjjd",formatted);
+      console.log("hsjjjjjjjjjd", formatted);
       setTrainees(formatted);
 
     } catch (error) {
@@ -403,19 +403,19 @@ const InterviewScheduling = () => {
       console.log("SCHEDULES API RESULT:", result);
 
       const transformedSchedules = Object.values(result.data).map(item => {
-  return {
-    id: item.interviewSchedule?.scheduleId,
-    traineeName: item.user?.firstname || "Trainee",
-    interviewerName: item.interviewSchedule?.trainer?.name || "N/A",
-    scheduledDate: item.interviewSchedule?.date,
-    time: item.interviewSchedule?.time,
-    duration: item.interviewSchedule?.duration,
-    type: item.interviewSchedule?.interviewType,
-    location: item.interviewSchedule?.location,
-    status: item.rsvpStatus || "PENDING",
-    notes: item.interviewSchedule?.notes || ""
-  };
-});
+        return {
+          id: item.interviewSchedule?.scheduleId,
+          traineeName: item.user?.firstname || "Trainee",
+          interviewerName: item.interviewSchedule?.trainer?.name || "N/A",
+          scheduledDate: item.interviewSchedule?.date,
+          time: item.interviewSchedule?.time,
+          duration: item.interviewSchedule?.duration,
+          type: item.interviewSchedule?.interviewType,
+          location: item.interviewSchedule?.location,
+          status: item.rsvpStatus || "PENDING",
+          notes: item.interviewSchedule?.notes || ""
+        };
+      });
 
 
       console.log("Transformed Schedules:", transformedSchedules);
@@ -438,8 +438,9 @@ const InterviewScheduling = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header
+
+        userName={sessionStorage.getItem("userName") || "User"}
         userRole="manager"
-        userName="Training Manager"
         onLogout={handleLogout}
       />
       <main className="pt-16">
