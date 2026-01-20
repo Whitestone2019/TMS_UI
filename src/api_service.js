@@ -540,3 +540,25 @@ export const fetchTraineeById = async (traineeId) => {
 
   return await res.json(); // ✅ guaranteed JSON
 };
+
+
+
+export const updateInterviewSchedule = async (scheduleId, data) => {
+  try {
+    const res = await axios.put(`${API_URL}/schedule/update/${scheduleId}`, data);  
+    return res.data;
+  } catch (error) {
+    console.error("Error updating schedule:", error);
+    throw error;
+  } 
+};
+
+export const deleteInterviewSchedule = async (scheduleId) => {
+  try {
+    const res = await axios.delete(`${API_URL}/schedule/delete/${scheduleId}`);  
+    return res.data;
+  } catch (error) {
+    console.error("Error deleting schedule:", error);
+    throw error;
+  }
+};

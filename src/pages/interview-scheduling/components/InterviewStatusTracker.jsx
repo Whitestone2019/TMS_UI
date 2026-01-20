@@ -18,24 +18,89 @@ const InterviewStatusTracker = ({
 
   console.log('Interviews:', interviews);
 
-  const data = interviews;
+  // const data = interviews;
 
-  const transformedSchedules = Object.values(interviews).map(item => {
+  // const transformedSchedules = Object.values(interviews).map(item => {
+  //   return {
+  //     id: item?.id,
+  //     scheduleId: item.interviewSchedule?.scheduleId,
+  //     traineeName: item.user?.firstname || "Trainee",
+  //     interviewerName: item.interviewSchedule?.trainer?.name || "N/A",
+  //     scheduledDate: item.interviewSchedule?.date,
+  //     time: item.interviewSchedule?.time,
+  //     duration: item.interviewSchedule?.duration,
+  //     type: item.interviewSchedule?.interviewType,
+  //     location: item.interviewSchedule?.location,
+  //     status: item?.rsvpStatus?.trim().toLowerCase() || "",
+  //     notes: item.interviewSchedule?.notes || ""
+  //   };
+  // });
+
+  // interviews = transformedSchedules;
+
+
+  const data = interviews || [];
+
+  const grouped = {};
+
+  data.forEach(item => {
+    const scheduleId = item?.interviewSchedule?.scheduleId;
+    if (!scheduleId) return;
+
+    if (!grouped[scheduleId]) {
+      grouped[scheduleId] = {
+        id: scheduleId,
+        scheduleId,
+        interviewSchedule: item.interviewSchedule,
+        trainees: [],
+        status: item?.rsvpStatus?.trim().toLowerCase() || "",
+      };
+    }
+
+    if (item?.user) {
+      grouped[scheduleId].trainees.push({
+        firstname: item.user?.firstname,
+        lastname: item.user?.lastname,
+        status: item?.rsvpStatus?.trim().toLowerCase() || 'pending'
+      });
+    }
+
+  });
+
+  /* =====================================================
+     🔹 FINAL TRANSFORM (UI SAFE)
+  ===================================================== */
+  const transformedSchedules = Object.values(grouped).map(group => {
+    const trainees = group.trainees.filter(Boolean);
+
     return {
-      id: item.interviewSchedule?.scheduleId,
-      traineeName: item.user?.firstname || "Trainee",
-      interviewerName: item.interviewSchedule?.trainer?.name || "N/A",
-      scheduledDate: item.interviewSchedule?.date,
-      time: item.interviewSchedule?.time,
-      duration: item.interviewSchedule?.duration,
-      type: item.interviewSchedule?.interviewType,
-      location: item.interviewSchedule?.location,
-      status: item.rsvpStatus || "PENDING",
-      notes: item.interviewSchedule?.notes || ""
+      id: group.scheduleId,
+      scheduleId: group.scheduleId,
+      traineeName: trainees
+        .map(t =>
+          `${t?.firstname || "Trainee"} ${t?.lastname || ""}`
+        )
+        .join(", "),
+      trainees,
+      interviewerName: group.interviewSchedule?.trainer?.name || "N/A",
+      scheduledDate: group.interviewSchedule?.date,
+      time: group.interviewSchedule?.time,
+      duration: group.interviewSchedule?.duration,
+      type: group.interviewSchedule?.interviewType,
+      location: group.interviewSchedule?.location,
+      notes: group.interviewSchedule?.notes || "",
+      status: group.status,
+
+      // 👇 IMPORTANT: keeps all users for reschedule
+      rawItems: data.filter(
+        i => i?.interviewSchedule?.scheduleId === group.scheduleId
+      )
     };
   });
 
   interviews = transformedSchedules;
+
+
   const statusOptions = [
     { value: 'all', label: 'All Status' },
     { value: 'pending', label: 'Pending Confirmation' },
@@ -90,12 +155,13 @@ const InterviewStatusTracker = ({
         label: 'Tentative'
       }
     };
-    return statusMap?.[status] || statusMap?.pending;
+    return statusMap?.[status];
   };
 
   const filteredAndSortedInterviews = React.useMemo(() => {
     let filtered = interviews?.filter(interview => {
       const matchesStatus = statusFilter === 'all' || interview?.status === statusFilter;
+
       const matchesSearch =
         interview?.traineeName?.toLowerCase()?.includes(searchTerm?.toLowerCase()) ||
         interview?.interviewerName?.toLowerCase()?.includes(searchTerm?.toLowerCase()) ||
@@ -125,18 +191,32 @@ const InterviewStatusTracker = ({
 
   const getStatusActions = (interview) => {
     const actions = [];
+     const anyAccepted = interview?.trainees?.length > 1 && interview?.trainees?.some(t => t.status === 'accepted');
+
+      if (anyAccepted) {
+    // If any trainee accepted, show Complete + Reschedule + Cancel
+    actions.push(
+      { label: 'Complete', action: 'complete', variant: 'default', icon: 'CheckCircle' },
+      { label: 'Reschedule', action: 'reschedule', variant: 'default', icon: 'Calendar' },
+      { label: 'Cancel', action: 'cancel', variant: 'outline', icon: 'X' }
+    );
+  } else {
 
     switch (interview?.status.toLowerCase()) {
       case 'pending':
+      case 'tentative':
+      case 'declined':
         actions?.push(
-          { label: 'Confirm', action: 'confirm', variant: 'default', icon: 'Check' },
-          { label: 'Cancel', action: 'cancel', variant: 'outline', icon: 'X' }
+          { label: 'Reschedule', action: 'reschedule', variant: 'default', icon: 'Calendar' },
+          { label: 'Cancel', action: 'cancel', variant: 'outline', icon: 'X' },
+          
+          // { label: 'View Feedback', action: 'feedback', variant: 'outline', icon: 'MessageSquare' }
         );
         break;
-      case 'tentative':
+      case 'accepted':
         actions?.push(
           { label: 'Complete', action: 'complete', variant: 'default', icon: 'CheckCircle' },
-          { label: 'Reschedule', action: 'reschedule', variant: 'outline', icon: 'Calendar' }
+          { label: 'Cancel', action: 'cancel', variant: 'outline', icon: 'X' }
         );
         break;
       case 'completed':
@@ -150,22 +230,59 @@ const InterviewStatusTracker = ({
         );
         break;
     }
-
+}
     return actions;
+  
   };
 
   const handleActionClick = (interview, action) => {
+
+    
     switch (action) {
-      case 'pending': case 'cancel': case 'complete':
+      case 'pending': case 'complete':
         console.log(`Action: ${action} for Interview ID: ${interview?.id}`);
-        onStatusUpdate(interview?.id, action);
+        onStatusUpdate(interview?.scheduleId, action);
         break;
+
       case 'reschedule':
-        const selected = data.find(
-          item => item.interviewSchedule?.scheduleId === interview?.id
+
+
+
+        //Single item fetch attempt
+        //         const selected = data.find(item => {
+        //   console.log(
+        //     'Comparing:',
+        //     item?.interviewSchedule?.scheduleId,
+        //     interview?.interviewSchedule?.scheduleId
+        //   );
+
+        //   return String(item?.interviewSchedule?.scheduleId) ===
+        //          String(interview?.interviewSchedule?.scheduleId);
+        // });
+
+        //Multiple item fetch attempt
+        //         const selected = data.filter(item =>
+        //   String(item?.interviewSchedule?.scheduleId) ===
+        //   String(interview?.interviewSchedule?.scheduleId)
+        // );
+
+        console.log('Rescheduling Interview ID:', interview?.interviewSchedule?.scheduleId);
+        const selected = data.filter(
+
+          item => {
+            console.log('Comparing:', item.interviewSchedule?.scheduleId, interview?.scheduleId);
+            return item.interviewSchedule?.scheduleId === interview?.scheduleId
+          }
         );
+        if (!selected) {
+          console.warn('No matching interview found for reschedule');
+          return;
+        }
         onReschedule(selected);
-        console.log('Rescheduling Interview ID:', selected);
+        // console.log('Rescheduling Interview ID:', selected);
+        break;
+      case 'cancel':
+        onStatusUpdate(interview?.id, action);
         break;
       case 'feedback': onViewDetails(interview?.id, 'feedback');
         break;
@@ -261,9 +378,23 @@ const InterviewStatusTracker = ({
                           </p>
                         </div>
 
+                        <div className="flex flex-col gap-1">
+                          {interview?.trainees?.map((t, idx) => {
+                            const tStatusConfig = getStatusConfig(t.status);
+                            return (
+                              <span
+                                key={idx}
+                                className={`px-2 py-1 text-xs font-medium rounded-full ${tStatusConfig?.bgColor} ${tStatusConfig?.color}`}
+                              >
+                                <p> {t.firstname || "Trainee"} ({t.status}) {interview?.scheduleId}</p>
+                              </span>
+                            );
+                          })}
+                        </div>
+                        {/*                   
                         <span className={`px-2 py-1 text-xs font-medium rounded-full ${statusConfig?.bgColor} ${statusConfig?.color}`}>
-                          {statusConfig?.label}
-                        </span>
+                          {statusConfig?.label} {interview?.scheduleId}
+                        </span> */}
                       </div>
 
                       {/* Interview Details */}
