@@ -45,6 +45,7 @@ useEffect(() => {
     return days;
   };
 
+
   // const getInterviewsForDate = (date) => {
   //   console.log("GET INTERVIEWS FOR DATE CALLED WITH DATE:",date);
   //   if (!date) return [];
@@ -56,7 +57,6 @@ useEffect(() => {
   //     return interviewDate?.toDateString() === date?.toDateString();
   //   });
   // };
-
   const getInterviewsForDate = (date) => {
   // console.log("GET INTERVIEWS FOR DATE CALLED WITH DATE:", date);
   if (!date) return [];
