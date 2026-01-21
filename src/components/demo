@@ -3250,3 +3250,193 @@
 // };
 
 // export default SchedulingForm;
+
+
+
+
+// package whitestone.trainee_management.service;
+
+// import org.springframework.beans.factory.annotation.Autowired;
+// import org.springframework.boot.context.event.ApplicationReadyEvent;
+// import org.springframework.context.event.EventListener;
+// import org.springframework.mail.SimpleMailMessage;
+// import org.springframework.mail.javamail.JavaMailSender;
+// import org.springframework.scheduling.annotation.Scheduled;
+// import org.springframework.stereotype.Service;
+// import whitestone.trainee_management.models.*;
+// import whitestone.trainee_management.repository.*;
+
+// import java.time.LocalDateTime;
+// import java.time.temporal.ChronoUnit;
+// import java.util.List;
+
+// @Service
+// public class DeadlineService {
+
+//     @Autowired
+//     private UserRepository userRepository;
+// // 
+//     @Autowired
+//     private SyllabusRepository syllabusRepository;
+
+//     @Autowired
+//     private StepProgressRepository stepProgressRepository;
+
+//     @Autowired
+//     private JavaMailSender mailSender;
+    
+//     @EventListener(ApplicationReadyEvent.class)
+//     public void runOnStartup() {
+//         System.out.println("🚀 Application Ready — Running Deadline Scheduler First Time");
+//         checkSyllabusDeadlines();
+//     }
+
+// //    @Scheduled(cron = "0 0 8 * * ?")   // every day at 8 AM
+// //    public void checkSyllabusDeadlines() {
+// //
+// //        List<User> trainees = userRepository.findByRole_IsManagerFalse();
+// //        List<Syllabus> syllabusList = syllabusRepository.findAll();
+// //
+// //        System.out.println("Starting deadline check for trainees: " + trainees.size());
+// //
+// //        for (User trainee : trainees) {
+// //
+// //            LocalDateTime stepStartDate = trainee.getCreatedAt(); // start from registration date
+// //            System.out.println("Checking trainee: " + trainee.getFirstname() + ", CreatedAt: " + stepStartDate);
+// //
+// //            for (Syllabus syllabus : syllabusList) {
+// //
+// //                long totalDays = syllabus.getDurationInDays();
+// //                LocalDateTime stepEndDate = stepStartDate.plusDays(totalDays); // calculate end date for this step
+// //
+// //                long daysLeft = LocalDateTime.now().until(stepEndDate, ChronoUnit.DAYS);
+// //
+// //                boolean completed = stepProgressRepository
+// //                        .existsByUser_UseridAndSubTopic_Syllabus_IdAndCompleteTrue(
+// //                                trainee.getUserid(),
+// //                                syllabus.getId()
+// //                        );
+// //
+// //                System.out.println("Syllabus: " + syllabus.getTitle() +
+// //                        ", Start: " + stepStartDate.toLocalDate() +
+// //                        ", End: " + stepEndDate.toLocalDate() +
+// //                        ", Days Left: " + daysLeft +
+// //                        ", Completed: " + completed);
+// //
+// //                // If not completed and deadline passed
+// //                if (!completed && daysLeft <= 0) {
+// //                    sendDeadlineMail(trainee, syllabus, daysLeft);
+// //                }
+// //
+// //                // Move start date for next syllabus: next day after this step ends
+// //                stepStartDate = stepEndDate.plusDays(1);
+// //            }
+// //        }
+// //    }
+    
+//     @Scheduled(cron = "0 0 8 * * ?")
+//     public void checkSyllabusDeadlines() {
+
+//         List<User> trainees = userRepository.findByRole_IsManagerFalse();
+//         List<Syllabus> syllabusList = syllabusRepository.findAll();
+
+//         for (User trainee : trainees) {
+
+//             LocalDateTime stepStartDate = trainee.getCreatedAt();
+
+//             for (Syllabus syllabus : syllabusList) {
+
+//                 long totalDays = syllabus.getDurationInDays();
+//                 LocalDateTime stepEndDate = stepStartDate.plusDays(totalDays);
+//                 long daysLeft = LocalDateTime.now().until(stepEndDate, ChronoUnit.DAYS);
+
+//                 boolean completed = stepProgressRepository
+//                         .existsByUser_UseridAndSubTopic_Syllabus_IdAndCompleteTrue(
+//                                 trainee.getUserid(),
+//                                 syllabus.getId()
+//                         );
+
+//                 boolean mailAlreadySent = stepProgressRepository
+//                         .existsByUser_UseridAndSubTopic_Syllabus_IdAndDeadlineMailSentTrue(
+//                                 trainee.getUserid(),
+//                                 syllabus.getId()
+//                         );
+
+//                 // mail condition
+// //                if (!completed && daysLeft <= 0 && !mailAlreadySent) {
+// //                    sendDeadlineMail(trainee, syllabus, daysLeft);
+// //
+// //                    // mark mail sent
+// //                    stepProgressRepository.markDeadlineMailSent(
+// //                            trainee.getUserid(),
+// //                            syllabus.getId()
+// //                    );
+// //
+// //                    System.out.println("💾 Deadline mail flag updated in DB (sent once only)");
+// //                }
+                
+//              // mail condition (skip last day)
+//                 if (!completed && daysLeft < 0 && !mailAlreadySent) {
+//                     sendDeadlineMail(trainee, syllabus, daysLeft);
+
+//                     stepProgressRepository.markDeadlineMailSent(
+//                             trainee.getUserid(),
+//                             syllabus.getId()
+//                     );
+
+//                     System.out.println("💾 Deadline mail flag updated in DB (sent once only)");
+//                 }
+
+
+//                 stepStartDate = stepEndDate.plusDays(1);
+//             }
+//         }
+//     }
+
+
+//     private void sendDeadlineMail(User trainee, Syllabus syllabus, long delayDays) {
+
+//         // Fetch manager dynamically
+//         User manager = trainee.getManager(); // assuming you have a manager mapping in Role
+//         String managerEmail = manager != null ? manager.getEmailid() : null;
+
+//         String traineeEmail = trainee.getEmailid();
+
+//         String subject = "Deadline Missed - " + syllabus.getTitle();
+//         String message =
+//                 "Trainee: " + trainee.getFirstname() + " " + trainee.getLastname() + "\n" +
+//                 "Syllabus: " + syllabus.getTitle() + "\n" +
+//                 "Status: Deadline Missed\n" +
+//                 "Delayed By: " + Math.abs(delayDays) + " days\n";
+
+//         try {
+//             if (managerEmail != null) {
+//                 sendMail(managerEmail, subject, message);
+//                 System.out.println("✅ Mail sent to Manager: " + managerEmail);
+//             } else {
+//                 System.out.println("⚠️ Manager email not found for trainee: " + trainee.getFirstname());
+//             }
+
+//             // Also send to trainee
+//             if (traineeEmail != null) {
+//                 sendMail(traineeEmail, subject, message);
+//                 System.out.println("✅ Mail sent to Trainee: " + traineeEmail);
+//             } else {
+//                 System.out.println("⚠️ Trainee email not found for: " + trainee.getFirstname());
+//             }
+
+//         } catch (Exception e) {
+//             System.out.println("❌ Failed to send mail: " + e.getMessage());
+//             e.printStackTrace();
+//         }
+//     }
+
+//     private void sendMail(String to, String subject, String text) {
+//         SimpleMailMessage mail = new SimpleMailMessage();
+//         mail.setTo(to);
+//         mail.setSubject(subject);
+//         mail.setText(text);
+//         mailSender.send(mail);
+//     }
+// }
+
