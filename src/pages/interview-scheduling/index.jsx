@@ -13,7 +13,7 @@ import Button from '../../components/ui/Button';
 
 // import { } from "../../Api/apiAuth";
 
-import { createSchedule, assignTrainees, fetchAllTrainees, fetchAllTraineeSummary, fetchAllSchedules } from "../../api_service";
+import { createSchedule, assignTrainees, fetchAllTrainees, fetchAllTraineeSummary, fetchAllSchedules,updateInterviewSchedule,deleteInterviewSchedule } from "../../api_service";
 // import { getAllTrainers, getAllTrainees } from "../../Api/apiAuth";
 
 
@@ -28,7 +28,7 @@ const InterviewScheduling = () => {
   const [trainers, setTrainers] = useState([]);
   const [trainees, setTrainees] = useState([]);
   const [schedules, setSchedules] = useState([]);
-
+  const [formdata, setFormdata] = useState();
 
   const mockTrainees = [
     {
@@ -101,11 +101,6 @@ const InterviewScheduling = () => {
       availability: "Tue-Fri 9AM-6PM"
     }
   ];
-
-
-
-
-
 
 
   const mockInterviews = [
@@ -189,6 +184,7 @@ const InterviewScheduling = () => {
 
   // Handle time slot selection
   const handleTimeSlotSelect = (date, time) => {
+    console.log('Selected Date and Time:', time);
     setSelectedDate(date);
     setSelectedTime(time);
     checkForConflicts(date, time);
@@ -254,6 +250,36 @@ const InterviewScheduling = () => {
 
 
   const handleSchedule = async (scheduleData) => {
+
+    console.log("Scheduling Data:", scheduleData);
+    if (scheduleData.scheduleId) {
+      console.log("Updating existing schedule with ID:", scheduleData);
+    
+      const updateRes = await updateInterviewSchedule(scheduleData.scheduleId,{
+        interviewer: scheduleData.interviewer,
+        date: scheduleData.date,
+        time: scheduleData.time,
+        interviewType: scheduleData.interviewType,
+        location: scheduleData.location,
+        subTopicIds: scheduleData.subTopicIds,
+        duration: scheduleData.duration,
+        notes: scheduleData.notes,
+        trainees: scheduleData.trainees
+      })
+
+      console.log("Update Response:", updateRes);
+      alert("✅ Interview Updated Successfully!");
+
+      try{
+
+      } catch (error) { 
+        console.error("Update Error:", error);
+        alert("❌ Failed to update interview");
+      } 
+      return;
+    }else {
+      alert("Creating new schedule");
+    
     try {
       // 1️⃣ Create Schedule
       const scheduleRes = await createSchedule(scheduleData.interviewer, {
@@ -285,6 +311,7 @@ const InterviewScheduling = () => {
       console.error("Schedule Error:", error);
       alert("❌ Failed to schedule interview");
     }
+    }
   };
 
 
@@ -305,8 +332,53 @@ const InterviewScheduling = () => {
     // This would typically open a modal or navigate to alternatives view
   };
 
-  // Handle status update
-  const handleStatusUpdate = (interviewId, newStatus) => {
+  const handleCancelInterview = async (interviewId) => {
+    const confirmCancel = window.confirm("Are you sure you want to cancel this interview? "+interviewId);
+    if (!confirmCancel) {
+      return; 
+    }
+    try {
+      const delInterviewData = await deleteInterviewSchedule(interviewId);  
+      console.log("Cancelled Interview ID:", interviewId);
+      // alert("Interview cancelled successfully");
+      loadAllSchedules();
+    } catch (error) {
+      console.error("Cancellation Error:", error);
+      alert("Failed to cancel interview.");
+    }
+  };
+
+
+  const handleStatusUpdate = async (interviewId, newStatus) => {
+
+    switch(newStatus){
+      case 'cancel':
+        await handleCancelInterview(interviewId);
+        break;
+      case 'feedback':
+        console.log("Viewing feedback for Interview ID:", interviewId);
+        break;
+      case 'complete':
+        console.log("Marking Interview ID as complete:", interviewId);
+        break;
+      default:
+        break;
+    }
+
+    // if(newStatus === 'cancel'){
+    //   const confirmCancel = window.confirm("Are you sure you want to cancel this interview? "+interviewId);
+      
+    //   if (!confirmCancel) {
+    //     return; 
+    //   }
+    //   if(confirmCancel){
+    //     const delInterview = schedules?.filter(sch => sch?.id !== interviewId);
+    //     const delInterviewData = await updateInterviewSchedule(interviewId);
+  
+    //     console.log("Cancelled Interview ID:", interviewId);
+    //     // alert("Interview cancelled successfully.");
+    //   }
+    // }
     console.log('Updating interview status:', interviewId, newStatus);
     // This would update the interview status in the backend
   };
@@ -318,14 +390,62 @@ const InterviewScheduling = () => {
   };
 
   // Handle interview reschedule
+  // const handleRescheduleInterview = (interview) => {
+
+  //   console.log('Rescheduling interview:', interview);
+  //   // This would populate the scheduling form with existing interview data
+  //   setSelectedDate(new Date(interview?.interviewSchedule?.date));
+    
+  // const formattedTime = interview?.interviewSchedule?.time?.slice(0, 5);
+
+  //   setSelectedTime(interview?.interviewSchedule?.time?.slice(0, 5).toString());
+  //   console.log("INTERVIEW TRAINEE ID:",interview?.interviewSchedule?.time.slice(0, 5));
+  //   setSelectedTrainees([interview?.user?.trngid]);
+  //   setSchedules(interview?.interviewSchedule);
+  //   setActiveView('calendar');
+  // };
+
   const handleRescheduleInterview = (interview) => {
+
     console.log('Rescheduling interview:', interview);
-    // This would populate the scheduling form with existing interview data
-    setSelectedDate(new Date(interview.scheduledDate));
-    setSelectedTime(interview?.time);
-    setSelectedTrainees([interview?.empid]);
-    setActiveView('calendar');
-  };
+  if (!interview || !interview[0].interviewSchedule) return;
+
+  const { date, time } = interview[0].interviewSchedule;
+
+
+  // Ensure we have a valid date object
+  const interviewDate = date ? new Date(date) : null;
+
+  // Format time to HH:MM
+  const interviewTime = time ? time.slice(0, 5) : null;
+
+  console.log("Formatted Interview Date and Time:", interviewDate, interviewTime);
+  setSelectedDate(interviewDate);
+  setSelectedTime(interviewTime);
+
+  // Set selected trainees for the reschedule
+  const traineeId = interview?.user?.trngid;
+   const traineeIds = interview
+    .map(item => item?.user?.trngid)
+    .filter(Boolean); 
+    setSelectedTrainees(traineeIds);
+  // setSelectedTrainees(traineeId ? [traineeId] : []);
+    // console.log("INTERVIEW TRAINEE ID:", schedules);
+  setFormdata(interview[0]?.interviewSchedule);
+
+  // Keep schedules intact; no need to overwrite all schedules
+  // setSchedules(interview?.interviewSchedule); <-- REMOVE
+
+  // Switch back to calendar view for scheduling
+  setActiveView('calendar');
+
+  console.log("Rescheduling interview:", {
+    interviewDate,
+    interviewTime,
+    selectedTrainees
+  });
+};
+
 
   // Handle email notifications
   const handleSendNotifications = (emailData) => {
@@ -417,9 +537,8 @@ const InterviewScheduling = () => {
         };
       });
 
-
-      console.log("Transformed Schedules:", transformedSchedules);
-      setSchedules(transformedSchedules);
+      console.log("Transformed Schedules:", result.data);
+      setSchedules(result.data);
     } catch (error) {
       console.error("Failed to load schedules:", error);
     }
@@ -505,8 +624,9 @@ const InterviewScheduling = () => {
               <div className="lg:col-span-2 space-y-6">
                 <CalendarView
                   selectedDate={selectedDate}
+                  selectedTime={selectedTime}
                   onDateSelect={handleDateSelect}
-                  interviews={mockInterviews}
+                  interviews={schedules}
                   onTimeSlotSelect={handleTimeSlotSelect}
                   conflicts={conflicts}
                 />
@@ -516,6 +636,7 @@ const InterviewScheduling = () => {
                   selectedTime={selectedTime}
                   selectedTrainees={selectedTrainees}
                   interviewers={trainers}
+                  Formdata={formdata}
                   onSchedule={handleSchedule}
                   onCancel={() => {
                     setSelectedDate(null);
