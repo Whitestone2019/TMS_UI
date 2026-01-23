@@ -3440,3 +3440,10 @@
 //     }
 // }
 
+
+
+//  @Scheduled(fixedDelay = 60000) // 60 sec
+//     public void liveDeadlineChecker() {
+//         System.out.println("⏱ Checking deadlines... " + LocalDateTime.now());
+//         checkSyllabusDeadlines();
+//     }

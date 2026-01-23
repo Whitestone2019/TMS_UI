@@ -545,20 +545,45 @@ export const fetchTraineeById = async (traineeId) => {
 
 export const updateInterviewSchedule = async (scheduleId, data) => {
   try {
-    const res = await axios.put(`${API_URL}/schedule/update/${scheduleId}`, data);  
+    const res = await axios.put(`${API_URL}/schedule/update/${scheduleId}`, data);
     return res.data;
   } catch (error) {
     console.error("Error updating schedule:", error);
     throw error;
-  } 
+  }
 };
 
 export const deleteInterviewSchedule = async (scheduleId) => {
   try {
-    const res = await axios.delete(`${API_URL}/schedule/delete/${scheduleId}`);  
+    const res = await axios.delete(`${API_URL}/schedule/delete/${scheduleId}`);
     return res.data;
   } catch (error) {
     console.error("Error deleting schedule:", error);
+    throw error;
+  }
+};
+
+export const fetchTraineesByManagerId = async (managerId) => {
+  try {
+    const response = await axios.get(
+      `${API_URL}/users/manager/${managerId}`
+    );
+    return response.data; // Returns ApiResponse object
+  } catch (error) {
+    console.error("Error fetching trainees by manager:", error);
+    throw error;
+  }
+};
+
+// 2. Get Trainee Summary for a Manager
+export const fetchTraineeSummaryByManager = async (managerUserId) => {
+  try {
+    const response = await axios.get(
+      `${API_URL}/users/${managerUserId}/trainee-summary`
+    );
+    return response.data; // Returns ApiResponse object
+  } catch (error) {
+    console.error("Error fetching trainee summary:", error);
     throw error;
   }
 };

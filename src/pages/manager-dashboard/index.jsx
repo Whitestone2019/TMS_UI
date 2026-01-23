@@ -524,7 +524,7 @@ import TraineeMetricsPanel from './components/TraineeMetricsPanel';
 import FilterToolbar from './components/FilterToolbar';
 import TraineeDataTable from './components/TraineeDataTable';
 import AssessmentEntryModal from './components/AssessmentEntryModal';
-import { fetchAllTraineeSummary, fetchCompletedSubTopics } from '../../api_service';
+import { fetchAllTraineeSummary, fetchCompletedSubTopics, fetchTraineeSummaryByManager } from '../../api_service';
 const ManagerDashboard = () => {
   const navigate = useNavigate();
   const [selectedTrainees, setSelectedTrainees] = useState([]);
@@ -645,20 +645,51 @@ const ManagerDashboard = () => {
   // }
 
   // Calculate metrics
+  // const fetchTrainees = async () => {
+  //   try {
+  //     const response = await fetchAllTraineeSummary();
+
+  //     const traineeList = Array.isArray(response?.data)
+  //       ? response.data
+  //       : Array.isArray(response?.data?.trainees)
+  //         ? response.data.trainees
+  //         : [];
+
+  //     setTrainees(traineeList);
+  //     setFilteredTrainees(traineeList);
+  //   } catch (error) {
+  //     console.error('Error fetching trainee summary:', error);
+  //     setTrainees([]);
+  //     setFilteredTrainees([]);
+  //   }
+  // };
+
+
   const fetchTrainees = async () => {
     try {
-      const response = await fetchAllTraineeSummary();
+      const managerUserId = sessionStorage.getItem("userId"); // adjust if different
 
+      if (!managerUserId) {
+        console.warn("Manager UserId not found");
+        return;
+      }
+
+      const response = await fetchTraineeSummaryByManager(managerUserId);
+
+      // API returns: ApiResponse → expected { data: [...] }
       const traineeList = Array.isArray(response?.data)
         ? response.data
-        : Array.isArray(response?.data?.trainees)
-          ? response.data.trainees
+        : Array.isArray(response?.trainees)
+          ? response.trainees
           : [];
+
+      console.log("Fetched trainee summary:", traineeList);
 
       setTrainees(traineeList);
       setFilteredTrainees(traineeList);
-    } catch (error) {
-      console.error('Error fetching trainee summary:', error);
+
+    } catch (err) {
+      console.error("Error fetching trainee summary:", err);
       setTrainees([]);
       setFilteredTrainees([]);
     }

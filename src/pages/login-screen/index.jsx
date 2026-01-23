@@ -135,7 +135,9 @@ const LoginScreen = () => {
         }
 
         const empId = sessionStorage.setItem("empid", `${formData?.trngId}`);
+        const userId = sessionStorage.setItem("userId", response?.data?.user?.userid);
         const userRole = sessionStorage.setItem("userRole", `${response?.data?.role}`);
+
         const userName = sessionStorage.setItem("userName", `${response?.data?.user?.firstname} ${response?.data?.user?.lastname}`);
         navigate(response?.data?.redirect || '/');
 
