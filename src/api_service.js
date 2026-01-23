@@ -104,7 +104,7 @@ export const fetchAllTrainees = async () => {
       "lastname": "Murugasen",
       "emailid": "arunmaran.murugesan@whitestones.co.in",
       "phonenumber": "9345287327",
-
+      "roleId": "R001",
     },
     {
       "userid": "2019WS10018",
@@ -115,7 +115,7 @@ export const fetchAllTrainees = async () => {
       "lastname": "A",
       "emailid": "abs@gmail.bom",
       "phonenumber": "02345678444",
-
+      "roleId": "R001",
     },
     {
       "userid": "2019WS10009",
@@ -126,6 +126,7 @@ export const fetchAllTrainees = async () => {
       "lastname": "S",
       "emailid": "anbarasan.sekar@whitestones.in",
       "phonenumber": "9788313457",
+      "roleId": "R001",
     }
   ]
   try {
@@ -545,17 +546,17 @@ export const fetchTraineeById = async (traineeId) => {
 
 export const updateInterviewSchedule = async (scheduleId, data) => {
   try {
-    const res = await axios.put(`${API_URL}/schedule/update/${scheduleId}`, data);  
+    const res = await axios.put(`${API_URL}/schedule/update/${scheduleId}`, data);
     return res.data;
   } catch (error) {
     console.error("Error updating schedule:", error);
     throw error;
-  } 
+  }
 };
 
 export const deleteInterviewSchedule = async (scheduleId) => {
   try {
-    const res = await axios.delete(`${API_URL}/schedule/delete/${scheduleId}`);  
+    const res = await axios.delete(`${API_URL}/schedule/delete/${scheduleId}`);
     return res.data;
   } catch (error) {
     console.error("Error deleting schedule:", error);
