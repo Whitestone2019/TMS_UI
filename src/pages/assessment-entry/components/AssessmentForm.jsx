@@ -456,11 +456,15 @@ const AssessmentForm = ({
   onSave,
   onSaveDraft,
   onCancel,
+  assessmentFormData,
   isLoading = false,
   className = ''
 }) => {
-  const [formData, setFormData] = useState({
+  console.log('Assessment form data prop:', assessmentFormData);
 
+
+
+  const [formData, setFormData] = useState({
     marks: '',
     maxMarks: '100',
     assessmentDate: new Date()?.toISOString()?.split('T')?.[0],
@@ -469,12 +473,8 @@ const AssessmentForm = ({
     strengths: '',
     improvements: '',
     recommendations: '',
-    // subTopicId: null,
     subTopicIds: [],
-    // syllabusTitles: []
-    interviewDone: null,
-    reviewNotes: "",     // ✅ review text (show only if Yes)
-
+    interviewDone: false,
   });
 
 
@@ -495,6 +495,26 @@ const AssessmentForm = ({
     { value: 'milestone', label: 'Milestone Assessment' },
     { value: 'final', label: 'Final Evaluation' }
   ];
+
+  useEffect(() => {
+  if (!assessmentFormData) return;
+
+  const subTopics =
+    typeof assessmentFormData?.rawItems?.[0]?.interviewSchedule?.subTopics === "string"
+      ? assessmentFormData.rawItems[0].interviewSchedule.subTopics
+          .split("|")
+          .map(Number)
+      : [];
+
+  setFormData(prev => ({
+    ...prev,
+    subTopicIds: subTopics,
+    interviewDone: true
+  }));
+
+  setSelectedSubTopics(subTopics);
+}, [assessmentFormData]);
+
 
   // Auto-save functionality
   useEffect(() => {
@@ -533,7 +553,21 @@ const AssessmentForm = ({
     }
   };
 
-  
+  useEffect(() => {
+  if (!syllabusData.length || selectedSubTopics.length === 0) return;
+
+  const matchedSyllabusTitles = syllabusData
+    .filter(syllabus =>
+      syllabus.subTopics.some(subTopic =>
+        selectedSubTopics.includes(subTopic.subTopicId)
+      )
+    )
+    .map(syllabus => syllabus.title);
+
+  setSelectedSyllabus(matchedSyllabusTitles);
+}, [syllabusData, selectedSubTopics]);
+
+
   // ✅ helper function – syllabus + subtopic filtering
   const getCompletedSyllabusData = (data, traineeId) => {
     return data
@@ -601,10 +635,6 @@ const AssessmentForm = ({
       newErrors.remarks = 'Remarks are required';
     } else if (formData?.remarks?.trim()?.length < 10) {
       newErrors.remarks = 'Remarks must be at least 10 characters';
-    }
-
-    if (formData.interviewDone === "yes" && !formData.reviewNotes.trim()) {
-      newErrors.reviewNotes = "Please enter review notes";
     }
 
     setErrors(newErrors);
@@ -1000,9 +1030,10 @@ const AssessmentForm = ({
               <input
                 type="radio"
                 name="interviewDone"
-                checked={formData.interviewDone === true }
+                checked={formData.interviewDone === true}
                 onChange={() => handleInputChange("interviewDone", true)}
                 className="form-radio"
+                disabled
               />
               <span>Yes</span>
             </label>
@@ -1014,6 +1045,7 @@ const AssessmentForm = ({
                 checked={formData.interviewDone === false}
                 onChange={() => handleInputChange("interviewDone", false)}
                 className="form-radio"
+                disabled
               />
               <span>No</span>
             </label>
