@@ -104,7 +104,7 @@ export const fetchAllTrainees = async () => {
       "lastname": "Murugasen",
       "emailid": "arunmaran.murugesan@whitestones.co.in",
       "phonenumber": "9345287327",
-
+      "roleId": "R001",
     },
     {
       "userid": "2019WS10018",
@@ -115,7 +115,7 @@ export const fetchAllTrainees = async () => {
       "lastname": "A",
       "emailid": "abs@gmail.bom",
       "phonenumber": "02345678444",
-
+      "roleId": "R001",
     },
     {
       "userid": "2019WS10009",
@@ -126,6 +126,7 @@ export const fetchAllTrainees = async () => {
       "lastname": "S",
       "emailid": "anbarasan.sekar@whitestones.in",
       "phonenumber": "9788313457",
+      "roleId": "R001",
     }
   ]
   try {
