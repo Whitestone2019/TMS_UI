@@ -459,7 +459,7 @@ import AssessmentHistory from './components/AssessmentHistory';
 import AssessmentDetailsModal from './components/AssessmentDetailsModal';
 import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
-import { fetchAllTrainees, fetchAssessmentsByTrainee } from '../../api_service';
+import { fetchAllTrainees, fetchAssessmentsByTrainee, fetchTraineesByManagerId } from '../../api_service';
 
 const AssessmentEntry = () => {
   const navigate = useNavigate();
@@ -608,7 +608,8 @@ const AssessmentEntry = () => {
     // Fetch initial data if needed
     const fetchData = async () => {
       try {
-        const trainees = await fetchAllTrainees();
+        const managerId = sessionStorage.getItem("userId");
+        const trainees = await fetchTraineesByManagerId(managerId);
         setTrainees(trainees.data);
         console.log('Fetched trainees:', trainees.data);
 

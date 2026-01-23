@@ -13,7 +13,7 @@ import Button from '../../components/ui/Button';
 
 // import { } from "../../Api/apiAuth";
 
-import { createSchedule, assignTrainees, fetchAllTrainees, fetchAllTraineeSummary, fetchAllSchedules, updateInterviewSchedule, deleteInterviewSchedule } from "../../api_service";
+import { createSchedule, assignTrainees, fetchAllTrainees, fetchAllTraineeSummary, fetchAllSchedules, updateInterviewSchedule, deleteInterviewSchedule, fetchTraineesByManagerId } from "../../api_service";
 // import { getAllTrainers, getAllTrainees } from "../../Api/apiAuth";
 
 
@@ -501,18 +501,28 @@ const InterviewScheduling = () => {
 
   const loadAllTrainees = async () => {
     try {
-      const result = await fetchAllTraineeSummary();
+      const managerId = sessionStorage.getItem("userId");
+      const result = await fetchTraineesByManagerId(managerId);
       console.log("API RESULT:", result);
 
-      const formatted = (result?.data || []).map(t => ({
-        id: t.traineeId,
-        name: t.name || "Unknown",
-        email: t.email || "N/A",
-        progressPercentage: t.completionPercentage || 0,
-        lastInterviewDate: t.lastAssessmentDate || null,
-        // interviewStatus: t.interviewStatus || "due",
-        // priority: t.priority || "medium"
+      // const formatted = (result.data || []).map(t => ({
+      //   id: t.traineeId,
+      //   name: t.name || "Unknown",
+      //   email: t.email || "N/A",
+      //   progressPercentage: t.completionPercentage || 0,
+      //   lastInterviewDate: t.lastAssessmentDate || null,
+      //   // interviewStatus: t.interviewStatus || "due",
+      //   // priority: t.priority || "medium"
+      // }));
+      const formatted = (result.data || []).map(t => ({
+        id: t.trngid,
+        name: `${t.firstname} ${t.lastname}`,
+        email: t.emailid,
+        phone: t.phonenumber,
+        designation: t.designation,
+        manager: t.managerData?.username || "No Manager"
       }));
+
 
       console.log("hsjjjjjjjjjd", formatted);
       setTrainees(formatted);
@@ -681,7 +691,7 @@ const InterviewScheduling = () => {
               onStatusUpdate={handleStatusUpdate}
               onViewDetails={handleViewInterviewDetails}
               onReschedule={handleRescheduleInterview}
-              // onComplete={handleCompleteInterview}
+            // onComplete={handleCompleteInterview}
             />
           )}
 
