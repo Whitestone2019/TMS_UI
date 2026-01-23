@@ -13,7 +13,7 @@ import Button from '../../components/ui/Button';
 
 // import { } from "../../Api/apiAuth";
 
-import { createSchedule, assignTrainees, fetchAllTrainees, fetchAllTraineeSummary, fetchAllSchedules,updateInterviewSchedule,deleteInterviewSchedule } from "../../api_service";
+import { createSchedule, assignTrainees, fetchAllTrainees, fetchAllTraineeSummary, fetchAllSchedules, updateInterviewSchedule, deleteInterviewSchedule } from "../../api_service";
 // import { getAllTrainers, getAllTrainees } from "../../Api/apiAuth";
 
 
@@ -254,8 +254,8 @@ const InterviewScheduling = () => {
     console.log("Scheduling Data:", scheduleData);
     if (scheduleData.scheduleId) {
       console.log("Updating existing schedule with ID:", scheduleData);
-    
-      const updateRes = await updateInterviewSchedule(scheduleData.scheduleId,{
+
+      const updateRes = await updateInterviewSchedule(scheduleData.scheduleId, {
         interviewer: scheduleData.interviewer,
         date: scheduleData.date,
         time: scheduleData.time,
@@ -270,47 +270,47 @@ const InterviewScheduling = () => {
       console.log("Update Response:", updateRes);
       alert("✅ Interview Updated Successfully!");
 
-      try{
+      try {
 
-      } catch (error) { 
+      } catch (error) {
         console.error("Update Error:", error);
         alert("❌ Failed to update interview");
-      } 
-      return;
-    }else {
-      alert("Creating new schedule");
-    
-    try {
-      // 1️⃣ Create Schedule
-      const scheduleRes = await createSchedule(scheduleData.interviewer, {
-        date: scheduleData.date,
-        time: scheduleData.time,
-        interviewType: scheduleData.interviewType,
-        location: scheduleData.location,
-        subTopicIds: scheduleData.subTopicIds,
-        duration: scheduleData.duration,
-        notes: scheduleData.notes
-      });
-
-      console.log("Schedule Response:", scheduleRes);
-
-      const scheduleId = scheduleRes?.data?.scheduleId;
-
-      if (!scheduleId) {
-        alert("❌ Schedule ID not received from backend!");
-        console.error("Response did not contain scheduleId:", scheduleRes);
-        return;
       }
+      return;
+    } else {
+      alert("Creating new schedule");
 
-      // 3️⃣ Assign Trainees
-      await assignTrainees(scheduleId, scheduleData.trainees);
+      try {
+        // 1️⃣ Create Schedule
+        const scheduleRes = await createSchedule(scheduleData.interviewer, {
+          date: scheduleData.date,
+          time: scheduleData.time,
+          interviewType: scheduleData.interviewType,
+          location: scheduleData.location,
+          subTopicIds: scheduleData.subTopicIds,
+          duration: scheduleData.duration,
+          notes: scheduleData.notes
+        });
 
-      alert("✅ Interview Scheduled Successfully!");
+        console.log("Schedule Response:", scheduleRes);
 
-    } catch (error) {
-      console.error("Schedule Error:", error);
-      alert("❌ Failed to schedule interview");
-    }
+        const scheduleId = scheduleRes?.data?.scheduleId;
+
+        if (!scheduleId) {
+          alert("❌ Schedule ID not received from backend!");
+          console.error("Response did not contain scheduleId:", scheduleRes);
+          return;
+        }
+
+        // 3️⃣ Assign Trainees
+        await assignTrainees(scheduleId, scheduleData.trainees);
+
+        alert("✅ Interview Scheduled Successfully!");
+
+      } catch (error) {
+        console.error("Schedule Error:", error);
+        alert("❌ Failed to schedule interview");
+      }
     }
   };
 
@@ -333,12 +333,12 @@ const InterviewScheduling = () => {
   };
 
   const handleCancelInterview = async (interviewId) => {
-    const confirmCancel = window.confirm("Are you sure you want to cancel this interview? "+interviewId);
+    const confirmCancel = window.confirm("Are you sure you want to cancel this interview? " + interviewId);
     if (!confirmCancel) {
-      return; 
+      return;
     }
     try {
-      const delInterviewData = await deleteInterviewSchedule(interviewId);  
+      const delInterviewData = await deleteInterviewSchedule(interviewId);
       console.log("Cancelled Interview ID:", interviewId);
       // alert("Interview cancelled successfully");
       loadAllSchedules();
@@ -347,11 +347,58 @@ const InterviewScheduling = () => {
       alert("Failed to cancel interview.");
     }
   };
+  const handleCompleteInterview = (interview) => {
+    console.log('Completing interview:', interview);
+    // This would mark the interview as complete in the backend
+    navigate('/assessment-entry', { state: { interview } });
+  }
+
+  // Reschedule interview
+  const handleRescheduleInterview = (interview) => {
+
+    console.log('Rescheduling interview:', interview);
+    if (!interview || !interview[0].interviewSchedule) return;
+
+    const { date, time } = interview[0].interviewSchedule;
+
+
+    // Ensure we have a valid date object
+    const interviewDate = date ? new Date(date) : null;
+
+    // Format time to HH:MM
+    const interviewTime = time ? time.slice(0, 5) : null;
+
+    console.log("Formatted Interview Date and Time:", interviewDate, interviewTime);
+    setSelectedDate(interviewDate);
+    setSelectedTime(interviewTime);
+
+    // Set selected trainees for the reschedule
+    const traineeId = interview?.user?.trngid;
+    const traineeIds = interview
+      .map(item => item?.user?.trngid)
+      .filter(Boolean);
+    setSelectedTrainees(traineeIds);
+    // setSelectedTrainees(traineeId ? [traineeId] : []);
+    // console.log("INTERVIEW TRAINEE ID:", schedules);
+    setFormdata(interview[0]?.interviewSchedule);
+
+    // Keep schedules intact; no need to overwrite all schedules
+    // setSchedules(interview?.interviewSchedule); <-- REMOVE
+
+    // Switch back to calendar view for scheduling
+    setActiveView('calendar');
+
+    console.log("Rescheduling interview:", {
+      interviewDate,
+      interviewTime,
+      selectedTrainees
+    });
+  };
 
 
   const handleStatusUpdate = async (interviewId, newStatus) => {
 
-    switch(newStatus){
+    switch (newStatus) {
       case 'cancel':
         await handleCancelInterview(interviewId);
         break;
@@ -360,6 +407,7 @@ const InterviewScheduling = () => {
         break;
       case 'complete':
         console.log("Marking Interview ID as complete:", interviewId);
+        handleCompleteInterview(interviewId);
         break;
       default:
         break;
@@ -367,20 +415,19 @@ const InterviewScheduling = () => {
 
     // if(newStatus === 'cancel'){
     //   const confirmCancel = window.confirm("Are you sure you want to cancel this interview? "+interviewId);
-      
+
     //   if (!confirmCancel) {
     //     return; 
     //   }
     //   if(confirmCancel){
     //     const delInterview = schedules?.filter(sch => sch?.id !== interviewId);
     //     const delInterviewData = await updateInterviewSchedule(interviewId);
-  
+
     //     console.log("Cancelled Interview ID:", interviewId);
     //     // alert("Interview cancelled successfully.");
     //   }
     // }
     console.log('Updating interview status:', interviewId, newStatus);
-    // This would update the interview status in the backend
   };
 
   // Handle interview details view
@@ -395,7 +442,7 @@ const InterviewScheduling = () => {
   //   console.log('Rescheduling interview:', interview);
   //   // This would populate the scheduling form with existing interview data
   //   setSelectedDate(new Date(interview?.interviewSchedule?.date));
-    
+
   // const formattedTime = interview?.interviewSchedule?.time?.slice(0, 5);
 
   //   setSelectedTime(interview?.interviewSchedule?.time?.slice(0, 5).toString());
@@ -405,46 +452,6 @@ const InterviewScheduling = () => {
   //   setActiveView('calendar');
   // };
 
-  const handleRescheduleInterview = (interview) => {
-
-    console.log('Rescheduling interview:', interview);
-  if (!interview || !interview[0].interviewSchedule) return;
-
-  const { date, time } = interview[0].interviewSchedule;
-
-
-  // Ensure we have a valid date object
-  const interviewDate = date ? new Date(date) : null;
-
-  // Format time to HH:MM
-  const interviewTime = time ? time.slice(0, 5) : null;
-
-  console.log("Formatted Interview Date and Time:", interviewDate, interviewTime);
-  setSelectedDate(interviewDate);
-  setSelectedTime(interviewTime);
-
-  // Set selected trainees for the reschedule
-  const traineeId = interview?.user?.trngid;
-   const traineeIds = interview
-    .map(item => item?.user?.trngid)
-    .filter(Boolean); 
-    setSelectedTrainees(traineeIds);
-  // setSelectedTrainees(traineeId ? [traineeId] : []);
-    // console.log("INTERVIEW TRAINEE ID:", schedules);
-  setFormdata(interview[0]?.interviewSchedule);
-
-  // Keep schedules intact; no need to overwrite all schedules
-  // setSchedules(interview?.interviewSchedule); <-- REMOVE
-
-  // Switch back to calendar view for scheduling
-  setActiveView('calendar');
-
-  console.log("Rescheduling interview:", {
-    interviewDate,
-    interviewTime,
-    selectedTrainees
-  });
-};
 
 
   // Handle email notifications
@@ -674,6 +681,7 @@ const InterviewScheduling = () => {
               onStatusUpdate={handleStatusUpdate}
               onViewDetails={handleViewInterviewDetails}
               onReschedule={handleRescheduleInterview}
+              // onComplete={handleCompleteInterview}
             />
           )}
 

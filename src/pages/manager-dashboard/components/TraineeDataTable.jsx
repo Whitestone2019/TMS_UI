@@ -92,10 +92,9 @@ const TraineeDataTable = ({
   const getInterviewStatusBadge = (interviewDone) => {
 
     const statusConfig = {
-      'pending': { bg: 'bg-yellow-100', text: 'text-yellow-700', label: 'Pending' },
-      'scheduled': { bg: 'bg-blue-100', text: 'text-blue-700', label: 'Scheduled' },
-      'completed': { bg: 'bg-green-100', text: 'text-green-700', label: 'Completed' },
-      'cancelled': { bg: 'bg-red-100', text: 'text-red-700', label: 'Cancelled' }
+      'pending': { bg: 'bg-yellow-100', text: 'text-yellow-700', label: 'Assessment Score' },
+      'completed': { bg: 'bg-green-100', text: 'text-green-700', label: 'Interview Score' },
+      'error': { bg: 'bg-red-100', text: 'text-red-700', label: 'N/A' }
     };
     let config;
     if (interviewDone === true) {
@@ -103,11 +102,11 @@ const TraineeDataTable = ({
     } else if (interviewDone === false) {
       config = statusConfig.pending;
     } else {
-      config = statusConfig.cancelled;
+      config = statusConfig.error;
     }
 
     return (
-      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${config?.bg} ${config?.text}`}>
+      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-medium ${config?.bg} ${config?.text}`}>
         {config?.label}
       </span>
     );
@@ -164,7 +163,7 @@ const TraineeDataTable = ({
                   {getSortIcon('lastAssessment')}
                 </button>
               </th>
-              <th className="px-6 py-4 text-left">Interview Status</th>
+              <th className="px-6 py-4 text-left">Score Status</th>
               <th className="px-6 py-4 text-center">Actions</th>
             </tr>
           </thead>
@@ -222,7 +221,7 @@ const TraineeDataTable = ({
                     <p className="text-xs text-muted-foreground">Score: {trainee?.lastAssessmentScore}/100</p>
                   </div>
                 </td>
-                <td className="px-6 py-4">
+                <td className="px-6 py-4 text-[10px]">
                   {getInterviewStatusBadge(trainee?.interviewStatus)}
                 </td>
                 <td className="px-6 py-4">

@@ -449,7 +449,7 @@
 
 
 import React, { useState, useEffect, use } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Header from '../../components/ui/Header';
 import NavigationBreadcrumb from '../../components/ui/NavigationBreadcrumb';
 import SessionTimeoutHandler from '../../components/ui/SessionTimeoutHandler';
@@ -463,6 +463,7 @@ import { fetchAllTrainees, fetchAssessmentsByTrainee } from '../../api_service';
 
 const AssessmentEntry = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [selectedTrainee, setSelectedTrainee] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
@@ -600,6 +601,7 @@ const AssessmentEntry = () => {
   //     }
   //   ]
   // };
+  const { interview } = location.state || {};
 
 
   useEffect(() => {
@@ -617,19 +619,23 @@ const AssessmentEntry = () => {
     fetchData();
   }, []);
 
-
+  useEffect(() => {
+    console.log('Interview data from navigation state:', interview);
+    if (interview && interview.trainees) {
+      handleTraineeSelect(interview.trainees[0]);
+    }}, [interview]);
 
   const handleTraineeSelect = async (trainee) => {
     console.log('Selected trainee:', trainee);
-    try {
-      const trainees = await fetchAllTrainees();
-      setTrainees(trainees.data);
-      console.log('Fetched trainees:', trainees.data);
+    // try {
+    //   const trainees = await fetchAllTrainees();
+    //   setTrainees(trainees.data);
+    //   console.log('Fetched trainees:', trainees.data);
 
-    } catch (error) {
-      console.error("Error fetching trainees:", error);
-    }
-
+    // } catch (error) {
+    //   console.error("Error fetching trainees:", error);
+    // }
+    
     setSelectedTrainee(trainee);
     try {
       const data = await getTraineeAssessments(trainee?.trngid);
@@ -796,6 +802,7 @@ const AssessmentEntry = () => {
               <AssessmentForm
                 trainee={selectedTrainee}
                 // onSave={handleSaveAssessment}
+                assessmentFormData = {interview || null}
                 onSaveDraft={handleSaveDraft}
                 onCancel={handleCancel}
                 isLoading={isLoading}

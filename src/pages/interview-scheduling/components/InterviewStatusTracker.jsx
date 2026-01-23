@@ -4,10 +4,12 @@ import Button from '../../../components/ui/Button';
 import Select from '../../../components/ui/Select';
 import Input from '../../../components/ui/Input';
 
+
 const InterviewStatusTracker = ({
   interviews,
   onStatusUpdate,
   onViewDetails,
+  onComplete,
   onReschedule,
   className = ''
 }) => {
@@ -61,7 +63,8 @@ const InterviewStatusTracker = ({
       grouped[scheduleId].trainees.push({
         firstname: item.user?.firstname,
         lastname: item.user?.lastname,
-        status: item?.rsvpStatus?.trim().toLowerCase() || 'pending'
+        status: item?.rsvpStatus?.trim().toLowerCase() || 'pending',
+        trngid: item.user?.trngid
       });
     }
 
@@ -239,15 +242,8 @@ const InterviewStatusTracker = ({
 
     
     switch (action) {
-      case 'pending': case 'complete':
-        console.log(`Action: ${action} for Interview ID: ${interview?.id}`);
-        onStatusUpdate(interview?.scheduleId, action);
-        break;
-
+      
       case 'reschedule':
-
-
-
         //Single item fetch attempt
         //         const selected = data.find(item => {
         //   console.log(
@@ -281,10 +277,19 @@ const InterviewStatusTracker = ({
         onReschedule(selected);
         // console.log('Rescheduling Interview ID:', selected);
         break;
-      case 'cancel':
+      
+        case 'cancel':
         onStatusUpdate(interview?.id, action);
         break;
-      case 'feedback': onViewDetails(interview?.id, 'feedback');
+
+      case 'complete':
+        console.log(`Action: ${action} for Interview ID: ${interview}`);
+        // onComplete(interview?.scheduleId, action);
+        onStatusUpdate(interview, action);
+        // console.log('Completing Interview ID:', filteredAndSortedInterviews);
+        break;
+      case 'feedback': 
+        onViewDetails(interview?.id, 'feedback');
         break;
       default:
         onViewDetails(interview?.id);
