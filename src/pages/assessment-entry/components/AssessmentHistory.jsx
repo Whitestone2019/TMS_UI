@@ -210,7 +210,7 @@ const AssessmentHistory = ({
   // ✅ Ensure assessments is always an array
   const safeAssessments = Array.isArray(assessments) ? assessments : [];
 
-  console.log('Safe assessments:', safeAssessments, assessments);
+  console.log('Safe assessments:', safeAssessments, assessments,trainee);
   const [sortBy, setSortBy] = useState('date');
   const [filterType, setFilterType] = useState('');
 
@@ -281,6 +281,8 @@ const AssessmentHistory = ({
       </div>
     );
   }
+
+  
 
   return (
     <div className={`bg-card border border-border rounded-lg ${className}`}>

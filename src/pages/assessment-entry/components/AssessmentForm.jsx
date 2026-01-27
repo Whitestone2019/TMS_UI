@@ -456,11 +456,15 @@ const AssessmentForm = ({
   onSave,
   onSaveDraft,
   onCancel,
+  assessmentFormData,
   isLoading = false,
   className = ''
 }) => {
-  const [formData, setFormData] = useState({
+  console.log('Assessment form data prop:', assessmentFormData);
 
+
+
+  const [formData, setFormData] = useState({
     marks: '',
     maxMarks: '100',
     assessmentDate: new Date()?.toISOString()?.split('T')?.[0],
@@ -469,11 +473,19 @@ const AssessmentForm = ({
     strengths: '',
     improvements: '',
     recommendations: '',
-    subTopicId: null
+    subTopicIds: [],
+    interviewDone: false,
   });
+
+
   const [errors, setErrors] = useState({});
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [autoSaveStatus, setAutoSaveStatus] = useState('');
+
+  const [selectedSyllabus, setSelectedSyllabus] = useState([]);
+  const [selectedSubTopics, setSelectedSubTopics] = useState([]);
+
+  const [syllabusData, setSyllabusData] = useState([]);
   const [completedSubTopics, setCompletedSubTopics] = useState([]);
 
 
@@ -483,6 +495,26 @@ const AssessmentForm = ({
     { value: 'milestone', label: 'Milestone Assessment' },
     { value: 'final', label: 'Final Evaluation' }
   ];
+
+  useEffect(() => {
+  if (!assessmentFormData) return;
+
+  const subTopics =
+    typeof assessmentFormData?.rawItems?.[0]?.interviewSchedule?.subTopics === "string"
+      ? assessmentFormData.rawItems[0].interviewSchedule.subTopics
+          .split("|")
+          .map(Number)
+      : [];
+
+  setFormData(prev => ({
+    ...prev,
+    subTopicIds: subTopics,
+    interviewDone: true
+  }));
+
+  setSelectedSubTopics(subTopics);
+}, [assessmentFormData]);
+
 
   // Auto-save functionality
   useEffect(() => {
@@ -521,6 +553,48 @@ const AssessmentForm = ({
     }
   };
 
+  useEffect(() => {
+  if (!syllabusData.length || selectedSubTopics.length === 0) return;
+
+  const matchedSyllabusTitles = syllabusData
+    .filter(syllabus =>
+      syllabus.subTopics.some(subTopic =>
+        selectedSubTopics.includes(subTopic.subTopicId)
+      )
+    )
+    .map(syllabus => syllabus.title);
+
+  setSelectedSyllabus(matchedSyllabusTitles);
+}, [syllabusData, selectedSubTopics]);
+
+
+  // ✅ helper function – syllabus + subtopic filtering
+  const getCompletedSyllabusData = (data, traineeId) => {
+    return data
+      .map(syllabus => {
+        const completedSubTopics = syllabus.subTopics?.filter(subTopic =>
+          subTopic.stepProgress?.some(
+            progress =>
+              progress.checker === true &&
+              progress.complete === true &&
+              progress.user?.empid === traineeId
+          )
+        );
+
+        // ❌ syllabus hide if no valid subtopics
+        if (!completedSubTopics || completedSubTopics.length === 0) {
+          return null;
+        }
+
+        return {
+          ...syllabus,
+          subTopics: completedSubTopics
+        };
+      })
+      .filter(Boolean);
+  };
+
+
   const validateForm = () => {
     const newErrors = {};
     // Subtopic validation
@@ -528,8 +602,8 @@ const AssessmentForm = ({
     //   newErrors.subTopic = 'Subtopic is required';
     // }
 
-    if (!formData?.subTopicId) {
-      newErrors.subTopicId = 'Subtopic is required';
+    if (!formData?.subTopicIds || formData?.subTopicIds.length === 0) {
+      newErrors.subTopicIds = 'Subtopic is required';
     }
 
     // Marks validation
@@ -577,7 +651,7 @@ const AssessmentForm = ({
       empid: trainee?.trngid,
       traineeName: trainee?.name,
       currentStep: trainee?.currentStep,
-      subTopicId: formData.subTopicId,
+      subTopicIds: formData.subTopicIds,
       // isDraft,
       submittedAt: new Date()?.toISOString(),
       percentage: Math.round((parseFloat(formData?.marks) / parseFloat(formData?.maxMarks)) * 100)
@@ -601,7 +675,7 @@ const AssessmentForm = ({
 
     if (isDraft) {
       onSaveDraft(assessmentData);
-    } 
+    }
     // else {
     //   onSave(assessmentData);
     // }
@@ -611,21 +685,21 @@ const AssessmentForm = ({
 
 
   const resetForm = () => {
-  setFormData({
-    marks: '',
-    maxMarks: '100',
-    assessmentDate: new Date().toISOString().split('T')[0],
-    assessmentType: 'weekly',
-    remarks: '',
-    strengths: '',
-    improvements: '',
-    recommendations: ''
-  });
+    setFormData({
+      marks: '',
+      maxMarks: '100',
+      assessmentDate: new Date().toISOString().split('T')[0],
+      assessmentType: 'weekly',
+      remarks: '',
+      strengths: '',
+      improvements: '',
+      recommendations: ''
+    });
 
-  setErrors({});
-  setHasUnsavedChanges(false);
-  setAutoSaveStatus('');
-};
+    setErrors({});
+    setHasUnsavedChanges(false);
+    setAutoSaveStatus('');
+  };
   const handleCancel = () => {
     if (hasUnsavedChanges) {
       if (window.confirm('You have unsaved changes. Are you sure you want to cancel?')) {
@@ -654,42 +728,95 @@ const AssessmentForm = ({
       try {
         const response = await fetchCompletedSubTopics();
 
-        const data = Array.isArray(response)
+        const rawData = Array.isArray(response)
           ? response
           : Array.isArray(response?.data)
             ? response.data
             : [];
 
-        const filteredSubTopics = data.flatMap(syllabus =>
-          syllabus.subTopics?.flatMap(subTopic =>
-            subTopic.stepProgress
-              ?.filter(progress =>
-                progress.checker === true &&
-                progress.user?.empid === trainee.trngid
-              )
-              ?.map(() => ({
-                value: subTopic.subTopicId,
-                label: `${subTopic.stepNumber}. ${subTopic.name}`
-              })) || []
-          ) || []
+        // ✅ APPLY SAME LOGIC TO SYLLABUS
+        const completedSyllabus = getCompletedSyllabusData(
+          rawData,
+          trainee.trngid
         );
 
-        console.log(
-          "Filtered SubTopics for",
-          trainee.trngid,
-          filteredSubTopics
+        setSyllabusData(completedSyllabus);
+
+        // ✅ dropdown ke liye flat subtopic list
+        const subTopicOptions = completedSyllabus.flatMap(syllabus =>
+          syllabus.subTopics.map(subTopic => ({
+            value: subTopic.subTopicId,
+            label: `${syllabus.title} - ${subTopic.stepNumber}. ${subTopic.name}`,
+            title: syllabus.title
+          }))
         );
 
-        setCompletedSubTopics(filteredSubTopics);
-
-      } catch (err) {
-        console.error("Error fetching completed subtopics", err);
+        setCompletedSubTopics(subTopicOptions);
+      } catch (error) {
+        console.error("Error fetching completed syllabus", error);
+        setSyllabusData([]);
         setCompletedSubTopics([]);
       }
     };
 
     loadData();
   }, [trainee?.trngid]);
+
+  const syllabusOptions = [
+    { value: "ALL", label: "All Syllabus" },
+    ...syllabusData.map(s => ({
+      value: s.title,
+      label: s.title
+    }))
+  ];
+
+  const filteredSubTopicOptions = (() => {
+    if (
+      selectedSyllabus.length === 0 ||
+      selectedSyllabus.includes("ALL")
+    ) {
+      return [
+        { value: "ALL_SUBTOPICS", label: "All Subtopics" },
+        ...completedSubTopics
+      ];
+    }
+
+    return [
+      { value: "ALL_SUBTOPICS", label: "All Subtopics" },
+      ...completedSubTopics.filter(sub =>
+        selectedSyllabus.includes(sub.title)
+      )
+    ];
+  })();
+
+  const handleSyllabusChange = values => {
+    let selected = Array.isArray(values) ? values : [values];
+
+    if (selected.includes("ALL")) {
+      selected = syllabusOptions
+        .filter(opt => opt.value !== "ALL")
+        .map(opt => opt.value);
+    }
+
+    setSelectedSyllabus(selected);
+    //handleInputChange("syllabusTitles", selected);
+    setSelectedSubTopics([]);
+    handleInputChange("subTopicIds", []);
+  };
+
+  const handleSubTopicChange = values => {
+    let selected = Array.isArray(values) ? values : [values];
+
+    if (selected.includes("ALL_SUBTOPICS")) {
+      selected = filteredSubTopicOptions
+        .filter(opt => opt.value !== "ALL_SUBTOPICS")
+        .map(opt => opt.value);
+    }
+
+    setSelectedSubTopics(selected);
+    handleInputChange("subTopicIds", selected);
+  };
+
 
   const calculatePercentage = () => {
     const marks = parseFloat(formData?.marks);
@@ -797,17 +924,133 @@ const AssessmentForm = ({
         </div>
 
 
-        <Select
+        {/* <Select
           label="Select Sub Topic"
           required
           options={completedSubTopics}
-          value={formData.subTopicId}
-          onChange={(value) =>
-            handleInputChange('subTopicId', value)
-          }
-
+          value={formData.subTopicIds}
+          // onChange={(value) =>
+          //   handleInputChange('subTopicId', value)
+          // }
+          onChange={(values) =>
+    handleInputChange('subTopicIds', Array.isArray(values) ? values : [values])
+  }
+   multiple 
           searchable
-        />
+        />  */}
+
+        {/* 🔹 TITLE DROPDOWN */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="flex flex-col gap-2">
+            {/* SYLLABUS MULTI SELECT */}
+            <Select
+              label="Syllabus"
+              options={syllabusOptions}
+              value={selectedSyllabus}
+              onChange={handleSyllabusChange}
+              multiple
+              searchable
+            />
+
+            {/* ✅ SELECTED SYLLABUS CHIPS – JUST BELOW */}
+            {selectedSyllabus.length > 0 && (
+              <div className="mt-1">
+                <p className="text-xs font-medium text-muted-foreground mb-1">
+                  Selected Syllabus
+                </p>
+
+                <div className="flex flex-wrap gap-2">
+                  {selectedSyllabus.map(title => (
+                    <span
+                      key={title}
+                      className="px-3 py-1 text-xs rounded-full
+          bg-secondary/10 text-secondary
+          border border-secondary/30"
+                    >
+                      {title}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+          </div>
+
+
+          <div className="space-y-3">
+            {/* 🔹 DROPDOWN */}
+            <Select
+              label="Completed Sub Topics"
+              options={filteredSubTopicOptions}
+              value={selectedSubTopics}
+              onChange={handleSubTopicChange}
+              multiple
+              searchable
+            />
+
+
+
+            {/* 🔹 SELECTED SUBTOPICS DISPLAY */}
+            {selectedSubTopics.length > 0 && (
+              <div>
+                <p className="text-sm font-medium text-foreground mb-1">
+                  Selected Sub Topics:
+                </p>
+
+                <div className="flex flex-wrap gap-2">
+                  {selectedSubTopics.map(id => {
+                    const sub = completedSubTopics.find(s => s.value === id);
+                    if (!sub) return null;
+
+                    return (
+                      <span
+                        key={id}
+                        className="px-3 py-1 text-xs rounded-full 
+                         bg-primary/10 text-primary 
+                         border border-primary/30"
+                      >
+                        {sub.label}
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+
+        </div>
+
+
+        <div>
+          <label className="block text-sm font-medium text-foreground mb-2">
+            Interview Completed?
+          </label>
+          <div className="flex items-center space-x-6">
+            <label className="flex items-center space-x-2">
+              <input
+                type="radio"
+                name="interviewDone"
+                checked={formData.interviewDone === true}
+                onChange={() => handleInputChange("interviewDone", true)}
+                className="form-radio"
+                disabled
+              />
+              <span>Yes</span>
+            </label>
+
+            <label className="flex items-center space-x-2">
+              <input
+                type="radio"
+                name="interviewDone"
+                checked={formData.interviewDone === false}
+                onChange={() => handleInputChange("interviewDone", false)}
+                className="form-radio"
+                disabled
+              />
+              <span>No</span>
+            </label>
+          </div>
+        </div>
 
 
         {/* Remarks Section */}
@@ -861,6 +1104,26 @@ const AssessmentForm = ({
               onChange={(e) => handleInputChange('recommendations', e?.target?.value)}
             />
           </div>
+
+
+          {/* Conditional Review Notes
+          {formData.interviewDone === "yes" && (
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-2">
+                Interview Review    
+              </label>
+              <textarea
+                rows={3}
+                className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+                placeholder="Enter review notes..."
+                value={formData.reviewNotes}
+                onChange={(e) => handleInputChange("reviewNotes", e.target.value)}
+              />
+              {errors.reviewNotes && (
+                <p className="text-error text-sm">{errors.reviewNotes}</p>
+              )}
+            </div>
+          )} */}
         </div>
 
         {/* Action Buttons */}
@@ -875,7 +1138,7 @@ const AssessmentForm = ({
           >
             Save Assessment
           </Button>
-          <Button
+          {/* <Button
             variant="outline"
             onClick={() => handleSubmit(true)}
             iconName="FileText"
@@ -883,7 +1146,7 @@ const AssessmentForm = ({
             className="flex-1 sm:flex-none"
           >
             Save as Draft
-          </Button>
+          </Button> */}
           <Button
             variant="ghost"
             onClick={handleCancel}

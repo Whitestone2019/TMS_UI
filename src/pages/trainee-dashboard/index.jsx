@@ -252,7 +252,9 @@ const TraineeDashboard = () => {
   const handleLogout = () => {
     // Clear session data
     localStorage.removeItem('authToken');
-    navigate('/login');
+     
+    sessionStorage.clear();
+    navigate('/');
   };
 
   const handleSessionExpired = () => {
@@ -275,6 +277,7 @@ const TraineeDashboard = () => {
             sub?.stepProgress?.some(p => p.complete === true && p.checker === true)
           );
 
+ 
           // ✔ previous step completed
           const prevCompleted =
             index === 0
@@ -294,7 +297,16 @@ const TraineeDashboard = () => {
           };
         });
 
+        console.log("Formatted steps status:", formattedSteps);
+
+
         setStepsStatus(formattedSteps);
+        const totalSteps = stepsStatus.length;
+  const completedSteps = stepsStatus.filter(s => s.completed).length;
+
+          const progressPercentage =
+    totalSteps > 0 ? (completedSteps / totalSteps) * 100 : 0;
+          setOverall(progressPercentage.toFixed(0));
         setLoading(false);
       } catch (err) {
         console.error(err);
@@ -420,13 +432,13 @@ const TraineeDashboard = () => {
             {/* Right Column - Sidebar */}
             <div className="space-y-8">
               {/* Quick Actions */}
-              <QuickActions />
+              {/* <QuickActions /> */}
 
               {/* Interview Schedule */}
               <InterviewSchedule interviews={interviews} />
 
               {/* Progress Summary Card */}
-              {/* <div className="bg-card rounded-lg border border-border p-6">
+              <div className="bg-card rounded-lg border border-border p-6">
                 <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center">
                   <Icon name="Target" size={20} className="mr-2 text-primary" />
                   Progress Summary
@@ -434,11 +446,11 @@ const TraineeDashboard = () => {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">Steps Completed</span>
-                    <span className="font-medium text-foreground">{completedSteps}/8</span>
+                    <span className="font-medium text-foreground">{stepsStatus.filter(item => item.locked === false).length-1}/{stepsStatus.length}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">Current Step</span>
-                    <span className="font-medium text-foreground">Step {currentStep}</span>
+                    <span className="font-medium text-foreground">Step {stepsStatus.filter(item => item.completed === false)[0]?.title}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">Overall Progress</span>
@@ -453,13 +465,13 @@ const TraineeDashboard = () => {
                       iconPosition="left"
                       iconSize={14}
                       fullWidth
-                      onClick={() => navigate('/progress-reports')}
+                      onClick={() => navigate('/syllabus-content-viewer')}
                     >
-                      View Detailed Reports
+                      View Detailed Content
                     </Button>
                   </div>
                 </div>
-              </div> */}
+              </div>
 
               {/* Help & Support Card */}
               {/* <div className="bg-card rounded-lg border border-border p-6">

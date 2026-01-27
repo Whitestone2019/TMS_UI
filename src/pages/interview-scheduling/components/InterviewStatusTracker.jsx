@@ -4,16 +4,105 @@ import Button from '../../../components/ui/Button';
 import Select from '../../../components/ui/Select';
 import Input from '../../../components/ui/Input';
 
-const InterviewStatusTracker = ({ 
-  interviews, 
-  onStatusUpdate, 
+
+const InterviewStatusTracker = ({
+  interviews,
+  onStatusUpdate,
   onViewDetails,
+  onComplete,
   onReschedule,
-  className = '' 
+  className = ''
 }) => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('date');
+
+
+  console.log('Interviews:', interviews);
+
+  // const data = interviews;
+
+  // const transformedSchedules = Object.values(interviews).map(item => {
+  //   return {
+  //     id: item?.id,
+  //     scheduleId: item.interviewSchedule?.scheduleId,
+  //     traineeName: item.user?.firstname || "Trainee",
+  //     interviewerName: item.interviewSchedule?.trainer?.name || "N/A",
+  //     scheduledDate: item.interviewSchedule?.date,
+  //     time: item.interviewSchedule?.time,
+  //     duration: item.interviewSchedule?.duration,
+  //     type: item.interviewSchedule?.interviewType,
+  //     location: item.interviewSchedule?.location,
+  //     status: item?.rsvpStatus?.trim().toLowerCase() || "",
+  //     notes: item.interviewSchedule?.notes || ""
+  //   };
+  // });
+
+  // interviews = transformedSchedules;
+
+
+  const data = interviews || [];
+
+  const grouped = {};
+
+  data.forEach(item => {
+    const scheduleId = item?.interviewSchedule?.scheduleId;
+    if (!scheduleId) return;
+
+    if (!grouped[scheduleId]) {
+      grouped[scheduleId] = {
+        id: scheduleId,
+        scheduleId,
+        interviewSchedule: item.interviewSchedule,
+        trainees: [],
+        status: item?.rsvpStatus?.trim().toLowerCase() || "",
+      };
+    }
+
+    if (item?.user) {
+      grouped[scheduleId].trainees.push({
+        firstname: item.user?.firstname,
+        lastname: item.user?.lastname,
+        status: item?.rsvpStatus?.trim().toLowerCase() || 'pending',
+        trngid: item.user?.trngid
+      });
+    }
+
+  });
+
+  /* =====================================================
+     🔹 FINAL TRANSFORM (UI SAFE)
+  ===================================================== */
+  const transformedSchedules = Object.values(grouped).map(group => {
+    const trainees = group.trainees.filter(Boolean);
+
+    return {
+      id: group.scheduleId,
+      scheduleId: group.scheduleId,
+      traineeName: trainees
+        .map(t =>
+          `${t?.firstname || "Trainee"} ${t?.lastname || ""}`
+        )
+        .join(", "),
+      trainees,
+      interviewerName: group.interviewSchedule?.trainer?.name || "N/A",
+      scheduledDate: group.interviewSchedule?.date,
+      time: group.interviewSchedule?.time,
+      duration: group.interviewSchedule?.duration,
+      type: group.interviewSchedule?.interviewType,
+      location: group.interviewSchedule?.location,
+      notes: group.interviewSchedule?.notes || "",
+      status: group.status,
+
+      // 👇 IMPORTANT: keeps all users for reschedule
+      rawItems: data.filter(
+        i => i?.interviewSchedule?.scheduleId === group.scheduleId
+      )
+    };
+  });
+
+  interviews = transformedSchedules;
+
 
   const statusOptions = [
     { value: 'all', label: 'All Status' },
@@ -69,17 +158,18 @@ const InterviewStatusTracker = ({
         label: 'Tentative'
       }
     };
-    return statusMap?.[status] || statusMap?.pending;
+    return statusMap?.[status];
   };
 
   const filteredAndSortedInterviews = React.useMemo(() => {
     let filtered = interviews?.filter(interview => {
       const matchesStatus = statusFilter === 'all' || interview?.status === statusFilter;
-      const matchesSearch = 
+
+      const matchesSearch =
         interview?.traineeName?.toLowerCase()?.includes(searchTerm?.toLowerCase()) ||
         interview?.interviewerName?.toLowerCase()?.includes(searchTerm?.toLowerCase()) ||
         interview?.type?.toLowerCase()?.includes(searchTerm?.toLowerCase());
-      
+
       return matchesStatus && matchesSearch;
     });
 
@@ -104,18 +194,32 @@ const InterviewStatusTracker = ({
 
   const getStatusActions = (interview) => {
     const actions = [];
-    
-    switch (interview?.status) {
+     const anyAccepted = interview?.trainees?.length > 1 && interview?.trainees?.some(t => t.status === 'accepted');
+
+      if (anyAccepted) {
+    // If any trainee accepted, show Complete + Reschedule + Cancel
+    actions.push(
+      { label: 'Complete', action: 'complete', variant: 'default', icon: 'CheckCircle' },
+      { label: 'Reschedule', action: 'reschedule', variant: 'default', icon: 'Calendar' },
+      { label: 'Cancel', action: 'cancel', variant: 'outline', icon: 'X' }
+    );
+  } else {
+
+    switch (interview?.status.toLowerCase()) {
       case 'pending':
+      case 'tentative':
+      case 'declined':
         actions?.push(
-          { label: 'Confirm', action: 'confirm', variant: 'default', icon: 'Check' },
-          { label: 'Cancel', action: 'cancel', variant: 'outline', icon: 'X' }
+          { label: 'Reschedule', action: 'reschedule', variant: 'default', icon: 'Calendar' },
+          { label: 'Cancel', action: 'cancel', variant: 'outline', icon: 'X' },
+          
+          // { label: 'View Feedback', action: 'feedback', variant: 'outline', icon: 'MessageSquare' }
         );
         break;
-      case 'confirmed':
+      case 'accepted':
         actions?.push(
           { label: 'Complete', action: 'complete', variant: 'default', icon: 'CheckCircle' },
-          { label: 'Reschedule', action: 'reschedule', variant: 'outline', icon: 'Calendar' }
+          { label: 'Cancel', action: 'cancel', variant: 'outline', icon: 'X' }
         );
         break;
       case 'completed':
@@ -129,19 +233,63 @@ const InterviewStatusTracker = ({
         );
         break;
     }
-    
+}
     return actions;
+  
   };
 
   const handleActionClick = (interview, action) => {
+
+    
     switch (action) {
-      case 'confirm': case'cancel': case'complete':
+      
+      case 'reschedule':
+        //Single item fetch attempt
+        //         const selected = data.find(item => {
+        //   console.log(
+        //     'Comparing:',
+        //     item?.interviewSchedule?.scheduleId,
+        //     interview?.interviewSchedule?.scheduleId
+        //   );
+
+        //   return String(item?.interviewSchedule?.scheduleId) ===
+        //          String(interview?.interviewSchedule?.scheduleId);
+        // });
+
+        //Multiple item fetch attempt
+        //         const selected = data.filter(item =>
+        //   String(item?.interviewSchedule?.scheduleId) ===
+        //   String(interview?.interviewSchedule?.scheduleId)
+        // );
+
+        console.log('Rescheduling Interview ID:', interview?.interviewSchedule?.scheduleId);
+        const selected = data.filter(
+
+          item => {
+            console.log('Comparing:', item.interviewSchedule?.scheduleId, interview?.scheduleId);
+            return item.interviewSchedule?.scheduleId === interview?.scheduleId
+          }
+        );
+        if (!selected) {
+          console.warn('No matching interview found for reschedule');
+          return;
+        }
+        onReschedule(selected);
+        // console.log('Rescheduling Interview ID:', selected);
+        break;
+      
+        case 'cancel':
         onStatusUpdate(interview?.id, action);
         break;
-      case 'reschedule':
-        onReschedule(interview);
+
+      case 'complete':
+        console.log(`Action: ${action} for Interview ID: ${interview}`);
+        // onComplete(interview?.scheduleId, action);
+        onStatusUpdate(interview, action);
+        // console.log('Completing Interview ID:', filteredAndSortedInterviews);
         break;
-      case 'feedback': onViewDetails(interview?.id,'feedback');
+      case 'feedback': 
+        onViewDetails(interview?.id, 'feedback');
         break;
       default:
         onViewDetails(interview?.id);
@@ -158,10 +306,10 @@ const InterviewStatusTracker = ({
     const now = new Date();
     const diffMs = interviewDateTime - now;
     const diffHours = Math.ceil(diffMs / (1000 * 60 * 60));
-    
+
     if (diffHours < 0) return 'Past due';
     if (diffHours < 24) return `In ${diffHours} hour${diffHours > 1 ? 's' : ''}`;
-    
+
     const diffDays = Math.ceil(diffHours / 24);
     return `In ${diffDays} day${diffDays > 1 ? 's' : ''}`;
   };
@@ -187,14 +335,14 @@ const InterviewStatusTracker = ({
             value={searchTerm}
             onChange={(e) => setSearchTerm(e?.target?.value)}
           />
-          
+
           <Select
             options={statusOptions}
             value={statusFilter}
             onChange={setStatusFilter}
             placeholder="Filter by status"
           />
-          
+
           <Select
             options={sortOptions}
             value={sortBy}
@@ -215,7 +363,7 @@ const InterviewStatusTracker = ({
             {filteredAndSortedInterviews?.map(interview => {
               const statusConfig = getStatusConfig(interview?.status);
               const actions = getStatusActions(interview);
-              
+              // console.log('Interview Actions:', interview);
               return (
                 <div key={interview?.id} className="p-4 hover:bg-muted/50 transition-colors duration-150">
                   <div className="flex items-start justify-between">
@@ -225,7 +373,7 @@ const InterviewStatusTracker = ({
                         <div className={`w-8 h-8 rounded-full ${statusConfig?.bgColor} flex items-center justify-center`}>
                           <Icon name={statusConfig?.icon} size={16} className={statusConfig?.color} />
                         </div>
-                        
+
                         <div className="flex-1 min-w-0">
                           <h4 className="text-sm font-medium text-foreground truncate">
                             {interview?.traineeName} - {interview?.type}
@@ -234,10 +382,24 @@ const InterviewStatusTracker = ({
                             with {interview?.interviewerName}
                           </p>
                         </div>
-                        
+
+                        <div className="flex flex-col gap-1">
+                          {interview?.trainees?.map((t, idx) => {
+                            const tStatusConfig = getStatusConfig(t.status);
+                            return (
+                              <span
+                                key={idx}
+                                className={`px-2 py-1 text-xs font-medium rounded-full ${tStatusConfig?.bgColor} ${tStatusConfig?.color}`}
+                              >
+                                <p> {t.firstname || "Trainee"} ({t.status}) {interview?.scheduleId}</p>
+                              </span>
+                            );
+                          })}
+                        </div>
+                        {/*                   
                         <span className={`px-2 py-1 text-xs font-medium rounded-full ${statusConfig?.bgColor} ${statusConfig?.color}`}>
-                          {statusConfig?.label}
-                        </span>
+                          {statusConfig?.label} {interview?.scheduleId}
+                        </span> */}
                       </div>
 
                       {/* Interview Details */}
@@ -256,7 +418,7 @@ const InterviewStatusTracker = ({
                             <span>{interview?.location || 'Virtual'}</span>
                           </span>
                         </div>
-                        
+
                         {interview?.status !== 'completed' && interview?.status !== 'cancelled' && (
                           <div className="text-xs text-primary font-medium">
                             {getTimeUntilInterview(interview?.scheduledDate, interview?.time)}
@@ -280,7 +442,7 @@ const InterviewStatusTracker = ({
                           {action?.label}
                         </Button>
                       ))}
-                      
+
                       <Button
                         variant="ghost"
                         size="sm"
@@ -311,7 +473,7 @@ const InterviewStatusTracker = ({
           {statusOptions?.slice(1)?.map(status => {
             const count = interviews?.filter(i => i?.status === status?.value)?.length;
             const config = getStatusConfig(status?.value);
-            
+
             return (
               <div key={status?.value} className="flex flex-col items-center space-y-1">
                 <div className={`w-8 h-8 rounded-full ${config?.bgColor} flex items-center justify-center`}>

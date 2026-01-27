@@ -27,6 +27,8 @@ export const login = async (credentials) => {
 };
 
 
+
+
 export const sendOtp = async (trngId) => {
   try {
     const response = await axios.post(`${API_URL}/users/send-otp`, { trngId });
@@ -80,7 +82,7 @@ export const fetchAllTrainees = async () => {
       "lastname": "A",
       "emailid": "wwm@gmail.com",
       "phonenumber": "987635616",
-"roleId": "R001",
+      "roleId": "R001",
     },
     {
       "userid": "2019WS1155",
@@ -91,7 +93,7 @@ export const fetchAllTrainees = async () => {
       "lastname": null,
       "emailid": "aswathi.ravindran@whitestones.co.in",
       "phonenumber": "09787255964",
-"roleId": "R001",
+      "roleId": "R001",
     },
     {
       "userid": "2019WS1122",
@@ -102,7 +104,7 @@ export const fetchAllTrainees = async () => {
       "lastname": "Murugasen",
       "emailid": "arunmaran.murugesan@whitestones.co.in",
       "phonenumber": "9345287327",
-
+      "roleId": "R001",
     },
     {
       "userid": "2019WS10018",
@@ -113,7 +115,7 @@ export const fetchAllTrainees = async () => {
       "lastname": "A",
       "emailid": "abs@gmail.bom",
       "phonenumber": "02345678444",
-
+      "roleId": "R001",
     },
     {
       "userid": "2019WS10009",
@@ -124,6 +126,7 @@ export const fetchAllTrainees = async () => {
       "lastname": "S",
       "emailid": "anbarasan.sekar@whitestones.in",
       "phonenumber": "9788313457",
+      "roleId": "R001",
     }
   ]
   try {
@@ -148,6 +151,19 @@ export const createAssessment = async (empId, data) => {
     return response.data;
   } catch (error) {
     console.error("Error creating assessment:", error);
+    throw error;
+  }
+};
+
+export const updateAssessment = async (assessmentId, data) => {
+  try {
+    const response = await axios.put(
+      `${API_URL}/assessments/update/${assessmentId}`,
+      data
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error updating assessment:", error);
     throw error;
   }
 };
@@ -509,4 +525,66 @@ const fetchSyllabusProgress = async (empId) => {
   }
 
   return await res.json(); // ✅ guaranteed JSON
+};
+
+
+export const fetchTraineeById = async (traineeId) => {
+  const res = await fetch(
+    `http://localhost:8080/api/assessments/trainee/${traineeId}`
+  );
+
+  if (!res.ok) {
+    const text = await res.text();
+    console.error("Backend error:", text);
+    throw new Error("Failed to fetch trainee details");
+  }
+
+  return await res.json(); // ✅ guaranteed JSON
+};
+
+
+
+export const updateInterviewSchedule = async (scheduleId, data) => {
+  try {
+    const res = await axios.put(`${API_URL}/schedule/update/${scheduleId}`, data);
+    return res.data;
+  } catch (error) {
+    console.error("Error updating schedule:", error);
+    throw error;
+  }
+};
+
+export const deleteInterviewSchedule = async (scheduleId) => {
+  try {
+    const res = await axios.delete(`${API_URL}/schedule/delete/${scheduleId}`);
+    return res.data;
+  } catch (error) {
+    console.error("Error deleting schedule:", error);
+    throw error;
+  }
+};
+
+export const fetchTraineesByManagerId = async (managerId) => {
+  try {
+    const response = await axios.get(
+      `${API_URL}/users/manager/${managerId}`
+    );
+    return response.data; // Returns ApiResponse object
+  } catch (error) {
+    console.error("Error fetching trainees by manager:", error);
+    throw error;
+  }
+};
+
+// 2. Get Trainee Summary for a Manager
+export const fetchTraineeSummaryByManager = async (managerUserId) => {
+  try {
+    const response = await axios.get(
+      `${API_URL}/users/${managerUserId}/trainee-summary`
+    );
+    return response.data; // Returns ApiResponse object
+  } catch (error) {
+    console.error("Error fetching trainee summary:", error);
+    throw error;
+  }
 };

@@ -192,8 +192,8 @@ const FilterToolbar = ({
           /> */}
           <Select
             label="Syllabus Step"
-            options={syllabusOptions}
-            value={filters.syllabusStep}   // ✅ correct
+            options={[...syllabusOptions].sort((a, b) => a.stepNo - b.stepNo)} // ascending
+            value={filters.syllabusStep}
             onChange={(value) => handleInputChange('syllabusStep', value)}
           />
 

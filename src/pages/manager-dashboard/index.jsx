@@ -524,12 +524,13 @@ import TraineeMetricsPanel from './components/TraineeMetricsPanel';
 import FilterToolbar from './components/FilterToolbar';
 import TraineeDataTable from './components/TraineeDataTable';
 import AssessmentEntryModal from './components/AssessmentEntryModal';
-import { fetchAllTraineeSummary, fetchCompletedSubTopics } from '../../api_service';
+import { fetchAllTraineeSummary, fetchCompletedSubTopics, fetchTraineeSummaryByManager } from '../../api_service';
 const ManagerDashboard = () => {
   const navigate = useNavigate();
   const [selectedTrainees, setSelectedTrainees] = useState([]);
   const [showAssessmentModal, setShowAssessmentModal] = useState(false);
   const [selectedTraineeForAssessment, setSelectedTraineeForAssessment] = useState(null);
+  const [traineeInfo, setTraineeInfo] = useState(null);
 
 
   const [syllabusOptions, setSyllabusOptions] = useState([
@@ -644,20 +645,51 @@ const ManagerDashboard = () => {
   // }
 
   // Calculate metrics
+  // const fetchTrainees = async () => {
+  //   try {
+  //     const response = await fetchAllTraineeSummary();
+
+  //     const traineeList = Array.isArray(response?.data)
+  //       ? response.data
+  //       : Array.isArray(response?.data?.trainees)
+  //         ? response.data.trainees
+  //         : [];
+
+  //     setTrainees(traineeList);
+  //     setFilteredTrainees(traineeList);
+  //   } catch (error) {
+  //     console.error('Error fetching trainee summary:', error);
+  //     setTrainees([]);
+  //     setFilteredTrainees([]);
+  //   }
+  // };
+
+
   const fetchTrainees = async () => {
     try {
-      const response = await fetchAllTraineeSummary();
+      const managerUserId = sessionStorage.getItem("userId"); // adjust if different
 
+      if (!managerUserId) {
+        console.warn("Manager UserId not found");
+        return;
+      }
+
+      const response = await fetchTraineeSummaryByManager(managerUserId);
+
+      // API returns: ApiResponse → expected { data: [...] }
       const traineeList = Array.isArray(response?.data)
         ? response.data
-        : Array.isArray(response?.data?.trainees)
-          ? response.data.trainees
+        : Array.isArray(response?.trainees)
+          ? response.trainees
           : [];
+
+      console.log("Fetched trainee summary:", traineeList);
 
       setTrainees(traineeList);
       setFilteredTrainees(traineeList);
-    } catch (error) {
-      console.error('Error fetching trainee summary:', error);
+
+    } catch (err) {
+      console.error("Error fetching trainee summary:", err);
       setTrainees([]);
       setFilteredTrainees([]);
     }
@@ -665,25 +697,29 @@ const ManagerDashboard = () => {
 
 
   const fetchAllSyllabus = async () => {
-    const res = await fetchCompletedSubTopics();
-    const list = res?.data || [];
+    try {
+      const res = await fetchCompletedSubTopics();
+      const list = res?.data || [];
 
-    const options = [
-      { value: 'all', label: 'All Steps', stepNo: 0 }
-    ];
+      const options = [
+        { value: 'all', label: 'All Steps', stepNo: 0 }
+      ];
 
-    list.forEach((item, index) => {
-      options.push({
-        value: item.syllabusId,           // backend value
-        stepNo: index + 1,                 // static step
-        label: `Step ${index + 1} : ${item.title}`
+      list.forEach((item, index) => {
+        options.push({
+          value: item.syllabusId,           // backend value
+          stepNo: index + 1,                 // static step
+          label: `Step ${index + 1} : ${item.title}`
+        });
       });
-    });
 
-    // 🔹 sort by stepNo
-    options.sort((a, b) => a.stepNo - b.stepNo);
+      // 🔹 sort by stepNo
+      options.sort((a, b) => a.stepNo - b.stepNo);
 
-    setSyllabusOptions(options);
+      setSyllabusOptions(options);
+    } catch (e) {
+      console.error('Error fetching syllabus', e);
+    }
   };
 
 
@@ -725,9 +761,19 @@ const ManagerDashboard = () => {
       });
     }
 
+    const getStatus = (p) => {
+      if (p >= 85) return "completed";
+      if (p > 0) return "in-progress";
+      return "not-started";
+    };
+
+
     if (filters?.completionStatus !== 'all') {
-      filtered = filtered?.filter(trainee => trainee?.status === filters?.completionStatus);
+      filtered = filtered?.filter(
+        trainee => getStatus(trainee?.completionPercentage) === filters?.completionStatus
+      );
     }
+
 
     if (filters?.dateFrom) {
       filtered = filtered?.filter(trainee => {
@@ -764,56 +810,106 @@ const ManagerDashboard = () => {
     }
   };
 
+  // const handleSort = (key, direction) => {
+  //   const sortedData = [...filteredTrainees].sort((a, b) => {
+  //     let aValue;
+  //     let bValue;
+
+  //     const getStepNumber = (currentStep) => {
+  //       if (!currentStep || currentStep === 'No Assessment Yet') return 0;
+  //       const match = currentStep.match(/\d+/);
+  //       return match ? Number(match[0]) : 0;
+  //     };
+  //     if (key === 'currentStep') {
+  //       aValue = getStepNumber(a.currentStep);
+  //       bValue = getStepNumber(b.currentStep);
+  //       console.log(
+  //         a.currentStep, getStepNumber(a.currentStep),
+  //         b.currentStep, getStepNumber(b.currentStep)
+  //       );
+
+  //     }
+
+
+
+  //     // ✅ COMPLETION %
+  //     else if (key === 'completion') {
+  //       aValue = Number(a?.completionPercentage || 0);
+  //       bValue = Number(b?.completionPercentage || 0);
+  //     }
+
+  //     // ✅ LAST ASSESSMENT DATE
+  //     else if (key === 'lastAssessment') {
+  //       aValue = new Date(a?.lastAssessmentDate);
+  //       bValue = new Date(b?.lastAssessmentDate);
+  //     }
+
+  //     // ✅ DEFAULT STRING SORT (Name, Email etc.)
+  //     else {
+  //       aValue = (a?.[key] || '').toString().toLowerCase();
+  //       bValue = (b?.[key] || '').toString().toLowerCase();
+  //     }
+
+  //     if (direction === 'asc') {
+  //       return aValue > bValue ? 1 : aValue < bValue ? -1 : 0;
+  //     } else {
+  //       return aValue < bValue ? 1 : aValue > bValue ? -1 : 0;
+  //     }
+  //   });
+
+  //   setFilteredTrainees(sortedData);
+  // };
+
+  // const handleSort = (key, direction) => {
+  //   const sortedData = [...filteredTrainees].sort((a, b) => {
+  //     let aValue, bValue;
+
+
+  //     // Map status to number for correct sorting order
+
+  //     if (key === 'completion') {
+  //       aValue = Number(a.completionPercentage || 0);
+  //       bValue = Number(b.completionPercentage || 0);
+  //     } else if (key === 'lastAssessment') {
+  //       aValue = new Date(a.lastAssessmentDate);
+  //       bValue = new Date(b.lastAssessmentDate);
+  //     } else {
+  //       aValue = (a[key] || '').toString().toLowerCase();
+  //       bValue = (b[key] || '').toString().toLowerCase();
+  //     }
+
+  //     if (direction === 'asc') return aValue - bValue;
+  //     else return bValue - aValue;
+  //   });
+
+  //   setFilteredTrainees(sortedData);
+  // };
+
   const handleSort = (key, direction) => {
-    const sortedData = [...filteredTrainees].sort((a, b) => {
-      let aValue;
-      let bValue;
+    const sorted = [...filteredTrainees]?.sort((a, b) => {
+      let aValue = a?.[key];
+      let bValue = b?.[key];
 
-      const getStepNumber = (currentStep) => {
-        if (!currentStep || currentStep === 'No Assessment Yet') return 0;
-        const match = currentStep.match(/\d+/);
-        return match ? Number(match[0]) : 0;
-      };
-      if (key === 'currentStep') {
-        aValue = getStepNumber(a.currentStep);
-        bValue = getStepNumber(b.currentStep);
-        console.log(
-          a.currentStep, getStepNumber(a.currentStep),
-          b.currentStep, getStepNumber(b.currentStep)
-        );
-
-      }
-
-
-
-      // ✅ COMPLETION %
-      else if (key === 'completion') {
-        aValue = Number(a?.completionPercentage || 0);
-        bValue = Number(b?.completionPercentage || 0);
-      }
-
-      // ✅ LAST ASSESSMENT DATE
-      else if (key === 'lastAssessment') {
-        aValue = new Date(a?.lastAssessmentDate);
-        bValue = new Date(b?.lastAssessmentDate);
-      }
-
-      // ✅ DEFAULT STRING SORT (Name, Email etc.)
-      else {
-        aValue = (a?.[key] || '').toString().toLowerCase();
-        bValue = (b?.[key] || '').toString().toLowerCase();
+      if (key === 'lastAssessmentDate') {
+        aValue = new Date(aValue);
+        bValue = new Date(bValue);
+      } else if (key === 'completion') {
+        aValue = a?.completionPercentage;
+        bValue = b?.completionPercentage;
+      } else if (typeof aValue === 'string') {
+        aValue = aValue?.toLowerCase();
+        bValue = bValue?.toLowerCase();
       }
 
       if (direction === 'asc') {
-        return aValue > bValue ? 1 : aValue < bValue ? -1 : 0;
+        return aValue > bValue ? 1 : -1;
       } else {
-        return aValue < bValue ? 1 : aValue > bValue ? -1 : 0;
+        return aValue < bValue ? 1 : -1;
       }
     });
 
-    setFilteredTrainees(sortedData);
+    setFilteredTrainees(sorted);
   };
-
 
 
   const handleViewProfile = (traineeId) => {
@@ -821,7 +917,9 @@ const ManagerDashboard = () => {
   };
 
   const handleAddAssessment = (traineeId) => {
-    const trainee = trainees?.find(t => t?.id === traineeId);
+    console.log("traineesHHHHH:", traineeId);
+    const trainee = trainees?.find(t => t?.traineeId === traineeId);
+    console.log("Selected Trainee for Assessment:", trainee);
     setSelectedTraineeForAssessment(trainee);
     setShowAssessmentModal(true);
   };
@@ -905,8 +1003,9 @@ const ManagerDashboard = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header
+
+        userName={sessionStorage.getItem("userName") || "User"}
         userRole="manager"
-        userName="Manager Smith"
         onLogout={handleLogout}
       />
       <main className="pt-16">

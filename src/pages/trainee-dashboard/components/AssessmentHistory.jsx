@@ -143,8 +143,8 @@ const AssessmentHistory = ({ className = '', assessments = [] }) => {
         </div>
       </div>
       {/* Assessment List */}
-      <div className="p-6">
-        <div className="space-y-4">
+      <div className="p-6 ">
+        <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
           {assessments?.map((assessment) =>
             <div
               key={assessment?.id}

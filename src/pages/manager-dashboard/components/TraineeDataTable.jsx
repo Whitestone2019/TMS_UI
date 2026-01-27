@@ -13,6 +13,7 @@ const TraineeDataTable = ({
   onScheduleInterview,
   onSort
 }) => {
+  console.log("trainees:", trainees);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
 
   const handleSort = (key) => {
@@ -23,6 +24,36 @@ const TraineeDataTable = ({
     setSortConfig({ key, direction });
     onSort(key, direction);
   };
+  // const sortedTrainees = React.useMemo(() => {
+  //   if (!sortConfig.key) return trainees;
+  //   return [...trainees].sort((a, b) => {
+  //     let valA = a[sortConfig.key];
+  //     let valB = b[sortConfig.key];
+
+  //     // Agar string hai to lowercase karke compare karo
+  //     if (typeof valA === 'string') valA = valA.toLowerCase();
+  //     if (typeof valB === 'string') valB = valB.toLowerCase();
+
+  //     if (valA < valB) return sortConfig.direction === 'asc' ? -1 : 1;
+  //     if (valA > valB) return sortConfig.direction === 'asc' ? 1 : -1;
+  //     return 0;
+  //   });
+  // }, [trainees, sortConfig]);
+
+  const sortedTrainees = React.useMemo(() => {
+    if (!sortConfig.key) return trainees;
+    return [...trainees].sort((a, b) => {
+      let valA = a[sortConfig.key];
+      let valB = b[sortConfig.key];
+
+      if (typeof valA === 'string') valA = valA.toLowerCase();
+      if (typeof valB === 'string') valB = valB.toLowerCase();
+
+      if (valA < valB) return sortConfig.direction === 'asc' ? -1 : 1;
+      if (valA > valB) return sortConfig.direction === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }, [trainees, sortConfig]);
 
   const getSortIcon = (key) => {
     if (sortConfig?.key !== key) {
@@ -33,15 +64,24 @@ const TraineeDataTable = ({
       : <Icon name="ArrowDown" size={16} className="text-foreground" />;
   };
 
-  const getStatusBadge = (status) => {
+  const getStatusBadge = (percentage) => {
     const statusConfig = {
       'not-started': { bg: 'bg-gray-100', text: 'text-gray-700', label: 'Not Started' },
       'in-progress': { bg: 'bg-blue-100', text: 'text-blue-700', label: 'In Progress' },
       'completed': { bg: 'bg-green-100', text: 'text-green-700', label: 'Completed' }
     };
 
-    const config = statusConfig?.[status] || statusConfig?.['not-started'];
+    // const config = statusConfig?.[status] || statusConfig?.['not-started'];
 
+    let config;
+    // console.log("percentage in badge", percentage);
+    if (percentage >= 85) {
+      config = statusConfig['completed'];
+    } else if (percentage > 0 && percentage < 85) {
+      config = statusConfig['in-progress'];
+    } else {
+      config = statusConfig['not-started'];
+    }
     return (
       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${config?.bg} ${config?.text}`}>
         {config?.label}
@@ -49,22 +89,30 @@ const TraineeDataTable = ({
     );
   };
 
-  const getInterviewStatusBadge = (status) => {
+  const getInterviewStatusBadge = (interviewDone) => {
+
     const statusConfig = {
-      'pending': { bg: 'bg-yellow-100', text: 'text-yellow-700', label: 'Pending' },
-      'scheduled': { bg: 'bg-blue-100', text: 'text-blue-700', label: 'Scheduled' },
-      'completed': { bg: 'bg-green-100', text: 'text-green-700', label: 'Completed' },
-      'cancelled': { bg: 'bg-red-100', text: 'text-red-700', label: 'Cancelled' }
+      'pending': { bg: 'bg-yellow-100', text: 'text-yellow-700', label: 'Assessment Score' },
+      'completed': { bg: 'bg-green-100', text: 'text-green-700', label: 'Interview Score' },
+      'error': { bg: 'bg-red-100', text: 'text-red-700', label: 'N/A' }
     };
-
-    const config = statusConfig?.[status] || statusConfig?.['pending'];
+    let config;
+    if (interviewDone === true) {
+      config = statusConfig.completed;
+    } else if (interviewDone === false) {
+      config = statusConfig.pending;
+    } else {
+      config = statusConfig.error;
+    }
 
     return (
-      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${config?.bg} ${config?.text}`}>
+      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-medium ${config?.bg} ${config?.text}`}>
         {config?.label}
       </span>
     );
   };
+
+  console.log("selectedTrainees:", selectedTrainees);
 
   return (
     <div className="bg-card border border-border rounded-lg overflow-hidden">
@@ -93,7 +141,7 @@ const TraineeDataTable = ({
                   onClick={() => handleSort('currentStep')}
                   className="flex items-center space-x-2 text-sm font-medium text-foreground hover:text-primary"
                 >
-                  <span>Current Step</span>
+                  <span>Current Syllabus</span>
                   {getSortIcon('currentStep')}
                 </button>
               </th>
@@ -115,17 +163,18 @@ const TraineeDataTable = ({
                   {getSortIcon('lastAssessment')}
                 </button>
               </th>
-              <th className="px-6 py-4 text-left">Interview Status</th>
+              <th className="px-6 py-4 text-left">Score Status</th>
               <th className="px-6 py-4 text-center">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {trainees?.map((trainee) => (
-              <tr key={trainee?.id} className="hover:bg-muted/30 transition-colors">
+
+            {sortedTrainees.map((trainee) => (
+              <tr key={trainee?.traineeId} className="hover:bg-muted/30 transition-colors">
                 <td className="px-6 py-4">
                   <Checkbox
-                    checked={selectedTrainees?.includes(trainee?.id)}
-                    onChange={(e) => onSelectTrainee(trainee?.id, e?.target?.checked)}
+                    checked={selectedTrainees?.includes(trainee?.traineeId)}
+                    onChange={(e) => onSelectTrainee(trainee?.traineeId, e?.target?.checked)}
                   />
                 </td>
                 <td className="px-6 py-4">
@@ -143,6 +192,11 @@ const TraineeDataTable = ({
                 </td>
                 <td className="px-6 py-4">
                   <div>
+                    {/* <p className="text-sm font-medium text-foreground">
+                      {trainee?.subtopics && trainee.subtopics.length > 0
+                        ? `Step ${trainee.subtopics.length} :${trainee.subtopics[trainee.subtopics.length - 1]} `
+                        : "No Assessment Yet"}</p> */}
+
                     <p className="text-sm font-medium text-foreground">{trainee?.currentStep}</p>
                     <p className="text-xs text-muted-foreground">{trainee?.stepDescription}</p>
                   </div>
@@ -159,7 +213,7 @@ const TraineeDataTable = ({
                       {trainee?.completionPercentage}%
                     </span>
                   </div>
-                  {getStatusBadge(trainee?.status)}
+                  {getStatusBadge(trainee?.completionPercentage)}
                 </td>
                 <td className="px-6 py-4">
                   <div>
@@ -167,7 +221,7 @@ const TraineeDataTable = ({
                     <p className="text-xs text-muted-foreground">Score: {trainee?.lastAssessmentScore}/100</p>
                   </div>
                 </td>
-                <td className="px-6 py-4">
+                <td className="px-6 py-4 text-[10px]">
                   {getInterviewStatusBadge(trainee?.interviewStatus)}
                 </td>
                 <td className="px-6 py-4">
@@ -183,7 +237,7 @@ const TraineeDataTable = ({
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() => onAddAssessment(trainee?.id)}
+                      onClick={() => onAddAssessment(trainee?.traineeId)}
                       iconName="ClipboardCheck"
                       iconSize={16}
                       title="Add Assessment"
@@ -245,7 +299,7 @@ const TraineeDataTable = ({
                   </span>
                 </div>
                 <div className="mt-2">
-                  {getStatusBadge(trainee?.status)}
+                  {getStatusBadge(trainee?.completionPercentage)}
                 </div>
               </div>
 

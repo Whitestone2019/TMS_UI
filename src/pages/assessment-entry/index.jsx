@@ -449,7 +449,7 @@
 
 
 import React, { useState, useEffect, use } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Header from '../../components/ui/Header';
 import NavigationBreadcrumb from '../../components/ui/NavigationBreadcrumb';
 import SessionTimeoutHandler from '../../components/ui/SessionTimeoutHandler';
@@ -459,10 +459,11 @@ import AssessmentHistory from './components/AssessmentHistory';
 import AssessmentDetailsModal from './components/AssessmentDetailsModal';
 import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
-import { fetchAllTrainees, fetchAssessmentsByTrainee } from '../../api_service';
+import { fetchAllTrainees, fetchAssessmentsByTrainee, fetchTraineesByManagerId } from '../../api_service';
 
 const AssessmentEntry = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [selectedTrainee, setSelectedTrainee] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
@@ -600,13 +601,15 @@ const AssessmentEntry = () => {
   //     }
   //   ]
   // };
+  const { interview } = location.state || {};
 
 
   useEffect(() => {
     // Fetch initial data if needed
     const fetchData = async () => {
       try {
-        const trainees = await fetchAllTrainees();
+        const managerId = sessionStorage.getItem("userId");
+        const trainees = await fetchTraineesByManagerId(managerId);
         setTrainees(trainees.data);
         console.log('Fetched trainees:', trainees.data);
 
@@ -617,23 +620,29 @@ const AssessmentEntry = () => {
     fetchData();
   }, []);
 
-
+  useEffect(() => {
+    console.log('Interview data from navigation state:', interview);
+    if (interview && interview.trainees) {
+      handleTraineeSelect(interview.trainees[0]);
+    }
+  }, [interview]);
 
   const handleTraineeSelect = async (trainee) => {
     console.log('Selected trainee:', trainee);
-    try {
-      const trainees = await fetchAllTrainees();
-      setTrainees(trainees.data);
-      console.log('Fetched trainees:', trainees.data);
+    // try {
+    //   const trainees = await fetchAllTrainees();
+    //   setTrainees(trainees.data);
+    //   console.log('Fetched trainees:', trainees.data);
 
-    } catch (error) {
-      console.error("Error fetching trainees:", error);
-    }
+    // } catch (error) {
+    //   console.error("Error fetching trainees:", error);
+    // }
 
     setSelectedTrainee(trainee);
     try {
       const data = await getTraineeAssessments(trainee?.trngid);
       setHistoryAssessments(data);
+      console.log("Assessment data set:", data);
     } catch (error) {
       console.error("Error fetching assessments:", error);
       setHistoryAssessments([]);
@@ -716,9 +725,9 @@ const AssessmentEntry = () => {
         strengths: a.strengths ?? '',
         improvements: a.improvements ?? '',
         recommendations: a.recommendations ?? '',
-        isDraft: a.currentStep !== 4,
+
         submittedAt: a.submittedAt,
-        currentStep: a.currentStep,
+        currentStep: a.subTopics,
         user: a.user
       }));
       console.log('Normalized assessments:', normalized);
@@ -732,8 +741,9 @@ const AssessmentEntry = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header
+
+        userName={sessionStorage.getItem("userName") || "User"}
         userRole="manager"
-        userName="Manager Smith"
         onLogout={handleLogout}
       />
       <SessionTimeoutHandler
@@ -794,6 +804,7 @@ const AssessmentEntry = () => {
               <AssessmentForm
                 trainee={selectedTrainee}
                 // onSave={handleSaveAssessment}
+                assessmentFormData={interview || null}
                 onSaveDraft={handleSaveDraft}
                 onCancel={handleCancel}
                 isLoading={isLoading}
