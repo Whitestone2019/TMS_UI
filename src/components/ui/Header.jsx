@@ -198,7 +198,7 @@ const Header = ({ userRole = 'trainee', userName = 'User', onLogout }) => {
       {/* Mobile Navigation Menu */}
       {isMobileMenuOpen && (
         <div className="lg:hidden bg-surface border-t border-border">
-          <nav className="px-6 py-4 space-y-2">
+          <nav className="px-6 py-4 space-y-2 bg-gray-100 rounded-xl m-2">
             {navigationItems?.filter(item => item?.roles?.includes(userRole))?.map((item) => (
               <Button
                 key={item?.path}
@@ -220,7 +220,7 @@ const Header = ({ userRole = 'trainee', userName = 'User', onLogout }) => {
       {/* Overlay for mobile menu */}
       {isMobileMenuOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
+          className="fixed z-10 bg-black bg-opacity-50 z-30 lg:hidden"
           onClick={() => setIsMobileMenuOpen(false)}
         />
       )}
