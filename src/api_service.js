@@ -333,7 +333,7 @@ export const updateStepProgress = async (empId, stepId, progress, durationTime) 
 };
 
 export const getOverallProgressTime = async (empId) => {
-  const response = await axios.get(`http://localhost:8080/api/progress/overall-time?empId=${empId}`);
+  const response = await axios.get(`${API_URL}/progress/overall-time?empId=${empId}`);
   return response.data.overallTimeSeconds;
 };
 
@@ -515,7 +515,7 @@ export const fetchSyllabusProgressByEmpId = async (empid) => {
 
 const fetchSyllabusProgress = async (empId) => {
   const res = await fetch(
-    `http://localhost:8080/api/syllabus/all-progress/${empId}`
+    `${API_URL}/syllabus/all-progress/${empId}`
   );
 
   if (!res.ok) {
@@ -530,7 +530,7 @@ const fetchSyllabusProgress = async (empId) => {
 
 export const fetchTraineeById = async (traineeId) => {
   const res = await fetch(
-    `http://localhost:8080/api/assessments/trainee/${traineeId}`
+    `${API_URL}/assessments/trainee/${traineeId}`
   );
 
   if (!res.ok) {
