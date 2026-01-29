@@ -234,6 +234,7 @@ const UploadSyllabus = ({ onCancel }) => {
             durationInDays: item.durationInDays,
             subTopics: (item.subTopics && item.subTopics.length > 0)
                 ? item.subTopics.map(sub => ({
+                    id: sub.id,
                     name: sub.name,
                     description: sub.description,
                     file: sub.filePath || null,
