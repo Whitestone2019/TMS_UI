@@ -5,6 +5,7 @@ import NavigationBreadcrumb from "../../../components/ui/NavigationBreadcrumb";
 import Button from "../../../components/ui/Button";
 import Input from "../../../components/ui/Input";
 import Icon from "../../../components/AppIcon";
+import Select from "../../../components/ui/Select";
 import { uploadSyllabusAPI, getAllSyllabusAPI, updateSyllabusAPI, getAllTrainers } from "../../../api_service";
 
 const UploadSyllabus = ({ onCancel }) => {
@@ -71,10 +72,19 @@ const UploadSyllabus = ({ onCancel }) => {
     };
 
     const deleteSubTopic = (index) => {
+        
+    if (!window.confirm("This will permanently delete this subtopic. Continue?")) return;
         const updated = [...formData.subTopics];
         updated.splice(index, 1);
         setFormData((prev) => ({ ...prev, subTopics: updated }));
     };
+
+    const interviewerOptions = Array.isArray(trainerList)
+        ? (trainerList).map((t) => ({
+            value: t.trainerId,
+            label: `${t.name}${t.title ? " - " + t.title : ""}`,
+        }))
+        : [];
 
     const validateForm = () => {
         const newErrors = {};
@@ -91,6 +101,7 @@ const UploadSyllabus = ({ onCancel }) => {
         return Object.keys(newErrors).length === 0;
     };
 
+<<<<<<< HEAD
     const handleLogout = () => {
         navigate('/');
     };
@@ -149,6 +160,8 @@ const UploadSyllabus = ({ onCancel }) => {
     //         setLoading(false);
     //     }
     // };
+=======
+>>>>>>> 3e511cb31298719158ddcbdbe58177f24ef64382
 
 
     const handleSubmit = async () => {
@@ -163,16 +176,16 @@ const UploadSyllabus = ({ onCancel }) => {
                 durationInDays: Number(formData.durationInDays),
                 //subTopics: formData.subTopics.map(st => ({ name: st.name, description: st.description }))
                 subTopics: formData.subTopics.map(st => ({
-                    id: st.id || null,
+                    id: st.id,
                     name: st.name,
                     description: st.description,
                     filePath: typeof st.file === "string" ? st.file : null,
-                    trainer: {
-                        trainerId: Number(st.trainerId)
-                    }
+                    trainer: st.trainerId ? { trainerId: st.trainerId } : null
                 }))
 
             };
+
+            console.log("Prepared Syllabus JSON:", syllabusJson);
 
             // const fd = new FormData();
             // fd.append("syllabus", new Blob([JSON.stringify(syllabusJson)], { type: "application/json" }));
@@ -199,9 +212,6 @@ const UploadSyllabus = ({ onCancel }) => {
                 }
             });
 
-
-
-
             // Send to backend
             const res = editingId
                 ? await updateSyllabusAPI(editingId, fd)
@@ -225,6 +235,7 @@ const UploadSyllabus = ({ onCancel }) => {
         }
     };
 
+    console.log("Trainer List:", trainerList);
     const editSyllabus = (item) => {
         setEditingId(item.id);
 
@@ -234,6 +245,7 @@ const UploadSyllabus = ({ onCancel }) => {
             durationInDays: item.durationInDays,
             subTopics: (item.subTopics && item.subTopics.length > 0)
                 ? item.subTopics.map(sub => ({
+                    id: sub.id,
                     name: sub.name,
                     description: sub.description,
                     file: sub.filePath || null,
@@ -241,6 +253,7 @@ const UploadSyllabus = ({ onCancel }) => {
 
                     // store the existing file path
 
+                    // store the existing file path
                 }))
                 : [{ name: "", description: "", file: null, trainerId: "" }]
         });
@@ -395,24 +408,16 @@ const UploadSyllabus = ({ onCancel }) => {
                                                 }
                                             />
                                             <div>
-                                                <label className="text-sm font-medium text-gray-700 mb-1 block">
-                                                    Select Trainer *
-                                                </label>
+                                                <br></br>
 
-                                                <select
-                                                    className="w-full h-12 px-4 rounded-xl border border-blue-300 bg-white shadow-sm text-gray-800"
+                                                <Select
+                                                    label="Select Interviewer"
+                                                    required
+                                                    options={interviewerOptions}
                                                     value={sub.trainerId}
-                                                    onChange={(e) => handleSubTopicChange(index, "trainerId", e.target.value)}
-                                                >
-                                                    <option value="">Select Trainer</option>
-
-                                                    {trainerList?.map((t) => (
-                                                        <option key={t.trainerId} value={t.trainerId}>
-                                                            {t.name}
-                                                        </option>
-                                                    ))}
-
-                                                </select>
+                                                    onChange={(value) => handleSubTopicChange(index, "trainerId", value)}
+                                                    searchable
+                                                />
 
                                             </div>
 

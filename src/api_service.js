@@ -401,12 +401,17 @@ export const startSubTopic = async (formData) => {
 
 export const completeSubTopic = async (formData) => {
   try {
+<<<<<<< HEAD
     const response = await axios.post(`${API_URL}/step-progress/complete`, formData);
+=======
+    const response = await axios.post(`${API_URL}/step-progress/complete`, formData); 
+>>>>>>> 3e511cb31298719158ddcbdbe58177f24ef64382
     return response.data;
   } catch (error) {
     console.error("Error completing subtopic:", error);
     throw error;
   }
+<<<<<<< HEAD
 }
 
 export const fetchCompletedSubTopics = async () => {
@@ -588,3 +593,6 @@ export const fetchTraineeSummaryByManager = async (managerUserId) => {
     throw error;
   }
 };
+=======
+}
+>>>>>>> 3e511cb31298719158ddcbdbe58177f24ef64382
