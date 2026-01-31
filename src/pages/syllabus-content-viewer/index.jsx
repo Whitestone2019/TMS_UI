@@ -10,20 +10,10 @@ import SecurityWatermark from './components/SecurityWatermark';
 import ProgressTracker from './components/ProgressTracker';
 import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
-<<<<<<< HEAD
 import { updateStepProgress, fetchUserByEmpId, fetchSyllabusProgressByEmpId } from '../../api_service';
-=======
-import {
-  updateStepProgress,
-  fetchUserByEmpId,
-  fetchStepByEmpId,
-  startSubTopic
-} from '../../api_service';
->>>>>>> 3e511cb31298719158ddcbdbe58177f24ef64382
 
 const SyllabusContentViewer = () => {
   const navigate = useNavigate();
-
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [currentStepId, setCurrentStepId] = useState(null);
   const [sessionActive, setSessionActive] = useState(true);
@@ -33,7 +23,6 @@ const SyllabusContentViewer = () => {
   const [loading, setLoading] = useState(true);
   const [subTopicIndex, setSubTopicIndex] = useState(0);
 
-<<<<<<< HEAD
   const { state } = useLocation();
   const stepNumber = state || 1;
 
@@ -64,52 +53,16 @@ const SyllabusContentViewer = () => {
         }
       } catch (err) {
         console.error("Failed to load trainee info", err);
-=======
-  const contentRef = useRef(null);
-
-  sessionStorage.setItem("empid", "TRN001");
-  const empid = sessionStorage.getItem("empid");
-
-  const currentStep = syllabusSteps.find(s => s.id === currentStepId);
-  const currentStepIndex = syllabusSteps.findIndex(s => s.id === currentStepId);
-  const completedSteps = syllabusSteps.filter(s => s.isCompleted).length;
-
-  // 🔧 RESET SUBTOPIC INDEX ON STEP CHANGE
-  useEffect(() => {
-    setSubTopicIndex(0);
-  }, [currentStepId]);
-
-  // ======================================================
-  // LOAD TRAINEE INFO (UNCHANGED)
-  // ======================================================
-  useEffect(() => {
-    const loadTraineeInfo = async () => {
-      const user = await fetchUserByEmpId(empid);
-      if (user) {
-        setTraineeInfo({
-          name: `${user.firstname} ${user.lastname}`,
-          id: user.empid,
-          email: user.email,
-          program: user.designation || "Training Program",
-          startDate: user.createdAt
-        });
->>>>>>> 3e511cb31298719158ddcbdbe58177f24ef64382
       }
     };
     loadTraineeInfo();
   }, []);
 
-<<<<<<< HEAD
-=======
-  // ======================================================
-  // FETCH SYLLABUS & INITIAL LOCKING (FIXED)
-  // ======================================================
->>>>>>> 3e511cb31298719158ddcbdbe58177f24ef64382
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(true);
+      try {
+        setLoading(true);
 
-<<<<<<< HEAD
         const response = await fetchSyllabusProgressByEmpId(empid);
         // const result = await response.json();
         const apiData = response?.data || response;
@@ -174,41 +127,10 @@ const SyllabusContentViewer = () => {
         console.error("Error fetching data:", error);
         setLoading(false);
       }
-=======
-      const res = await fetch("http://localhost:8080/api/syllabus/all");
-      const result = await res.json();
-      const apiData = result.data || [];
-
-      const formattedSteps = apiData.map((item, index) => ({
-        id: item.id,
-        stepNumber: index + 1,
-        title: item.title,
-        description: item.topic || "",
-        isLocked: index !== 0,          // 🔒 ONLY STEP 1 UNLOCKED
-        isCompleted: false,
-        progress: 0,
-        topics: [{
-          title: item.title,
-          subTopics: item.subTopics.map(sub => ({
-            id: sub.id,
-            name: sub.name,
-            description: sub.description,
-            filePath: sub.filePath,
-            stepNumber: sub.stepNumber,
-            completed: false               // 🔧 IMPORTANT
-          }))
-        }]
-      }));
-
-      setSyllabusSteps(formattedSteps);
-      setCurrentStepId(formattedSteps[0]?.id);
-      setLoading(false);
->>>>>>> 3e511cb31298719158ddcbdbe58177f24ef64382
     };
     fetchData();
   }, [empid]);
 
-<<<<<<< HEAD
   // SECURITY EVENT HANDLERS
   const handleContextMenu = (e) => { e?.preventDefault(); return false; };
   const handleSelectStart = (e) => { e?.preventDefault(); return false; };
@@ -289,76 +211,10 @@ const SyllabusContentViewer = () => {
     if (currentStepIndex < syllabusSteps?.length - 1) {
       const nextStep = syllabusSteps?.[currentStepIndex + 1];
       if (!nextStep?.isLocked) setCurrentStepId(nextStep?.id);
-=======
-  // ======================================================
-  // STEP SELECT (BLOCK LOCKED STEPS)
-  // ======================================================
-  const handleStepSelect = (stepId) => {
-    const step = syllabusSteps.find(s => s.id === stepId);
-    if (!step || step.isLocked) return;   // 🔒 BLOCK
-    setCurrentStepId(stepId);
-  };
-
-  // ======================================================
-  // SUBTOPIC COMPLETION (NEW – CORE FIX)
-  // ======================================================
-  const handleSubTopicComplete = (stepId, subTopicId) => {
-    setSyllabusSteps(prev =>
-      prev.map(step => {
-        if (step.id !== stepId) return step;
-
-        const updatedSubs = step.topics[0].subTopics.map(sub =>
-          sub.id === subTopicId ? { ...sub, completed: true } : sub
-        );
-
-        const completedCount = updatedSubs.filter(s => s.completed).length;
-        const total = updatedSubs.length;
-        const isStepCompleted = completedCount === total;
-
-        return {
-          ...step,
-          topics: [{ ...step.topics[0], subTopics: updatedSubs }],
-          progress: Math.round((completedCount / total) * 100),
-          isCompleted: isStepCompleted
-        };
-      })
-    );
-  };
-
-  // ======================================================
-  // STEP COMPLETE → UNLOCK NEXT STEP (FIXED)
-  // ======================================================
-  const handleCompleteStep = (stepId) => {
-    setSyllabusSteps(prev => {
-      const updated = [...prev];
-      const index = updated.findIndex(s => s.id === stepId);
-
-      updated[index].isCompleted = true;
-      updated[index].progress = 100;
-
-      if (index + 1 < updated.length) {
-        updated[index + 1].isLocked = false;   // 🔓 UNLOCK NEXT
-      }
-
-      return updated;
-    });
-  };
-
-  // ======================================================
-  // NAVIGATION (UNCHANGED)
-  // ======================================================
-  const handleNextStep = () => {
-    if (
-      currentStepIndex < syllabusSteps.length - 1 &&
-      !syllabusSteps[currentStepIndex + 1].isLocked
-    ) {
-      setCurrentStepId(syllabusSteps[currentStepIndex + 1].id);
->>>>>>> 3e511cb31298719158ddcbdbe58177f24ef64382
     }
   };
 
   const handlePreviousStep = () => {
-<<<<<<< HEAD
     if (currentStepIndex > 0) setCurrentStepId(syllabusSteps?.[currentStepIndex - 1]?.id);
   };
 
@@ -386,34 +242,9 @@ const SyllabusContentViewer = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header userRole="trainee" userName={traineeInfo?.name} onLogout={handleLogout} />
-=======
-    if (currentStepIndex > 0) {
-      setCurrentStepId(syllabusSteps[currentStepIndex - 1].id);
-    }
-  };
-
-  const canGoNext =
-    currentStepIndex < syllabusSteps.length - 1 &&
-    !syllabusSteps[currentStepIndex + 1].isLocked;
-
-  const canGoPrevious = currentStepIndex > 0;
-
-  // ======================================================
-  // UI
-  // ======================================================
-  return (
-    <div className="min-h-screen bg-background">
-      <Header
-        userRole="trainee"
-        userName={traineeInfo?.name}
-        onLogout={() => navigate('/trainee-dashboard')}
-      />
-
->>>>>>> 3e511cb31298719158ddcbdbe58177f24ef64382
       <div className="pt-16 flex h-screen">
         <StepNavigationSidebar steps={syllabusSteps} currentStepId={currentStepId} onStepSelect={handleStepSelect} isCollapsed={isSidebarCollapsed} onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)} />
         <div className="flex-1 flex flex-col overflow-hidden">
-<<<<<<< HEAD
           <div className="bg-surface border-b border-border px-6 py-3">
             <NavigationBreadcrumb userRole="trainee" />
           </div>
@@ -432,20 +263,6 @@ const SyllabusContentViewer = () => {
         <div className="flex items-center space-x-2">
           <Icon name="Shield" size={14} className="text-warning" />
           <span className="text-muted-foreground">This content is protected and monitored for security.</span>
-=======
-          <NavigationBreadcrumb userRole="trainee" />
-
-          <ContentDisplay
-            currentStep={currentStep}
-            traineeInfo={traineeInfo}
-            onSubTopicComplete={handleSubTopicComplete}  // 🔧 NEW
-            onStepComplete={handleCompleteStep}
-            onNextStep={handleNextStep}
-            onPreviousStep={handlePreviousStep}
-            canGoNext={canGoNext}
-            canGoPrevious={canGoPrevious}
-          />
->>>>>>> 3e511cb31298719158ddcbdbe58177f24ef64382
         </div>
       </div>
     </div>

@@ -101,7 +101,6 @@ const UploadSyllabus = ({ onCancel }) => {
         return Object.keys(newErrors).length === 0;
     };
 
-<<<<<<< HEAD
     const handleLogout = () => {
         navigate('/');
     };
@@ -160,8 +159,6 @@ const UploadSyllabus = ({ onCancel }) => {
     //         setLoading(false);
     //     }
     // };
-=======
->>>>>>> 3e511cb31298719158ddcbdbe58177f24ef64382
 
 
     const handleSubmit = async () => {
