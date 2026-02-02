@@ -2,25 +2,25 @@ import React, { useState, useEffect } from 'react';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 
-const CalendarView = ({ 
-  selectedDate, 
+const CalendarView = ({
+  selectedDate,
   selectedTime,
-  onDateSelect, 
-  interviews, 
+  onDateSelect,
+  interviews,
   onTimeSlotSelect,
   conflicts = [],
-  className = '' 
+  className = ''
 }) => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
-console.log("INTERVIEWS IN CALENDAR VIEW:",interviews);
+  console.log("INTERVIEWS IN CALENDAR VIEW:", interviews);
   const timeSlots = [
     '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
     '14:00', '14:30', '15:00', '15:30', '16:00', '16:30'
   ];
-useEffect(() => {
-  setSelectedTimeSlot(selectedTime);
-}, [selectedTime]);
+  useEffect(() => {
+    setSelectedTimeSlot(selectedTime);
+  }, [selectedTime]);
 
   const getDaysInMonth = (date) => {
     const year = date?.getFullYear();
@@ -31,87 +31,83 @@ useEffect(() => {
     const startingDayOfWeek = firstDay?.getDay();
 
     const days = [];
-    
+
     // Add empty cells for days before the first day of the month
     for (let i = 0; i < startingDayOfWeek; i++) {
       days?.push(null);
     }
-    
+
     // Add days of the month
     for (let day = 1; day <= daysInMonth; day++) {
       days?.push(new Date(year, month, day));
     }
-    
+
     return days;
   };
 
 
-  // const getInterviewsForDate = (date) => {
-  //   console.log("GET INTERVIEWS FOR DATE CALLED WITH DATE:",date);
-  //   if (!date) return [];
-  //   const interviewArray = Array.isArray(interviews) ? interviews : [];
-  //   interviewArray && console.log("INTERVIEW ARRAY:",interviewArray);
-  //   return  interviewArray?.filter(interview => {
-  //     const interviewDate = new Date(interview?.interviewSchedule?.date);
-  //     console.log("CHECKING INTERVIEW DATE:",interviewDate);
-  //     return interviewDate?.toDateString() === date?.toDateString();
-  //   });
-  // };
+  const isPastDate = (date) => {
+    if (!date) return false;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return date < today;
+  };
+
   const getInterviewsForDate = (date) => {
-  // console.log("GET INTERVIEWS FOR DATE CALLED WITH DATE:", date);
-  if (!date) return [];
-  const interviewArray = Array.isArray(interviews) ? interviews : [];
+    // console.log("GET INTERVIEWS FOR DATE CALLED WITH DATE:", date);
+    if (!date) return [];
+    const interviewArray = Array.isArray(interviews) ? interviews : [];
 
-  return interviewArray.filter(interview => {
-    const schedule = interview?.interviewSchedule;
+    return interviewArray.filter(interview => {
+      const schedule = interview?.interviewSchedule;
 
-    if (!schedule?.date) return false;
-    // console.log("CHECKING INTERVIEW SCHEDULE DATE:", schedule.date);
-    const interviewDate = new Date(schedule.date); 
-    // this is fine
-    return (
-      interviewDate.getFullYear() === date.getFullYear() &&
-      interviewDate.getMonth() === date.getMonth() &&
-      interviewDate.getDate() === date.getDate()
-    );
-  });
-};
+      if (!schedule?.date) return false;
+      // console.log("CHECKING INTERVIEW SCHEDULE DATE:", schedule.date);
+      const interviewDate = new Date(schedule.date);
+      // this is fine
+      return (
+        interviewDate.getFullYear() === date.getFullYear() &&
+        interviewDate.getMonth() === date.getMonth() &&
+        interviewDate.getDate() === date.getDate()
+      );
+    });
+  };
 
   const hasConflict = (date, time) => {
     if (!date) return false;
     return conflicts?.some(conflict => {
       const conflictDate = new Date(conflict.date);
-      return conflictDate?.toDateString() === date?.toDateString() && 
-             conflict?.time === time;
+      return conflictDate?.toDateString() === date?.toDateString() &&
+        conflict?.time === time;
     });
   };
 
   const formatTime = (timeStr) => {
-  if (!timeStr) return "";
-  const [hours, minutes] = timeStr.split(":");
-  return `${hours.padStart(2, "0")}:${minutes}`;
-};
+    if (!timeStr) return "";
+    const [hours, minutes] = timeStr.split(":");
+    return `${hours.padStart(2, "0")}:${minutes}`;
+  };
 
   const isTimeSlotBooked = (date, time) => {
     // console.log(date,time)
     const dayInterviews = getInterviewsForDate(date);
 
-    console.log("DAY INTERVIEWS:",dayInterviews);
-   
+    console.log("DAY INTERVIEWS:", dayInterviews);
+
     return dayInterviews.some(interview => {
-    const interviewTime = formatTime(interview?.interviewSchedule?.time);
-    return interviewTime === time;
-  });
+      const interviewTime = formatTime(interview?.interviewSchedule?.time);
+      return interviewTime === time;
+    });
   };
 
   const handleTimeSlotClick = (time) => {
     if (!selectedDate) return;
-    
+
     const isBooked = isTimeSlotBooked(selectedDate, time);
     const hasConflictAtTime = hasConflict(selectedDate, time);
-    
+
     if (isBooked || hasConflictAtTime) return;
-    
+
     setSelectedTimeSlot(time);
     onTimeSlotSelect(selectedDate, time);
   };
@@ -129,7 +125,7 @@ useEffect(() => {
   };
 
   const isSelected = (date) => {
-    if (!date || !selectedDate) return false;
+    if (!date || !selectedDate || isPastDate(date)) return false;
     return date?.toDateString() === selectedDate?.toDateString();
   };
 
@@ -180,12 +176,12 @@ useEffect(() => {
             {day}
           </div>
         ))}
-        
+
         {/* Calendar Days */}
         {days?.map((date, index) => {
           const dayInterviews = getInterviewsForDate(date);
           const interviewCount = dayInterviews?.length;
-          
+
           return (
             <button
               key={index}
@@ -195,6 +191,8 @@ useEffect(() => {
                 p-2 h-12 text-sm rounded-lg transition-colors duration-150 relative
                 ${!date ? 'invisible' : ''}
                 ${isToday(date) ? 'bg-primary/10 border border-primary' : ''}
+                
+    ${isPastDate(date) ? 'text-muted-foreground cursor-not-allowed' : ''}
                 ${isSelected(date) ? 'bg-primary text-primary-foreground' : ''}
                 ${!isSelected(date) && !isToday(date) ? 'hover:bg-muted' : ''}
                 ${interviewCount > 0 ? 'font-medium' : ''}
@@ -216,22 +214,23 @@ useEffect(() => {
       {selectedDate && (
         <div>
           <h4 className="text-md font-medium text-foreground mb-4">
-            Available Time Slots - {selectedDate?.toLocaleDateString()}
+            Available Time Slots - {isSelected(selectedDate) && selectedDate?.toLocaleDateString()}
           </h4>
           <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-2">
             {timeSlots?.map(time => {
               const isBooked = isTimeSlotBooked(selectedDate, time);
               const hasConflictAtTime = hasConflict(selectedDate, time);
               const isSelectedTime = selectedTimeSlot === time;
-              
+
               return (
                 <button
                   key={time}
                   onClick={() => handleTimeSlotClick(time)}
-                  disabled={isBooked || hasConflictAtTime}
+                  disabled={isBooked || hasConflictAtTime || isPastDate(selectedDate)}
                   className={`
                     p-2 text-sm rounded-lg border transition-colors duration-150
                     ${isSelectedTime ? 'bg-primary text-primary-foreground border-primary' : ''}
+                    ${isPastDate(selectedDate) ? 'text-muted-foreground cursor-not-allowed' : ''}
                     ${isBooked ? 'bg-muted text-muted-foreground text-primary border-border border-primary cursor-not-allowed' : ''}
                     ${hasConflictAtTime ? 'bg-error/10 text-error border-error cursor-not-allowed' : ''}
                     ${!isBooked && !hasConflictAtTime && !isSelectedTime ? 'bg-background border-border hover:bg-muted' : ''}

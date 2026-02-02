@@ -79,12 +79,19 @@ const UploadSyllabus = ({ onCancel }) => {
         setFormData((prev) => ({ ...prev, subTopics: updated }));
     };
 
-    const interviewerOptions = Array.isArray(trainerList)
-        ? (trainerList).map((t) => ({
-            value: t.trainerId,
-            label: `${t.name}${t.title ? " - " + t.title : ""}`,
-        }))
-        : [];
+    // const interviewerOptions = Array.isArray(trainerList)
+    //     ? (trainerList).map((t) => ({
+    //         value: t.trainerId,
+    //         label: `${t.name}${t.title ? " - " + t.title : ""}`,
+    //     }))
+    //     : [];
+
+         const interviewerOptions = Array.isArray(trainerList)
+    ? (trainerList).map((t) => ({
+      value: t.userid,
+      label: `${t.firstname} ${t.lastname}${t.role.roleName ? " - " + t.role.roleName : ""}`,
+    }))
+    : [];
 
     const validateForm = () => {
         const newErrors = {};

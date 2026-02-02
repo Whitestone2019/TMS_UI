@@ -206,15 +206,29 @@ export const fetchAllTraineeSummary = async () => {
 
 
 
+// export const getAllTrainers = async () => {
+//   try {
+//     const res = await axios.get(`${API_URL}/trainers/all`);
+//     return res.data;
+//   } catch (error) {
+//     console.error("Error fetching trainers:", error);
+//     throw error;
+//   }
+// };
+
+
 export const getAllTrainers = async () => {
   try {
-    const res = await axios.get(`${API_URL}/trainers/all`);
+    const res = await axios.get(`${API_URL}/users/manager/all`);
+    console.log("Trainers fetched:", res.data);
     return res.data;
   } catch (error) {
     console.error("Error fetching trainers:", error);
     throw error;
   }
 };
+
+
 
 // export const addTrainer = async (data) => {
 //   try {
