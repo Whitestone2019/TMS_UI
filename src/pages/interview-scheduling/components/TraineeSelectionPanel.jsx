@@ -3,7 +3,7 @@ import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 import Input from '../../../components/ui/Input';
 import Select from '../../../components/ui/Select';
-
+import '../../../App.css'
 const TraineeSelectionPanel = ({
   trainees,
   selectedTrainees,
@@ -171,7 +171,7 @@ console.log("trainees in panel",trainees);
         )}
       </div>
       {/* Trainee List */}
-      <div className="max-h-96 overflow-y-auto">
+      <div className="max-h-96 overflow-y-auto custom-scrollbar">
         {filteredTrainees?.length === 0 ? (
           <div className="p-6 text-center">
             <Icon name="Users" size={48} className="text-muted-foreground mx-auto mb-4" />

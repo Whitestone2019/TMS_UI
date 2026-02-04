@@ -378,14 +378,17 @@ const InterviewScheduling = () => {
     setSelectedTime(interviewTime);
 
     // Set selected trainees for the reschedule
-    const traineeId = interview?.user?.trngid;
+    // const traineeId = interview?.user?.trngid;
     const traineeIds = interview
       .map(item => item?.user?.trngid)
       .filter(Boolean);
     setSelectedTrainees(traineeIds);
     // setSelectedTrainees(traineeId ? [traineeId] : []);
     // console.log("INTERVIEW TRAINEE ID:", schedules);
+    console.log(interview)
+    console.log("fddddddd",interview[0]?.interviewSchedule)
     setFormdata(interview[0]?.interviewSchedule);
+    
 
     // Keep schedules intact; no need to overwrite all schedules
     // setSchedules(interview?.interviewSchedule); <-- REMOVE
@@ -519,6 +522,7 @@ const InterviewScheduling = () => {
       //   // interviewStatus: t.interviewStatus || "due",
       //   // priority: t.priority || "medium"
       // }));
+      
       const formatted = (result.data || []).map(t => ({
         id: t.trngid,
         name: `${t.firstname} ${t.lastname}`,

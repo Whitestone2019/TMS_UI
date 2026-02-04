@@ -136,7 +136,7 @@ useEffect(() => {
 
       if (isValidCredentials) {
         // Successful login
-        console.log('Login successful', response?.data?.redirect);
+        console.log('Login successful', response?.data);
 
         setFailedAttempts(0);
 
@@ -146,10 +146,13 @@ useEffect(() => {
             timestamp: Date.now()
           }));
         }
-
+      
         const empId = sessionStorage.setItem("empid", `${formData?.trngId}`);
         const userId = sessionStorage.setItem("userId", response?.data?.user?.userid);
-        const userRole = sessionStorage.setItem("userRole", `${response?.data?.role}`);
+        
+        const userRole = response?.data?.user?.role?.manager ? "MANAGER" : "TRAINEE";
+sessionStorage.setItem("userRole", userRole);
+        // const userRole = sessionStorage.setItem("userRole", `${response?.data?.role?.manager ? "MANAGER":"TRAINEE"}`);
 
         const userName = sessionStorage.setItem("userName", `${response?.data?.user?.firstname} ${response?.data?.user?.lastname}`);
         navigate(response?.data?.redirect || '/');

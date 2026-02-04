@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Routes as RouterRoutes, Route } from "react-router-dom";
+import { BrowserRouter, Routes as RouterRoutes, Route, Navigate } from "react-router-dom";
 import ScrollToTop from "./components/ScrollToTop";
 import ErrorBoundary from "./components/ErrorBoundary";
 import NotFound from "./pages/NotFound";
@@ -14,32 +14,138 @@ import AssessmentEntry from './pages/assessment-entry';
 import UploadSyllabus from "./pages/manager-dashboard/components/UploadSyllabus";
 import TraineeStepsPage from "./pages/manager-dashboard/components/TraineeStepsPage";
 
+
+const ProtectedRoute = ({ allowedRoles, children }) => {
+  const role = sessionStorage.getItem("userRole");
+
+  if (!role) {
+    console.log("sd", role)
+    return <Navigate to="/login-screen" replace />;
+  }
+
+  if (!allowedRoles.includes(role)) {
+    return <Navigate to="/*" replace />;
+  }
+
+  return children;
+};
+
+
+const NotAuthorized = () => (
+  <div className="h-screen flex items-center justify-center text-xl font-semibold">
+    ❌ You are not authorized to access this page
+  </div>
+);
+
 const Routes = () => {
   return (
     <BrowserRouter>
-      {/* <ErrorBoundary> */}
-      {/* <ScrollToTop /> */}
       <RouterRoutes>
-        {/* Define your route here */}
+
+        {/* Public Routes */}
         <Route path="/" element={<LoginScreen />} />
         <Route path="/login-screen" element={<LoginScreen />} />
-        <Route path="/manager-dashboard" element={<ManagerDashboard />} />
-        <Route path="/progress-reports" element={<ProgressReports />} />
-        <Route path="/syllabus-content-viewer" element={<SyllabusContentViewer />} />
-        <Route path="/interview-scheduling" element={<InterviewScheduling />} />
-        <Route path="/trainee-dashboard" element={<TraineeDashboard />} />
-        <Route path="/assessment-entry" element={<AssessmentEntry />} />
-        <Route path="/upload-syllabus" element={<UploadSyllabus />} />
-        <Route path="/trainee-steps" element={<TraineeStepsPage />} />
         <Route path="/reset-password" element={<ResetPassword />} />
 
+        {/* Manager Only */}
+        <Route
+          path="/manager-dashboard"
+          element={
+            <ProtectedRoute allowedRoles={["MANAGER"]}>
+              <ManagerDashboard />
+            </ProtectedRoute>
+          }
+        />
 
-        <Route path="/progress-reports/:traineeId" element={<ProgressReports />} />
+        <Route
+          path="/upload-syllabus"
+          element={
+            <ProtectedRoute allowedRoles={["MANAGER"]}>
+              <UploadSyllabus />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/trainee-steps"
+          element={
+            <ProtectedRoute allowedRoles={["MANAGER"]}>
+              <TraineeStepsPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/interview-scheduling"
+          element={
+            <ProtectedRoute allowedRoles={["MANAGER"]}>
+              <InterviewScheduling />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/assessment-entry"
+          element={
+            <ProtectedRoute allowedRoles={["MANAGER"]}>
+              <AssessmentEntry />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Trainee Only */}
+        <Route
+          path="/trainee-dashboard"
+          element={
+            <ProtectedRoute allowedRoles={["TRAINEE"]}>
+              <TraineeDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/syllabus-content-viewer"
+          element={
+            <ProtectedRoute allowedRoles={["TRAINEE"]}>
+              <SyllabusContentViewer />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* System Routes */}
+        <Route path="/not-authorized" element={<NotAuthorized />} />
         <Route path="*" element={<NotFound />} />
+
       </RouterRoutes>
-      {/* </ErrorBoundary> */}
     </BrowserRouter>
   );
 };
+
+// const Routes = () => {
+//   return (
+//     <BrowserRouter>
+//       {/* <ErrorBoundary> */}
+//       {/* <ScrollToTop /> */}
+//       <RouterRoutes>
+//         {/* Define your route here */}
+//         <Route path="/" element={<LoginScreen />} />
+//         <Route path="/login-screen" element={<LoginScreen />} />
+//         <Route path="/manager-dashboard" element={<ManagerDashboard />} />
+//         <Route path="/progress-reports" element={<ProgressReports />} />
+//         <Route path="/syllabus-content-viewer" element={<SyllabusContentViewer />} />
+//         <Route path="/interview-scheduling" element={<InterviewScheduling />} />
+//         <Route path="/trainee-dashboard" element={<TraineeDashboard />} />
+//         <Route path="/assessment-entry" element={<AssessmentEntry />} />
+//         <Route path="/upload-syllabus" element={<UploadSyllabus />} />
+//         <Route path="/trainee-steps" element={<TraineeStepsPage />} />
+//         <Route path="/reset-password" element={<ResetPassword />} />
+
+
+//         <Route path="/progress-reports/:traineeId" element={<ProgressReports />} />
+//         <Route path="*" element={<NotFound />} />
+//       </RouterRoutes>
+//       {/* </ErrorBoundary> */}
+//     </BrowserRouter>
+//   );
+// };
 
 export default Routes;

@@ -6,6 +6,7 @@ import Button from "../../../components/ui/Button";
 import Input from "../../../components/ui/Input";
 import Icon from "../../../components/AppIcon";
 import Select from "../../../components/ui/Select";
+import '../../../App.css'
 import { uploadSyllabusAPI, getAllSyllabusAPI, updateSyllabusAPI, getAllTrainers } from "../../../api_service";
 
 const UploadSyllabus = ({ onCancel }) => {
@@ -294,7 +295,7 @@ const UploadSyllabus = ({ onCancel }) => {
                         </div>
 
                         {/* <div className="p-8 space-y-8"> */}
-                        <div className="p-8 space-y-8 flex-1 flex flex-col overflow-hidden">
+                        <div className="custom-scrollbar p-8 space-y-8 flex-1 flex flex-col overflow-y-auto">
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-7">
                                 <Input
@@ -338,7 +339,7 @@ const UploadSyllabus = ({ onCancel }) => {
 
                             {/* SUBTOPICS */}
                             {/* <div className="space-y-6 h-[500px] overflow-y-scroll pr-3 custom-scroll"> */}
-                            <div className="space-y-6 flex-1 overflow-y-auto pr-3 custom-scroll min-h-[200px]">
+                            <div className="space-y-6 flex-1 overflow-y-auto pr-3 custom-scrollbar min-h-[200px]">
 
 
 

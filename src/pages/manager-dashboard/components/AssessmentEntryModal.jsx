@@ -616,7 +616,8 @@ const validateForm = () => {
 
     setSelectedSyllabus(selected);
     //handleInputChange("syllabusTitles", selected);
-    setSelectedSubTopics([]);
+    // setSelectedSubTopics([]);
+    
     handleInputChange("subTopicIds", []);
   };
 

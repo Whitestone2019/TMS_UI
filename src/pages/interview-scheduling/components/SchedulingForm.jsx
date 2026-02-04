@@ -32,7 +32,7 @@ const SchedulingForm = ({
   //   //syllabusTitles: []
   // });
   const [formData, setFormData] = useState({
-    interviewer: Formdata?.trainer?.trainerId || "",
+    interviewer: Formdata?.managerId?.userid || "",
     interviewType: Formdata?.interviewType || "",
     location: Formdata?.location || "",
     duration: Formdata?.duration?.toString() || "60",
@@ -319,8 +319,10 @@ const SchedulingForm = ({
 
     setSelectedSyllabus(selected);
     //handleInputChange("syllabusTitles", selected)
-    setSelectedSubTopics([]);
+    // setSelectedSubTopics([]);
     handleInputChange("subTopicIds", []);
+    // setSelectedSubTopics(selected);
+
   };
 
 
@@ -505,10 +507,12 @@ const SchedulingForm = ({
             options={durationOptions}
             value={formData.duration}
             onChange={(value) => handleInputChange("duration", value)}
+            required
           />
         </div>
 
         {/* Location + Meeting Link */}
+        
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Input
             label="Location"
@@ -517,7 +521,7 @@ const SchedulingForm = ({
             value={formData.location}
             onChange={(e) => handleInputChange("location", e.target.value)}
             error={errors.location}
-            description="Physical meeting location"
+            description="Physical meeting location "
           />
 
           {/* <Input
@@ -544,6 +548,7 @@ const SchedulingForm = ({
               onChange={handleSyllabusChange}
               multiple
               searchable
+              required
             />
 
             {/* ✅ Selected syllabus chips */}
@@ -572,7 +577,9 @@ const SchedulingForm = ({
               onChange={handleSubTopicChange}
               multiple
               searchable
+              required
             />
+
 
             {selectedSubTopics.length > 0 && (
               <div>

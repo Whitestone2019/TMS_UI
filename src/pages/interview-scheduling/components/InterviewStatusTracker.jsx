@@ -122,9 +122,8 @@ const InterviewStatusTracker = ({
 
   const statusOptions = [
     { value: 'all', label: 'All Status' },
-    { value: 'pending', label: 'Pending Confirmation' },
+    { value: 'needsaction', label: 'Pending Confirmation' },
     { value: 'accepted', label: 'Accepted' },
-    { value: 'completed', label: 'Completed' },
     { value: 'declined', label: 'Declined' },
     { value: 'tentative', label: 'Tentative' }
   ];
@@ -280,7 +279,6 @@ const InterviewStatusTracker = ({
 
         console.log('Rescheduling Interview ID:', interview?.interviewSchedule?.scheduleId);
         const selected = data.filter(
-
           item => {
             console.log('Comparing:', item.interviewSchedule?.scheduleId, interview?.scheduleId);
             return item.interviewSchedule?.scheduleId === interview?.scheduleId
