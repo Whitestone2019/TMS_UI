@@ -185,7 +185,6 @@ const UploadSyllabus = ({ onCancel }) => {
                     name: st.name,
                     description: st.description,
                     filePath: typeof st.file === "string" ? st.file : null,
-                    // manager_id: st.userid ? { userid: st.userid } : null
                     manager: st.managerId ? { trngid: st.managerId } : null
                 }))
 
