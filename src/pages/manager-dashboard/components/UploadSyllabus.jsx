@@ -79,12 +79,19 @@ const UploadSyllabus = ({ onCancel }) => {
         setFormData((prev) => ({ ...prev, subTopics: updated }));
     };
 
-    const interviewerOptions = Array.isArray(trainerList)
-        ? (trainerList).map((t) => ({
-            value: t.trainerId,
-            label: `${t.name}${t.title ? " - " + t.title : ""}`,
-        }))
-        : [];
+    // const interviewerOptions = Array.isArray(trainerList)
+    //     ? (trainerList).map((t) => ({
+    //         value: t.trainerId,
+    //         label: `${t.name}${t.title ? " - " + t.title : ""}`,
+    //     }))
+    //     : [];
+
+         const interviewerOptions = Array.isArray(trainerList)
+    ? (trainerList).map((t) => ({
+      value: t.userid,
+      label: `${t.firstname} ${t.lastname}${t.role.roleName ? " - " + t.role.roleName : ""}`,
+    }))
+    : [];
 
     const validateForm = () => {
         const newErrors = {};
@@ -101,7 +108,6 @@ const UploadSyllabus = ({ onCancel }) => {
         return Object.keys(newErrors).length === 0;
     };
 
-<<<<<<< HEAD
     const handleLogout = () => {
         navigate('/');
     };
@@ -160,8 +166,6 @@ const UploadSyllabus = ({ onCancel }) => {
     //         setLoading(false);
     //     }
     // };
-=======
->>>>>>> 3e511cb31298719158ddcbdbe58177f24ef64382
 
 
     const handleSubmit = async () => {

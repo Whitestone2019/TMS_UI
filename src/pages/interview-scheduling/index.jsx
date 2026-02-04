@@ -280,6 +280,7 @@ const InterviewScheduling = () => {
     } else {
       alert("Creating new schedule");
 
+      
       try {
         // 1️⃣ Create Schedule
         const scheduleRes = await createSchedule(scheduleData.interviewer, {
@@ -302,8 +303,12 @@ const InterviewScheduling = () => {
           return;
         }
 
+
+        console.log("created Schedule ID:", scheduleData);
+        const emailIds = [...scheduleData.trainees,scheduleData.interviewerId];
+        console.log("Trainee Emails for Notification:", emailIds);
         // 3️⃣ Assign Trainees
-        await assignTrainees(scheduleId, scheduleData.trainees);
+        await assignTrainees(scheduleId,emailIds);
 
         alert("✅ Interview Scheduled Successfully!");
 

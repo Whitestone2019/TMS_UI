@@ -55,17 +55,30 @@ const InterviewStatusTracker = ({
         scheduleId,
         interviewSchedule: item.interviewSchedule,
         trainees: [],
-        status: item?.rsvpStatus?.trim().toLowerCase() || "",
+        manager: [],
+        status: "",
       };
     }
 
-    if (item?.user) {
+    if (item?.user && item?.roleRvsp?.toLowerCase() === 'trainee') {
       grouped[scheduleId].trainees.push({
         firstname: item.user?.firstname,
         lastname: item.user?.lastname,
         status: item?.rsvpStatus?.trim().toLowerCase() || 'pending',
         trngid: item.user?.trngid
       });
+    }
+
+    if (item?.user && item?.roleRvsp?.toLowerCase() === 'manager') {
+       const managerStatus = item?.rsvpStatus?.trim().toLowerCase() || 'pending';
+
+      grouped[scheduleId].manager.push({
+        firstname: item.user?.firstname,
+        lastname: item.user?.lastname,
+        status: item?.rsvpStatus?.trim().toLowerCase() || 'pending',
+        trngid: item.user?.trngid
+      });
+      grouped[scheduleId].status = managerStatus;
     }
 
   });
@@ -75,7 +88,7 @@ const InterviewStatusTracker = ({
   ===================================================== */
   const transformedSchedules = Object.values(grouped).map(group => {
     const trainees = group.trainees.filter(Boolean);
-
+    const manager = group.manager?.filter(Boolean) || [];
     return {
       id: group.scheduleId,
       scheduleId: group.scheduleId,
@@ -85,7 +98,8 @@ const InterviewStatusTracker = ({
         )
         .join(", "),
       trainees,
-      interviewerName: group.interviewSchedule?.trainer?.name || "N/A",
+      manager,
+      interviewerName: group.interviewSchedule?.managerId?.firstname || "N/A",
       scheduledDate: group.interviewSchedule?.date,
       time: group.interviewSchedule?.time,
       duration: group.interviewSchedule?.duration,
@@ -96,13 +110,15 @@ const InterviewStatusTracker = ({
 
       // 👇 IMPORTANT: keeps all users for reschedule
       rawItems: data.filter(
-        i => i?.interviewSchedule?.scheduleId === group.scheduleId
+        i => i?.interviewSchedule?.scheduleId === group.scheduleId && i?.roleRvsp?.toLowerCase() === 'trainee'
       )
+      
     };
   });
 
   interviews = transformedSchedules;
 
+  console.log('Transformed Interviews:', interviews);
 
   const statusOptions = [
     { value: 'all', label: 'All Status' },
@@ -209,6 +225,7 @@ const InterviewStatusTracker = ({
       case 'pending':
       case 'tentative':
       case 'declined':
+      case 'needsaction':
         actions?.push(
           { label: 'Reschedule', action: 'reschedule', variant: 'default', icon: 'Calendar' },
           { label: 'Cancel', action: 'cancel', variant: 'outline', icon: 'X' },
@@ -222,16 +239,15 @@ const InterviewStatusTracker = ({
           { label: 'Cancel', action: 'cancel', variant: 'outline', icon: 'X' }
         );
         break;
-      case 'completed':
-        actions?.push(
-          { label: 'View Feedback', action: 'feedback', variant: 'outline', icon: 'MessageSquare' }
-        );
-        break;
       case 'cancelled':
         actions?.push(
           { label: 'Reschedule', action: 'reschedule', variant: 'default', icon: 'Calendar' }
         );
         break;
+      default:
+          actions?.push(
+          { label: 'Cancel', action: 'cancel', variant: 'outline', icon: 'X' }
+        );
     }
 }
     return actions;
@@ -384,6 +400,21 @@ const InterviewStatusTracker = ({
                         </div>
 
                         <div className="flex flex-col gap-1">
+                          <span className="text-xs font-medium text-muted-foreground">Interviewer:</span>
+                          {interview?.manager?.map((t, idx) => {
+                            const tStatusConfig = getStatusConfig(t.status);
+                            return (
+                              <span
+                                key={idx}
+                                className={`px-2 py-1 text-xs font-medium rounded-full ${tStatusConfig?.bgColor} ${tStatusConfig?.color}`}
+                              >
+                                <p> {t.firstname || "Trainee"} ({t.status}) {interview?.scheduleId}</p>
+                              </span>
+                            );
+                          })}
+                        </div>
+                        <div className="flex flex-col gap-1">
+                          <span className="text-xs font-medium text-muted-foreground">Trainees:</span>
                           {interview?.trainees?.map((t, idx) => {
                             const tStatusConfig = getStatusConfig(t.status);
                             return (
@@ -396,6 +427,8 @@ const InterviewStatusTracker = ({
                             );
                           })}
                         </div>
+
+
                         {/*                   
                         <span className={`px-2 py-1 text-xs font-medium rounded-full ${statusConfig?.bgColor} ${statusConfig?.color}`}>
                           {statusConfig?.label} {interview?.scheduleId}

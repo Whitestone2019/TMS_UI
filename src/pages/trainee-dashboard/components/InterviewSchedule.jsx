@@ -161,25 +161,22 @@ const InterviewSchedule = ({ className = '', interviews = [] }) => {
                 <div className="space-y-4">
                   <div>
                     <h4 className="font-medium text-foreground mb-2">Interview Notes:</h4>
-                    <div className="bg-muted/30 rounded-lg p-4">
-                      <p className="text-sm text-foreground whitespace-pre-line">{interview?.notes}</p>
+                    <div className="bg-muted/30 rounded-lg p-2">
+                      <p className="text-sm text-foreground whitespace-pre-line">{interview?.notes || "Prepare well"}</p>
                     </div>
                   </div>
                   <div>
-                    <h4 className="font-medium text-foreground mb-2">Trainee Info:</h4>
-                    <div className="bg-muted/30 rounded-lg p-4">
-                      <p className="text-sm">Name: {interview?.traineeName}</p>
-                      <p className="text-sm">Email: {interview?.traineeEmail}</p>
-                      <p className="text-sm">Emp ID: {interview?.traineeEmpId}</p>
+                    <h4 className="font-medium text-foreground mb-2">Interviewer Info:</h4>
+                    <div className="bg-muted/30 rounded-lg p-1">
+                      <p className="text-sm">Name: {interview?.interviewerName}</p>
+                      <p className="text-sm">Email: {interview?.interviewerEmail}</p>
                     </div>
                   </div>
                   <div>
-                    <h4 className="font-medium text-foreground mb-2">Approval Status:</h4>
-                    <div className="bg-muted/30 rounded-lg p-4">
-                      <p className="text-sm">Trainer Approval: {interview?.trainerApproval}</p>
-                      <p className="text-sm">Trainee Approval: {interview?.traineeApproval}</p>
-                      <p className="text-sm">RSVP Status: {interview?.rsvpStatus}</p>
-                    </div>
+                    <h4 className="font-medium text-foreground mb-2">Approval Status: {interview?.rsvpStatus}</h4>
+                    {/* <div className="bg-muted/30 rounded-lg p-4">
+                       <p className="text-sm">RSVP Status: {interview?.rsvpStatus}</p>
+                    </div> */}
                   </div>
                 </div>
               </div>

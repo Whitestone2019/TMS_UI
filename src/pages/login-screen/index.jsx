@@ -5,7 +5,7 @@ import Select from '../../components/ui/Select';
 import Button from '../../components/ui/Button';
 import Checkbox from '../../components/ui/Checkbox';
 import { Eye, EyeOff, Shield, AlertCircle, Lock, User, Mail } from 'lucide-react';
-import { login } from '../../api_service';
+import { login, storeUserDetails } from '../../api_service';
 
 const LoginScreen = () => {
   const navigate = useNavigate();
@@ -25,6 +25,19 @@ const LoginScreen = () => {
   const [failedAttempts, setFailedAttempts] = useState(0);
   const [isLocked, setIsLocked] = useState(false);
   const [lockTimeRemaining, setLockTimeRemaining] = useState(0);
+
+useEffect(() => {
+  const initUsers = async () => {
+    try {
+      await storeUserDetails();
+      console.log("Users synced successfully");
+    } catch (error) {
+      console.error("User sync failed", error);
+    }
+  };
+
+  initUsers();
+}, []);
 
   // Account lockout timer
   useEffect(() => {

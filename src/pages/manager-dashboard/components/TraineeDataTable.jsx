@@ -141,7 +141,7 @@ const TraineeDataTable = ({
                   onClick={() => handleSort('currentStep')}
                   className="flex items-center space-x-2 text-sm font-medium text-foreground hover:text-primary"
                 >
-                  <span>Current Syllabus</span>
+                  <span>Current Subtopic</span>
                   {getSortIcon('currentStep')}
                 </button>
               </th>
@@ -192,12 +192,14 @@ const TraineeDataTable = ({
                 </td>
                 <td className="px-6 py-4">
                   <div>
-                    {/* <p className="text-sm font-medium text-foreground">
-                      {trainee?.subtopics && trainee.subtopics.length > 0
-                        ? `Step ${trainee.subtopics.length} :${trainee.subtopics[trainee.subtopics.length - 1]} `
-                        : "No Assessment Yet"}</p> */}
+                      
 
-                    <p className="text-sm font-medium text-foreground">{trainee?.currentStep}</p>
+                    {/* <p className="text-sm font-medium text-foreground">{trainee?.currentStep}</p> */}
+                   
+                    <p className="text-sm font-medium text-foreground">
+                    {trainee?.subtopics && trainee.subtopics.length > 0
+                        ? `Step: ${trainee.subtopics} `
+                        : "No Assessment Yet"}</p>
                     <p className="text-xs text-muted-foreground">{trainee?.stepDescription}</p>
                   </div>
                 </td>
@@ -210,7 +212,7 @@ const TraineeDataTable = ({
                       />
                     </div>
                     <span className="text-sm font-medium text-foreground">
-                      {trainee?.completionPercentage}%
+                      {Math.round(trainee?.completionPercentage || 0)}%
                     </span>
                   </div>
                   {getStatusBadge(trainee?.completionPercentage)}

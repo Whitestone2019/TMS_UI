@@ -123,11 +123,13 @@ const TraineeDashboard = () => {
         if (response?.data) {
           // API returns: { status, success, message, data:[ ... ] }
 
+        
+
           const cleanData = response.data.map(item => {
             const schedule = item.interviewSchedule;
             const trainee = item.user;
             const trainer = schedule?.trainer;
-
+            const interviewer = item?.interviewSchedule?.managerId;
             return {
               id: item.id,
               scheduleId: schedule?.scheduleId,
@@ -138,21 +140,11 @@ const TraineeDashboard = () => {
               duration: schedule?.duration,
               notes: schedule?.notes,
               meetingLink: schedule?.meetingLink,
+              subTopics: schedule?.subTopics,
+              interviewerName: interviewer?.firstname + " " +interviewer?.lastname,
+              interviewerEmail: interviewer?.emailid,
               eventId: item?.eventId,
-              rsvpStatus: item?.rsvpStatus?.trim(),
-
-              // Trainer Info
-              trainerName: trainer?.name,
-              trainerEmail: trainer?.email,
-              trainerTitle: trainer?.title,
-
-              // Trainee Info
-              traineeName: `${trainee?.firstname} ${trainee?.lastname}`,
-              traineeEmail: trainee?.email,
-              traineeEmpId: trainee?.empid,
-
-              traineeApproval: item?.traineeApproval,
-              trainerApproval: item?.trainerApproval
+              rsvpStatus: item?.rsvpStatus?.trim(),            
             };
           });
 
@@ -271,7 +263,13 @@ const TraineeDashboard = () => {
 
         const apiData = result?.data || result || [];
 
-        const formattedSteps = apiData.map((item, index, arr) => {
+        const sortedData = [...apiData].sort((a, b) => {
+        const dateA = new Date(a?.createdDate || 0);
+        const dateB = new Date(b?.createdDate || 0);
+        return dateA - dateB;
+      });
+
+        const formattedSteps = sortedData.map((item, index, arr) => {
           // ✔ current step completed
           const isCompleted = item?.subTopics?.every(sub =>
             sub?.stepProgress?.some(p => p.complete === true && p.checker === true)
@@ -301,6 +299,7 @@ const TraineeDashboard = () => {
 
 
         setStepsStatus(formattedSteps);
+
         const totalSteps = stepsStatus.length;
   const completedSteps = stepsStatus.filter(s => s.completed).length;
 

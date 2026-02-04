@@ -135,10 +135,17 @@ const SchedulingForm = ({
   ];
 
   // ✅ Build interviewer dropdown options
+  // const interviewerOptions = Array.isArray(trainerList)
+  //   ? (trainerList).map((t) => ({
+  //     value: t.trainerId,
+  //     label: `${t.name}${t.title ? " - " + t.title : ""}`,
+  //   }))
+  //   : [];
+
   const interviewerOptions = Array.isArray(trainerList)
     ? (trainerList).map((t) => ({
-      value: t.trainerId,
-      label: `${t.name}${t.title ? " - " + t.title : ""}`,
+      value: t.userid,
+      label: `${t.firstname} ${t.lastname}${t.role.roleName ? " - " + t.role.roleName : ""}`,
     }))
     : [];
 
@@ -390,6 +397,9 @@ const SchedulingForm = ({
         duration: parseInt(formData.duration),
         syllabusTitles: formData.syllabusTitles,
         subTopicIds: formData.subTopics,
+        interviewerId: trainerList.find(t => t.userid === formData.interviewer)?.trngid,
+        // syllabusTitles: selectedSyllabus,
+//     syllabusTitles: formData.syllabusTitles,
         
         //     subTopicIds: formData.subTopicIds,
 
