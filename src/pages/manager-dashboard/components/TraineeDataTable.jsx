@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from "react-router-dom";
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 import Checkbox from '../../../components/ui/Checkbox';
@@ -11,7 +12,8 @@ const TraineeDataTable = ({
   onViewProfile,
   onAddAssessment,
   onScheduleInterview,
-  onSort
+  onSort,
+  onViewSyllabus
 }) => {
   console.log("trainees:", trainees);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
@@ -24,6 +26,9 @@ const TraineeDataTable = ({
     setSortConfig({ key, direction });
     onSort(key, direction);
   };
+
+  const [selectedTraineeId, setSelectedTraineeId] = useState(null);
+
   // const sortedTrainees = React.useMemo(() => {
   //   if (!sortConfig.key) return trainees;
   //   return [...trainees].sort((a, b) => {
@@ -39,6 +44,8 @@ const TraineeDataTable = ({
   //     return 0;
   //   });
   // }, [trainees, sortConfig]);
+
+  const navigate = useNavigate();
 
   const sortedTrainees = React.useMemo(() => {
     if (!sortConfig.key) return trainees;
@@ -141,7 +148,7 @@ const TraineeDataTable = ({
                   onClick={() => handleSort('currentStep')}
                   className="flex items-center space-x-2 text-sm font-medium text-foreground hover:text-primary"
                 >
-                  <span>Current Subtopic</span>
+                  <span>Current Syllabus</span>
                   {getSortIcon('currentStep')}
                 </button>
               </th>
@@ -192,14 +199,12 @@ const TraineeDataTable = ({
                 </td>
                 <td className="px-6 py-4">
                   <div>
-                      
+                    {/* <p className="text-sm font-medium text-foreground">
+                      {trainee?.subtopics && trainee.subtopics.length > 0
+                        ? `Step ${trainee.subtopics.length} :${trainee.subtopics[trainee.subtopics.length - 1]} `
+                        : "No Assessment Yet"}</p> */}
 
-                    {/* <p className="text-sm font-medium text-foreground">{trainee?.currentStep}</p> */}
-                   
-                    <p className="text-sm font-medium text-foreground">
-                    {trainee?.subtopics && trainee.subtopics.length > 0
-                        ? `Step: ${trainee.subtopics} `
-                        : "No Assessment Yet"}</p>
+                    <p className="text-sm font-medium text-foreground">{trainee?.currentStep}</p>
                     <p className="text-xs text-muted-foreground">{trainee?.stepDescription}</p>
                   </div>
                 </td>
@@ -212,7 +217,7 @@ const TraineeDataTable = ({
                       />
                     </div>
                     <span className="text-sm font-medium text-foreground">
-                      {Math.round(trainee?.completionPercentage || 0)}%
+                      {trainee?.completionPercentage}%
                     </span>
                   </div>
                   {getStatusBadge(trainee?.completionPercentage)}
@@ -252,6 +257,17 @@ const TraineeDataTable = ({
                       iconSize={16}
                       title="Schedule Interview"
                     />
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => onViewSyllabus(trainee?.traineeId)}
+
+                      //onClick={() => navigate(`/trainee-syllabus/${trainee?.traineeId}`)}
+                      iconName="BookOpen"
+                      iconSize={16}
+                      title="View Syllabus"
+                    />
+
                   </div>
                 </td>
               </tr>
@@ -316,7 +332,7 @@ const TraineeDataTable = ({
               </div>
 
               <div className="flex space-x-2 pt-2 border-t border-border">
-                <Button
+                {/* <Button
                   variant="outline"
                   size="sm"
                   onClick={() => onViewProfile(trainee?.id)}
@@ -326,7 +342,7 @@ const TraineeDataTable = ({
                   className="flex-1"
                 >
                   View
-                </Button>
+                </Button> */}
                 <Button
                   variant="outline"
                   size="sm"
@@ -349,6 +365,17 @@ const TraineeDataTable = ({
                 >
                   Interview
                 </Button>
+
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => onViewSyllabus(trainee?.traineeId)}
+
+
+                  iconName="BookOpen"
+                  iconSize={16}
+                  title="View Syllabus"
+                />
               </div>
             </div>
           </div>

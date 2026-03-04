@@ -22,6 +22,8 @@ const SyllabusContentViewer = () => {
   const [traineeInfo, setTraineeInfo] = useState({});
   const [loading, setLoading] = useState(true);
   const [subTopicIndex, setSubTopicIndex] = useState(0);
+  const [refreshKey, setRefreshKey] = useState(0);
+
 
   const { state } = useLocation();
   const stepNumber = state || 1;
@@ -58,80 +60,98 @@ const SyllabusContentViewer = () => {
     loadTraineeInfo();
   }, []);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
+ 
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const empid = sessionStorage.getItem("empid");
+      if (!empid) return;
 
-        const response = await fetchSyllabusProgressByEmpId(empid);
-        // const result = await response.json();
-        const apiData = response?.data || response;
+      // Fetch progress from API
+      const response = await fetchSyllabusProgressByEmpId(empid);
+      const apiData = response?.data || response;
 
-        const formattedSteps = apiData.map((item, index, arr) => {
-          // 🔹 current step completed or not
-          const isStepCompleted = item?.subTopics?.every(sub =>
-            sub?.stepProgress?.some(p => p.complete === true && p.checker === true)
-          );
+      console.log("Raw API Response:", apiData);
 
-          // 🔹 previous step completed or not
-          const prevStepCompleted =
-            index === 0
-              ? true
-              : arr[index - 1]?.subTopics?.every(sub =>
+      const formattedSteps = apiData.map((item, index, arr) => {
+        // 🔹 Check if all subtopics in this syllabus are completed AND approved by manager
+        const isStepCompleted = item?.subTopics?.every(sub =>
+          sub?.stepProgress?.some(p => p.complete === true && p.checker === true)
+        );
+
+        // 🔹 Check if the previous syllabus was fully completed to handle locking logic
+        const prevStepCompleted =
+          index === 0
+            ? true
+            : arr[index - 1]?.subTopics?.every(sub =>
                 sub?.stepProgress?.some(p => p.complete === true && p.checker === true)
               );
 
-          return {
-            id: item?.syllabusId,
-            stepNumber: index + 1,
-            title: item?.title || `Step ${index + 1}`,
-            description: item?.topic || "",
-
-            // ✅ MAIN FIX
-            isLocked: !prevStepCompleted,
-
-            isCompleted: isStepCompleted,
-
-            progress: item?.subTopics?.length
-              ? Math.round(
+        return {
+          id: item?.syllabusId,         // For React navigation
+          syllabusId: item?.syllabusId, // Explicit API syllabusId
+          stepNumber: index + 1,
+          title: item?.title || `Step ${index + 1}`,
+          description: item?.topic || "",
+          trainer: item?.trainer
+            ? {
+                id: item.trainer.trainerId,
+                name: item.trainer.name,
+                email: item.trainer.email,
+              }
+            : null,
+          isLocked: !prevStepCompleted,
+          isCompleted: isStepCompleted,
+          progress: item?.subTopics?.length
+            ? Math.round(
                 (item.subTopics.filter(sub =>
                   sub.stepProgress?.some(p => p.complete === true && p.checker === true)
                 ).length / item.subTopics.length) * 100
               )
-              : 0,
+            : 0,
+          topics: [
+            {
+              title: item?.topic,
+              subTopics: item?.subTopics?.map(sub => ({
+                id: sub?.subTopicId,       // Subtopic ID for React UI
+                subTopicId: sub?.subTopicId, // Explicit subtopicId from API
+                title: sub?.name,
+                name: sub?.name,
+                description: sub?.description,
+                filePath: sub?.filePath,
+                stepNumber: sub?.stepNumber,
+                completed: sub?.stepProgress?.some(p => p.complete === true),
+                managerDecision: sub?.stepProgress?.some(p => p.checker === true),
+                review: sub?.stepProgress?.[0]?.review || null,
+              })) || [],
+            },
+          ],
+        };
+      });
 
-            topics: [
-              {
-                title: item?.topic,
-                subTopics: item?.subTopics?.map(sub => ({
-                  id: sub?.subTopicId,
-                  title: sub?.name,
-                  name: sub?.name,
-                  description: sub?.description,
-                  filePath: sub?.filePath,
-                  stepNumber: sub?.stepNumber,
+      console.log("Formatted Steps with Syllabus IDs:", formattedSteps);
 
-                  completed: sub?.stepProgress?.some(p => p.complete === true),
-                  managerDecision: sub?.stepProgress?.some(p => p.checker === true),
-                })) || []
-              }
-            ]
-          };
-        });
+      setSyllabusSteps(formattedSteps);
 
-        setSyllabusSteps(formattedSteps);
-
-        if (formattedSteps.length > 0) setCurrentStepId(formattedSteps[stepNumber - 1].id);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        setLoading(false);
+      // Set initial current step safely
+      if (formattedSteps.length > 0) {
+        const activeStep = formattedSteps[stepNumber - 1] || formattedSteps[0];
+        setCurrentStepId(activeStep.id);
+        console.log("Initial Active Syllabus ID:", activeStep.syllabusId);
       }
-    };
-    fetchData();
-  }, [empid]);
 
-  // SECURITY EVENT HANDLERS
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching syllabus data:", error);
+      setLoading(false);
+    }
+  };
+
+  fetchData();
+}, [empid, refreshKey]);
+
+
   const handleContextMenu = (e) => { e?.preventDefault(); return false; };
   const handleSelectStart = (e) => { e?.preventDefault(); return false; };
   const handleKeyDown = (e) => {
@@ -140,32 +160,13 @@ const SyllabusContentViewer = () => {
     }
   };
 
-  // imp
-  // useEffect(() => {
-  //   document.addEventListener('contextmenu', handleContextMenu);
-  //   document.addEventListener('selectstart', handleSelectStart);
-  //   document.addEventListener('keydown', handleKeyDown);
-  //   return () => {
-  //     document.removeEventListener('contextmenu', handleContextMenu);
-  //     document.removeEventListener('selectstart', handleSelectStart);
-  //     document.removeEventListener('keydown', handleKeyDown);
-  //   };
-  // }, []);
 
   const handleStepSelect = (stepId) => {
     const step = syllabusSteps?.find((s) => s?.id === stepId);
     if (step && !step?.isLocked) setCurrentStepId(stepId);
   };
 
-  // const handleCompleteStep = (stepId) => {
-  //   setSyllabusSteps(prevSteps => prevSteps.map((step, index) => {
 
-  //     if (step.id === stepId) return { ...step, isCompleted: true, progress: 100, completedAt: new Date().toISOString() };
-  //     const prevIndex = prevSteps.findIndex(s => s.id === stepId);
-  //     if (index === prevIndex + 1) return { ...step, isLocked: false };
-  //     return step;
-  //   }));
-  // };
 
   const handleCompleteStep = (stepId) => {
     setSyllabusSteps(prevSteps => prevSteps.map((step, index) => {
@@ -190,22 +191,7 @@ const SyllabusContentViewer = () => {
     }));
   };
 
-  //   setSyllabusSteps(prevSteps => prevSteps.map((step) => {
-  //     if (step.id === stepId) {
-  //       const stepCompleted = step.topics[0]?.subTopics?.length > 0
-  //         ? step.topics[0].subTopics.every(sub => sub.managerDecision)
-  //         : false;
 
-  //       return {
-  //         ...step,
-  //         isCompleted: stepCompleted,
-  //         progress: 100,
-  //         completedAt: new Date().toISOString()
-  //       };
-  //     }
-  //     return step;
-  //   }));
-  // };
 
   const handleNextStep = () => {
     if (currentStepIndex < syllabusSteps?.length - 1) {
@@ -250,7 +236,7 @@ const SyllabusContentViewer = () => {
           </div>
           <div className="flex-1 flex overflow-hidden">
             <div className="flex-1 overflow-hidden" ref={contentRef}>
-              <ContentDisplay currentStep={currentStep} traineeInfo={traineeInfo} onStepComplete={handleCompleteStep} onNextStep={handleNextStep} onPreviousStep={handlePreviousStep} canGoNext={canGoNext} canGoPrevious={canGoPrevious} />
+              <ContentDisplay currentStep={currentStep} traineeInfo={traineeInfo} onStepComplete={handleCompleteStep} onNextStep={handleNextStep} onPreviousStep={handlePreviousStep} canGoNext={canGoNext} canGoPrevious={canGoPrevious}  />
             </div>
             {showProgressTracker && <div className="w-80 border-l border-border overflow-y-auto">
               <ProgressTracker currentStep={currentStep} totalSteps={syllabusSteps?.length} completedSteps={completedSteps} timeSpent={45} estimatedTimeRemaining={180} className="m-4" />

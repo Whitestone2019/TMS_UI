@@ -16,15 +16,7 @@ const QuickActions = ({ className = '' }) => {
       textColor: 'text-primary-foreground',
       action: () => navigate('/syllabus-content-viewer')
     },
-    // {
-    //   id: 'progress',
-    //   title: 'Progress Reports',
-    //   description: 'View detailed progress analytics',
-    //   icon: 'TrendingUp',
-    //   color: 'bg-success',
-    //   textColor: 'text-success-foreground',
-    //   action: () => navigate('/progress-reports')
-    // },
+
     {
       id: 'help',
       title: 'Get Help',
@@ -93,41 +85,7 @@ const QuickActions = ({ className = '' }) => {
           </div>
         ))}
       </div>
-      {/* Additional Actions */}
-      {/* <div className="mt-6 pt-6 border-t border-border">
-        <div className="flex flex-wrap gap-3">
-          <Button
-            variant="outline"
-            size="sm"
-            iconName="Download"
-            iconPosition="left"
-            iconSize={14}
-            onClick={() => console.log('Downloading progress report')}
-          >
-            Download Progress
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            iconName="Share"
-            iconPosition="left"
-            iconSize={14}
-            onClick={() => console.log('Sharing progress')}
-          >
-            Share Progress
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            iconName="Settings"
-            iconPosition="left"
-            iconSize={14}
-            onClick={() => console.log('Opening settings')}
-          >
-            Settings
-          </Button>
-        </div>
-      </div> */}
+
     </div>
   );
 };

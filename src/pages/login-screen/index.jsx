@@ -26,18 +26,18 @@ const LoginScreen = () => {
   const [isLocked, setIsLocked] = useState(false);
   const [lockTimeRemaining, setLockTimeRemaining] = useState(0);
 
-useEffect(() => {
-  const initUsers = async () => {
-    try {
-      await storeUserDetails();
-      console.log("Users synced successfully");
-    } catch (error) {
-      console.error("User sync failed", error);
-    }
-  };
+  useEffect(() => {
+    const initUsers = async () => {
+      try {
+        await storeUserDetails();
+        console.log("Users synced successfully");
+      } catch (error) {
+        console.error("User sync failed", error);
+      }
+    };
 
-  initUsers();
-}, []);
+    initUsers();
+  }, []);
 
   // Account lockout timer
   useEffect(() => {
@@ -75,17 +75,6 @@ useEffect(() => {
   const validateForm = () => {
     const newErrors = {};
 
-    // // Role validation
-    // if (!formData?.role) {
-    //   newErrors.role = 'Please select your role';
-    // }
-
-    // Email validation for both roles
-    // if (!formData?.email) {
-    //   newErrors.email = 'Email is required';
-    // } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/?.test(formData?.email)) {
-    //   newErrors.email = 'Please enter a valid email address';
-    // }
 
     // Trainee ID validation for trainee role
     if (!formData?.trngId) {
@@ -118,11 +107,6 @@ useEffect(() => {
     setIsLoading(true);
 
     try {
-      // Simulate API call delay
-      // await new Promise(resolve => setTimeout(resolve, 1500));
-
-      // Mock authentication logic
-      // const mockUser = mockUsers?.[formData?.role];
 
       console.log('Creating account with data:', formData);
 
@@ -136,7 +120,7 @@ useEffect(() => {
 
       if (isValidCredentials) {
         // Successful login
-        console.log('Login successful', response?.data?.redirect);
+        console.log('Login successful', response?.data);
 
         setFailedAttempts(0);
 
@@ -149,7 +133,11 @@ useEffect(() => {
 
         const empId = sessionStorage.setItem("empid", `${formData?.trngId}`);
         const userId = sessionStorage.setItem("userId", response?.data?.user?.userid);
-        const userRole = sessionStorage.setItem("userRole", `${response?.data?.role}`);
+
+        const userRole = response?.data?.user?.role?.manager ? "MANAGER" : "TRAINEE";
+        sessionStorage.setItem("userRole", userRole);
+const roleName = response?.data?.user?.role?.roleName;
+sessionStorage.setItem("roleName", roleName);
 
         const userName = sessionStorage.setItem("userName", `${response?.data?.user?.firstname} ${response?.data?.user?.lastname}`);
         navigate(response?.data?.redirect || '/');
@@ -161,19 +149,13 @@ useEffect(() => {
           });
           return;
         }
-        // if (response?.status === 402) {
-        //   setErrors({
-        //     general: response?.message || 'Invalid credentials. Please try again.'
-        //   });
-        //   return;
-        // }
-        // Failed login
+
         const newFailedAttempts = failedAttempts + 1;
         setFailedAttempts(newFailedAttempts);
 
         if (newFailedAttempts >= 3) {
           setIsLocked(true);
-          setLockTimeRemaining(300); // 5 minutes lockout
+          setLockTimeRemaining(300);
           setErrors({
             general: 'Account locked due to multiple failed attempts. Please try again in 5 minutes.'
           });
@@ -256,35 +238,6 @@ useEffect(() => {
                 </div>
               )}
 
-              {/* Role Selection */}
-              {/* <Select
-                label="Select Your Role"
-                required
-                options={roleOptions}
-                value={formData?.role}
-                onChange={(value) => handleInputChange('role', value)}
-                error={errors?.role}
-                placeholder="Choose your access level"
-                className="w-full"
-              /> */}
-
-              {/* Email Field */}
-              {/* <div className="relative">
-                <Input
-                  label="Email Address"
-                  type="email"
-                  required
-                  value={formData?.email}
-                  onChange={(e) => handleInputChange('email', e?.target?.value)}
-                  error={errors?.email}
-                  placeholder="Enter your email address"
-                  className="pl-10"
-                />
-                <Mail className="absolute left-3 top-9 w-4 h-4 text-muted-foreground" />
-              </div> */}
-
-              {/* Trainee ID Field (conditional) */}
-              {/* {formData?.role === 'trainee' && ( */}
 
 
               <div className="relative">
@@ -303,7 +256,7 @@ useEffect(() => {
               </div>
 
 
-              {/* )} */}
+
 
               {/* Password Field */}
               <div className="relative">
@@ -364,25 +317,7 @@ useEffect(() => {
               </Button>
             </form>
 
-            {/* Demo Credentials */}
-            {/* <div className="mt-8 pt-6 border-t border-border">
-              <h3 className="text-sm font-medium text-muted-foreground mb-3 text-center">
-                Demo Credentials
-              </h3>
-              <div className="space-y-2 text-xs">
-                <div className="bg-muted/50 p-3 rounded-lg">
-                  <p className="font-medium text-foreground mb-1">Manager Access:</p>
-                  <p className="text-muted-foreground">Email: admin@traineesystem.com</p>
-                  <p className="text-muted-foreground">Password: Manager123!</p>
-                </div>
-                <div className="bg-muted/50 p-3 rounded-lg">
-                  <p className="font-medium text-foreground mb-1">Trainee Access:</p>
-                  <p className="text-muted-foreground">Email: john.doe@company.com</p>
-                  <p className="text-muted-foreground">Trainee ID: TRN001</p>
-                  <p className="text-muted-foreground">Password: Trainee123!</p>
-                </div>
-              </div>
-            </div> */}
+
           </div>
 
           {/* Security Footer */}

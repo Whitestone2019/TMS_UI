@@ -12,7 +12,7 @@ import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
 import { fetchAssessmentsByTrainee } from '../../api_service';
 import { fetchUserByEmpId } from "../../api_service";
-import { fetchInterviewScheduleByEmpId, fetchSyllabusProgressByEmpId } from "../../api_service"
+import { fetchInterviewScheduleByEmpId, fetchSyllabusProgressByEmpId,fetchAllDelays, fetchTraineeDelays  } from "../../api_service"
 
 const TraineeDashboard = () => {
   const navigate = useNavigate();
@@ -27,47 +27,12 @@ const TraineeDashboard = () => {
   const [interviews, setInterviews] = useState([]);
 
   const [loading, setLoading] = useState(false);
+  const [syllabusProgress, setSyllabusProgress] = useState([]);
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [delayNotifications, setDelayNotifications] = useState([]);
 
+const [delays, setDelays] = useState([]);
 
-
-  // const [traineeInfo] = useState({
-  //   name: 'John Doe',
-  //   id: 'TRN001',
-  //   email: 'john.doe@company.com',
-  //   startDate: '2024-10-01',
-  //   program: 'Software Development Training'
-  // });
-
-
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const empId = traineeInfo.id;
-
-  //       // 1) Syllabus data
-  //       const syllabusRes = await fetch(`http://localhost:8080/syllabus/all`);
-  //       const syllabusData = await syllabusRes.json();
-  //       setSyllabus(syllabusData);
-
-  //       // 2) Steps progress data
-  //       const stepsRes = await fetch(`http://localhost:8080/steps/${empId}`);
-  //       const stepsData = await stepsRes.json();
-  //       setStepsStatus(stepsData);
-
-  //       // 3) Overall progress
-  //       const overallRes = await fetch(`http://localhost:8080/overall/${empId}`);
-  //       const overallData = await overallRes.json();
-  //       setOverall(overallData.overallProgress);
-
-  //       setIsLoading(false);
-  //     } catch (err) {
-  //       console.error("Error loading dashboard:", err);
-  //       setIsLoading(false);
-  //     }
-  //   };
-
-  //   fetchData();
-  // }, []);
 
   useEffect(() => {
     const loadTraineeInfo = async () => {
@@ -93,22 +58,7 @@ const TraineeDashboard = () => {
     loadTraineeInfo();
   }, []);
 
-  // useEffect(() => {
-  //   const loadData = async () => {
-  //     try {
-  //       const empId = sessionStorage.getItem("empid") || "TRN001";
 
-  //       // 🔥 Interview schedule API call
-  //       const schedule = await fetchInterviewScheduleByEmpId(empId);
-  //       setInterviews(schedule);
-
-  //     } catch (err) {
-  //       console.error("Error loading dashboard:", err);
-  //     }
-  //   };
-
-  //   loadData();
-  // }, []);
 
 
   useEffect(() => {
@@ -116,14 +66,13 @@ const TraineeDashboard = () => {
       try {
         const empId = sessionStorage.getItem("empid");
 
-        // 🔥 Interview schedule API call
+        // Interview schedule API call
         const response = await fetchInterviewScheduleByEmpId(empId);
 
         console.log("Fetched interview schedule response:", response);
         if (response?.data) {
-          // API returns: { status, success, message, data:[ ... ] }
 
-        
+
 
           const cleanData = response.data.map(item => {
             const schedule = item.interviewSchedule;
@@ -141,12 +90,13 @@ const TraineeDashboard = () => {
               notes: schedule?.notes,
               meetingLink: schedule?.meetingLink,
               subTopics: schedule?.subTopics,
-              interviewerName: interviewer?.firstname + " " +interviewer?.lastname,
+              interviewerName: interviewer?.firstname + " " + interviewer?.lastname,
               interviewerEmail: interviewer?.emailid,
               eventId: item?.eventId,
-              rsvpStatus: item?.rsvpStatus?.trim(),            
+              rsvpStatus: item?.rsvpStatus?.trim(),
             };
-          });
+          })
+            .sort((a, b) => new Date(b.date) - new Date(a.date));
 
           console.log("Loaded interviews:", cleanData);
           setInterviews(cleanData);
@@ -158,7 +108,7 @@ const TraineeDashboard = () => {
     };
 
     loadData();
-  }, []);
+  }, [refreshKey]);
 
 
   useEffect(() => {
@@ -167,7 +117,7 @@ const TraineeDashboard = () => {
         const empId = sessionStorage.getItem("empid");
         if (!empId) return;
 
-        // 2️⃣ Fetch assessments
+        //  Fetch assessments
         const assessmentRes = await fetchAssessmentsByTrainee(empId);
         const list = Array.isArray(assessmentRes.data) ? assessmentRes.data : [];
 
@@ -202,7 +152,8 @@ const TraineeDashboard = () => {
           submittedAt: a.submittedAt,
 
           status: Number(a.currentStep) >= 1 ? "completed" : "pending"
-        }));
+        }))
+          .sort((a, b) => new Date(b.date) - new Date(a.date));
 
         setAssessments(normalized);
 
@@ -212,10 +163,41 @@ const TraineeDashboard = () => {
     };
 
     loadTraineeData();
-  }, []);
+  }, [refreshKey]);
 
+useEffect(() => {
+  const empId = sessionStorage.getItem("empid");
+  if (!empId) return;
 
+  const loadDelays = async () => {
+    try {
+      const response = await fetchTraineeDelays(empId);
+      const list = Array.isArray(response.data) ? response.data : [];
+      setDelays(list);
+    } catch (err) {
+      console.error("Failed to fetch delays:", err);
+    }
+  };
 
+  loadDelays();
+
+  // Optional: auto-refresh every 1 minute
+  const interval = setInterval(loadDelays, 60000);
+  return () => clearInterval(interval);
+
+}, []);
+
+useEffect(() => {
+  if (!delays || delays.length === 0) {
+    setDelayNotifications([]);
+    return;
+  }
+
+  const delayedItems = delays.filter(item => item.delayDays > 0);
+
+  setDelayNotifications(delayedItems);
+
+}, [delays]);
 
   // Mock authentication check
   useEffect(() => {
@@ -244,7 +226,7 @@ const TraineeDashboard = () => {
   const handleLogout = () => {
     // Clear session data
     localStorage.removeItem('authToken');
-     
+
     sessionStorage.clear();
     navigate('/');
   };
@@ -264,19 +246,20 @@ const TraineeDashboard = () => {
         const apiData = result?.data || result || [];
 
         const sortedData = [...apiData].sort((a, b) => {
-        const dateA = new Date(a?.createdDate || 0);
-        const dateB = new Date(b?.createdDate || 0);
-        return dateA - dateB;
-      });
+          const dateA = new Date(a?.createdDate || 0);
+          const dateB = new Date(b?.createdDate || 0);
+          return dateA - dateB;
+        });
+        setSyllabusProgress(sortedData);
 
         const formattedSteps = sortedData.map((item, index, arr) => {
-          // ✔ current step completed
+          //  current step completed
           const isCompleted = item?.subTopics?.every(sub =>
             sub?.stepProgress?.some(p => p.complete === true && p.checker === true)
           );
 
- 
-          // ✔ previous step completed
+
+          //  previous step completed
           const prevCompleted =
             index === 0
               ? true
@@ -301,11 +284,11 @@ const TraineeDashboard = () => {
         setStepsStatus(formattedSteps);
 
         const totalSteps = stepsStatus.length;
-  const completedSteps = stepsStatus.filter(s => s.completed).length;
+        const completedSteps = stepsStatus.filter(s => s.completed).length;
 
-          const progressPercentage =
-    totalSteps > 0 ? (completedSteps / totalSteps) * 100 : 0;
-          setOverall(progressPercentage.toFixed(0));
+        const progressPercentage =
+          totalSteps > 0 ? (completedSteps / totalSteps) * 100 : 0;
+        setOverall(progressPercentage.toFixed(0));
         setLoading(false);
       } catch (err) {
         console.error(err);
@@ -314,7 +297,7 @@ const TraineeDashboard = () => {
     };
 
     if (empid) fetchData();
-  }, [empid]);
+  }, [empid, refreshKey]);
 
 
   if (isLoading) {
@@ -344,8 +327,17 @@ const TraineeDashboard = () => {
         userName={traineeInfo?.name}
         onLogout={handleLogout}
       />
+   
+
       {/* Main Content */}
       <main className="pt-16">
+        {delayNotifications.length > 0 && (
+  <div className="max-w-7xl mx-auto px-6 mt-4">
+    <div className="bg-red-50 border-l-4 border-red-500 text-red-700 px-4 py-3 rounded-lg shadow-sm">
+      ⚠️ You have {delayNotifications.length} delayed syllabus pending.
+    </div>
+  </div>
+)}
         <div className="max-w-7xl mx-auto px-6 py-8">
           {/* Breadcrumb Navigation */}
           <NavigationBreadcrumb
@@ -398,14 +390,6 @@ const TraineeDashboard = () => {
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
             {/* Left Column - Main Content */}
             <div className="xl:col-span-2 space-y-8">
-              {/* Progress Tracker */}
-              {/* <ProgressTracker
-                // currentStep={currentStep}
-                // totalSteps={8}
-                // completedSteps={stepsStatus.filter(s => s.completed).length}
-                onStepClick={handleStepClick}
-                stepsStatus={stepsStatus}
-              /> */}
 
               <ProgressTracker
                 stepsStatus={stepsStatus}
@@ -415,23 +399,15 @@ const TraineeDashboard = () => {
               />
 
 
-              {/* Current Step Content */}
-              {/* <CurrentStepContent
-                currentStep={currentStep}
-                traineeInfo={traineeInfo}
-                onStepComplete={handleStepComplete}
-                syllabus={syllabus}
-                stepsStatus={stepsStatus}
-              /> */}
 
               {/* Assessment History */}
-              <AssessmentHistory assessments={assessments} />
+              <AssessmentHistory
+                assessments={assessments}
+                syllabus={syllabusProgress} />
             </div>
 
             {/* Right Column - Sidebar */}
             <div className="space-y-8">
-              {/* Quick Actions */}
-              {/* <QuickActions /> */}
 
               {/* Interview Schedule */}
               <InterviewSchedule interviews={interviews} />
@@ -445,7 +421,7 @@ const TraineeDashboard = () => {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">Steps Completed</span>
-                    <span className="font-medium text-foreground">{stepsStatus.filter(item => item.locked === false).length-1}/{stepsStatus.length}</span>
+                    <span className="font-medium text-foreground">{stepsStatus.filter(item => item.locked === false).length - 1}/{stepsStatus.length}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">Current Step</span>
@@ -472,50 +448,7 @@ const TraineeDashboard = () => {
                 </div>
               </div>
 
-              {/* Help & Support Card */}
-              {/* <div className="bg-card rounded-lg border border-border p-6">
-                <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center">
-                  <Icon name="HelpCircle" size={20} className="mr-2 text-primary" />
-                  Need Help?
-                </h3>
-                <div className="space-y-3">
-                  <p className="text-sm text-muted-foreground">
-                    Get assistance with your training program
-                  </p>
-                  <div className="space-y-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      iconName="MessageSquare"
-                      iconPosition="left"
-                      iconSize={14}
-                      fullWidth
-                    >
-                      Ask a Question
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      iconName="Book"
-                      iconPosition="left"
-                      iconSize={14}
-                      fullWidth
-                    >
-                      Training Guide
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      iconName="Phone"
-                      iconPosition="left"
-                      iconSize={14}
-                      fullWidth
-                    >
-                      Contact Support
-                    </Button>
-                  </div>
-                </div>
-              </div> */}
+
             </div>
           </div>
         </div>

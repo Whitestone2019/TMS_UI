@@ -1,8 +1,8 @@
 import axios from "axios";
 
 // const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080/api";
-const API_URL = "http://192.168.0.21:8085/TMS/api";
- //const API_URL = "http://localhost:8085/TMS/api";
+// const API_URL = "http://192.168.0.21:8085/TMS/api";
+const API_URL = "http://localhost:8080/api";
 
 console.log("API URL:", API_URL);
 
@@ -54,52 +54,52 @@ export const storeUserDetails = async () => {
     {
       "userid": "2019Ws10019",
       "trngid": "Ws10111",
-      "password": "TEST@123",
+      "password": "$2a$10$uuitzF5IfvDByIhsOE5TieovEOJ6LyJJppMgaBjbECZBAaeLj0NnK",
       "username": "BB",
       "firstname": "BB",
       "lastname": "A",
       "emailid": "abs@gmail.bom",
       "phonenumber": "9787255965",
-      "roleId": "R009",
+      "roleId": "R001",
 
     },
     {
       "userid": "2019wss123",
       "trngid": "wss123",
-      "password": "TEST@123",
+      "password": "$2a$10$2Z3nNVR5uGKJE33jSK9yreGFDwvktrzFuWwLb95IpQhex5eLOAk8e",
       "username": "wss123",
       "firstname": "BBB",
       "lastname": "A",
       "emailid": "wwm@gmail.com",
       "phonenumber": "987635616",
-      "roleId": "R009",
+      "roleId": "R001",
     },
     {
       "userid": "2019WS1155",
       "trngid": "WS1155",
-      "password": "TEST@123",
+      "password": "$2a$10$G7szEGln2OiGaqVA0SnUpu0mN7EeaS3JpLpC83OSD35sYSholZL3C",
       "username": null,
       "firstname": "Aswathi",
       "lastname": null,
       "emailid": "aswathi.ravindran@whitestones.co.in",
       "phonenumber": "09787255964",
-      "roleId": "R009",
+      "roleId": "R001",
     },
     {
       "userid": "2019WS1122",
       "trngid": "WS1122",
-      "password": "TEST@123",
+      "password": "$2a$10$VVz9JDazDVsGjfj3L5AzYeWPs1LCvU/HT6kcqUr55TRHVGJguIzGa",
       "username": "Arunmaran",
       "firstname": "Arunmaran",
       "lastname": "Murugasen",
       "emailid": "arunmaran.murugesan@whitestones.co.in",
       "phonenumber": "9345287327",
-      "roleId": "R009",
+      "roleId": "R001",
     },
     {
       "userid": "2019WS10018",
       "trngid": "WS10018",
-      "password": "TEST@123",
+      "password": "$2a$10$qECY9SHPCdM1cA16TuC9.eDKw7GrlLOCEoE27iJuP9HlAEYFftVOm",
       "username": "Britto",
       "firstname": "Brit",
       "lastname": "A",
@@ -110,13 +110,13 @@ export const storeUserDetails = async () => {
     {
       "userid": "2019WS10009",
       "trngid": "WS10009",
-      "password": "TEST@123",
+      "password": "$2a$10$dCrmV.cSDhplIYnAvyNUR.XNiUn9d/pmW87uGj3AT79BN6dur8bum",
       "username": "ANBU",
       "firstname": "ANBU",
       "lastname": "S",
       "emailid": "anbarasan.sekar@whitestones.in",
       "phonenumber": "9788313457",
-      "roleId": "R009",
+      "roleId": "R001",
     }
   ]
   try {
@@ -130,82 +130,82 @@ export const storeUserDetails = async () => {
 
 
 // const data = [
-  //   {
-  //     "userid": "2019Ws10019",
-  //     "trngid": "Ws10111",
-  //     "password": "$2a$10$uuitzF5IfvDByIhsOE5TieovEOJ6LyJJppMgaBjbECZBAaeLj0NnK",
-  //     "username": "BB",
-  //     "firstname": "BB",
-  //     "lastname": "A",
-  //     "emailid": "abs@gmail.bom",
-  //     "phonenumber": "9787255965",
-  //     "roleId": "R001",
+//   {
+//     "userid": "2019Ws10019",
+//     "trngid": "Ws10111",
+//     "password": "$2a$10$uuitzF5IfvDByIhsOE5TieovEOJ6LyJJppMgaBjbECZBAaeLj0NnK",
+//     "username": "BB",
+//     "firstname": "BB",
+//     "lastname": "A",
+//     "emailid": "abs@gmail.bom",
+//     "phonenumber": "9787255965",
+//     "roleId": "R001",
 
-  //   },
-  //   {
-  //     "userid": "2019wss123",
-  //     "trngid": "wss123",
-  //     "password": "$2a$10$2Z3nNVR5uGKJE33jSK9yreGFDwvktrzFuWwLb95IpQhex5eLOAk8e",
-  //     "username": "wss123",
-  //     "firstname": "BBB",
-  //     "lastname": "A",
-  //     "emailid": "wwm@gmail.com",
-  //     "phonenumber": "987635616",
-  //     "roleId": "R001",
-  //   },
-  //   {
-  //     "userid": "2019WS1155",
-  //     "trngid": "WS1155",
-  //     "password": "$2a$10$G7szEGln2OiGaqVA0SnUpu0mN7EeaS3JpLpC83OSD35sYSholZL3C",
-  //     "username": null,
-  //     "firstname": "Aswathi",
-  //     "lastname": null,
-  //     "emailid": "aswathi.ravindran@whitestones.co.in",
-  //     "phonenumber": "09787255964",
-  //     "roleId": "R001",
-  //   },
-  //   {
-  //     "userid": "2019WS1122",
-  //     "trngid": "WS1122",
-  //     "password": "$2a$10$VVz9JDazDVsGjfj3L5AzYeWPs1LCvU/HT6kcqUr55TRHVGJguIzGa",
-  //     "username": "Arunmaran",
-  //     "firstname": "Arunmaran",
-  //     "lastname": "Murugasen",
-  //     "emailid": "arunmaran.murugesan@whitestones.co.in",
-  //     "phonenumber": "9345287327",
-  //     "roleId": "R001",
-  //   },
-  //   {
-  //     "userid": "2019WS10018",
-  //     "trngid": "WS10018",
-  //     "password": "$2a$10$qECY9SHPCdM1cA16TuC9.eDKw7GrlLOCEoE27iJuP9HlAEYFftVOm",
-  //     "username": "Britto",
-  //     "firstname": "Brit",
-  //     "lastname": "A",
-  //     "emailid": "abs@gmail.bom",
-  //     "phonenumber": "02345678444",
-  //     "roleId": "R001",
-  //   },
-  //   {
-  //     "userid": "2019WS10009",
-  //     "trngid": "WS10009",
-  //     "password": "$2a$10$dCrmV.cSDhplIYnAvyNUR.XNiUn9d/pmW87uGj3AT79BN6dur8bum",
-  //     "username": "ANBU",
-  //     "firstname": "ANBU",
-  //     "lastname": "S",
-  //     "emailid": "anbarasan.sekar@whitestones.in",
-  //     "phonenumber": "9788313457",
-  //     "roleId": "R001",
-  //   }
-  // ]
-      // // const alreadyCreated = localStorage.getItem("bulkUsersCreated");
+//   },
+//   {
+//     "userid": "2019wss123",
+//     "trngid": "wss123",
+//     "password": "$2a$10$2Z3nNVR5uGKJE33jSK9yreGFDwvktrzFuWwLb95IpQhex5eLOAk8e",
+//     "username": "wss123",
+//     "firstname": "BBB",
+//     "lastname": "A",
+//     "emailid": "wwm@gmail.com",
+//     "phonenumber": "987635616",
+//     "roleId": "R001",
+//   },
+//   {
+//     "userid": "2019WS1155",
+//     "trngid": "WS1155",
+//     "password": "$2a$10$G7szEGln2OiGaqVA0SnUpu0mN7EeaS3JpLpC83OSD35sYSholZL3C",
+//     "username": null,
+//     "firstname": "Aswathi",
+//     "lastname": null,
+//     "emailid": "aswathi.ravindran@whitestones.co.in",
+//     "phonenumber": "09787255964",
+//     "roleId": "R001",
+//   },
+//   {
+//     "userid": "2019WS1122",
+//     "trngid": "WS1122",
+//     "password": "$2a$10$VVz9JDazDVsGjfj3L5AzYeWPs1LCvU/HT6kcqUr55TRHVGJguIzGa",
+//     "username": "Arunmaran",
+//     "firstname": "Arunmaran",
+//     "lastname": "Murugasen",
+//     "emailid": "arunmaran.murugesan@whitestones.co.in",
+//     "phonenumber": "9345287327",
+//     "roleId": "R001",
+//   },
+//   {
+//     "userid": "2019WS10018",
+//     "trngid": "WS10018",
+//     "password": "$2a$10$qECY9SHPCdM1cA16TuC9.eDKw7GrlLOCEoE27iJuP9HlAEYFftVOm",
+//     "username": "Britto",
+//     "firstname": "Brit",
+//     "lastname": "A",
+//     "emailid": "abs@gmail.bom",
+//     "phonenumber": "02345678444",
+//     "roleId": "R001",
+//   },
+//   {
+//     "userid": "2019WS10009",
+//     "trngid": "WS10009",
+//     "password": "$2a$10$dCrmV.cSDhplIYnAvyNUR.XNiUn9d/pmW87uGj3AT79BN6dur8bum",
+//     "username": "ANBU",
+//     "firstname": "ANBU",
+//     "lastname": "S",
+//     "emailid": "anbarasan.sekar@whitestones.in",
+//     "phonenumber": "9788313457",
+//     "roleId": "R001",
+//   }
+// ]
+// // const alreadyCreated = localStorage.getItem("bulkUsersCreated");
 
-    // // if (!alreadyCreated) {
-    // // console.log("ecekfoks")
-    // //   const res = await storeUserDetails(data);
-    // //   console.log("ahd"+res)
-    // //   localStorage.setItem("bulkUsersCreated", "true");
-    // // }
+// // if (!alreadyCreated) {
+// // console.log("ecekfoks")
+// //   const res = await storeUserDetails(data);
+// //   console.log("ahd"+res)
+// //   localStorage.setItem("bulkUsersCreated", "true");
+// // }
 // export const storeDetails = async () =>{}
 
 
@@ -278,7 +278,15 @@ export const fetchAllTraineeSummary = async () => {
   }
 };
 
-
+export const fetchAllTraineeSummaryAdmin = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/users/all-trainee/summary`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching trainee summary:", error);
+    throw error;
+  }
+}
 
 
 // export const getAllTrainers = async () => {
@@ -601,6 +609,21 @@ export const fetchSyllabusProgressByEmpId = async (empid) => {
 };
 
 
+// export const fetchSyllabusProgressByEmpId = async (empid) => {
+//   try {
+//     const response = await axios.get(
+//       `${API_URL}/syllabus/user/${empid}`
+//     );
+//     return response;
+//   } catch (error) {
+//     console.error("Error fetching syllabus progress by empid:", error);
+//     throw error;
+//   }
+// };
+
+
+
+
 
 const fetchSyllabusProgress = async (empId) => {
   const res = await fetch(
@@ -677,3 +700,343 @@ export const fetchTraineeSummaryByManager = async (managerUserId) => {
     throw error;
   }
 };
+
+
+export const deleteSubTopicAPI = async (subTopicId) => {
+  return axios.delete(`${API_URL}/syllabus/subtopic/${subTopicId}`);
+};
+
+// Delete entire Syllabus by ID
+export const deleteSyllabusAPI = async (syllabusId) => {
+  return axios.delete(`${API_URL}/syllabus/bulk-delete/${syllabusId}`);
+};
+
+
+// Create Department
+export const createDepartment = (department) => {
+  return axios.post(`${API_URL}/departments`, department);
+};
+
+// Get all departments (NOT by manager)
+export const getAllDepartments = () => {
+  return axios.get(`${API_URL}/departments`);
+};
+
+// Get departments by manager
+export const getDepartmentsByManager = (managerId) => {
+  return axios.get(`${API_URL}/departments/manager/${managerId}`);
+};
+
+// Delete department
+export const deleteDepartment = (id) => {
+  return axios.delete(`${API_URL}/departments/${id}`);
+};
+
+// ===== Trainee Department APIs =====
+export const getTraineeDepartments = (traineeId) =>
+  axios.get(`${API_URL}/trainee-departments/${traineeId}`);
+
+export const assignDepartmentToTrainee = (traineeId, deptId) =>
+  axios.post(`${API_URL}/trainees/${traineeId}/departments/${deptId}`);
+
+export const removeDepartmentFromTrainee = (traineeId, deptId) =>
+  axios.delete(`${API_URL}/trainees/${traineeId}/departments/${deptId}`);
+
+
+export const updateDepartment = async (id, payload) => {
+  try {
+    const response = await axios.put(`${API_URL}/departments/${id}`, payload);
+    return response.data;
+  } catch (error) {
+    throw new Error("Error updating department");
+  }
+  }
+
+  
+  export const fetchAllDepartments = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/departments/departments`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching departments:", error);
+    throw error;
+  }
+};
+  
+export const fetchAllRoles = () => {
+  return axios.get(`${API_URL}/roles`);
+};
+
+// ================= TRAINEE CRUD =================
+export const addTrainee = (data) => {
+  return axios.post(`${API_URL}/users/addtrainees`, data);
+};
+
+export const updateTrainee = (trngid, data) => {
+  return axios.put(`${API_URL}/users/addtrainee/${trngid}`, data);
+};
+
+export const deleteTraineeById = (trngid) => {
+  return axios.delete(`${API_URL}/users/addtrainee/${trngid}`);
+};
+
+export const getTraineeById = (trngid) => {
+  return axios.get(`${API_URL}/users/addtrainee/${trngid}`);
+};
+
+// ================= ASSIGN DEPARTMENT =================
+export const updateTraineeDepartments = (traineeId, deptIds) => {
+  return axios.put(
+    `${API_URL}/trainee-departments/${traineeId}`,
+    deptIds
+  );
+};
+
+export const fetchCompletedSubTopicsByManager = async (managerId) => {
+  try {
+    const response = await axios.get(
+      `${API_URL}/syllabus/syllabus-progress/${managerId}`
+    );
+    return response;
+  } catch (error) {
+    console.error("Error fetching syllabus progress:", error);
+    throw error;
+  }
+};
+
+
+// ================= TRAINING FEEDBACK APIs =================
+
+// export const submitTraineeFeedback = async (syllabusId, userId, feedback) => {
+//   const response = await fetch(
+//     `${process.env.REACT_APP_API_URL}/training/trainee-feedback?syllabusId=${syllabusId}&userId=${userId}&feedback=${encodeURIComponent(feedback)}`,
+//     {
+//       method: "POST",
+//     }
+//   );
+
+//   if (!response.ok) {
+//     throw new Error("Failed to submit feedback");
+//   }
+
+//   return response.text();
+// };
+
+// export const submitTrainerRemark = async (syllabusId, userId, remark) => {
+//   const response = await fetch(
+//     `${process.env.REACT_APP_API_URL}/training/trainer-remark?syllabusId=${syllabusId}&userId=${userId}&remark=${encodeURIComponent(remark)}`,
+//     {
+//       method: "POST",
+//     }
+//   );
+
+//   if (!response.ok) {
+//     throw new Error("Failed to submit trainer remark");
+//   }
+
+//   return response.text();
+// };
+
+// export const submitManagerAssessment = async (syllabusId, userId, assessment) => {
+//   const response = await fetch(
+//     `${process.env.REACT_APP_API_URL}/training/manager-assessment?syllabusId=${syllabusId}&userId=${userId}&assessment=${encodeURIComponent(assessment)}`,
+//     {
+//       method: "POST",
+//     }
+//   );
+
+//   if (!response.ok) {
+//     throw new Error("Failed to submit manager assessment");
+//   }
+
+//   return response.text();
+// };
+
+
+
+export const fetchSyllabusByTrainer = async (trainerId) => {
+  try {
+    const response = await axios.get(`${API_URL}/syllabus/trainer/${trainerId}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching syllabus for trainer ${trainerId}:`, error);
+    return [];
+  }
+};
+
+
+// // ================= TRAINER SUBMIT =================
+// export const submitTrainerFeedbackAPI = async (
+//   trngid,
+//   syllabusId,
+//   feedback
+// ) => {
+//   try {
+//     const response = await axios.post(
+//       `${API_URL}/feedback/trainer`,
+//       null,
+//       {
+//         params: {
+//           trngid,
+//           syllabusId,
+//           feedback,
+//         },
+//       }
+//     );
+
+//     return response.data;
+//   } catch (error) {
+//     console.error("Trainer feedback submit error:", error);
+//     throw error;
+//   }
+// };
+
+// ================= TRAINEE SUBMIT =================
+export const submitTraineeFeedbackAPI = async (
+  traineeId,
+  trainerId,
+  syllabusId,
+  feedback
+) => {
+  try {
+    console.log("Trainee Submit:", traineeId, trainerId, syllabusId, feedback);
+
+    const response = await axios.post(
+      `${API_URL}/feedback/trainee`,
+      null,
+      {
+        params: {
+          traineeId,
+          trainerId,
+          syllabusId,
+          feedback,
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Trainee feedback submit error:", error.response?.data);
+    console.error("Status:", error.response?.status);
+    console.error("Full Error:", error);
+    throw error;
+  }
+};
+
+// ================= TRAINER SUBMIT =================
+export const submitTrainerFeedbackAPI = async (
+  traineeId,
+  trainerId,
+  syllabusId,
+  feedback
+) => {
+  try {
+    console.log("Trainer Submit:", traineeId, trainerId, syllabusId, feedback);
+
+    const response = await axios.post(
+      `${API_URL}/feedback/trainer`,
+      null,
+      {
+        params: {
+          traineeId,
+          trainerId,
+          syllabusId,
+          feedback,
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Trainer feedback submit error:", error.response?.data);
+    console.error("Status:", error.response?.status);
+    console.error("Full Error:", error);
+    throw error;
+  }
+};
+
+
+// ================= GET FEEDBACK =================
+export const getSyllabusFeedbackAPI = async (
+  traineeId,
+  trainerId,
+  syllabusId
+) => {
+  try {
+    const response = await axios.get(
+      `${API_URL}/feedback/data`,
+      {
+        params: {
+          traineeId,
+          trainerId,
+          syllabusId,
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Get feedback error:", error.response?.data);
+    console.error("Status:", error.response?.status);
+    throw error;
+  }
+};
+
+
+export const fetchAssignedSyllabusWithFeedbackForAdmin = async (
+  traineeId,
+  managerId
+) => {
+  try {
+    const response = await axios.get(`${API_URL}/feedback/assigned`, {
+      params: {
+        traineeId,
+        managerId,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching syllabus feedback:", error);
+    throw error;
+  }
+};
+
+
+export const fetchAssignedSyllabus = async (traineeId) => {
+  try {
+    const response = await axios.get(
+      `${API_URL}/feedback/assigned-syllabus`,
+      {
+        params: { traineeId },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching assigned syllabus:", error);
+    throw error;
+  }
+};
+
+export const fetchFeedbackBySyllabusForManager = async (traineeId, syllabusId) => {
+  const response = await axios.get(
+    `${API_URL}/feedback/trainee-feedback-by-syllabus`,
+    {
+      params: {
+        traineeId: traineeId,
+        syllabusId: syllabusId
+      }
+    }
+  );
+
+  return response.data;
+};
+
+
+
+export const fetchAllDelays = () => axios.get(`${API_URL}/dashboard/delays`);
+export const fetchTraineeDelays = (traineeId) =>
+  axios.get(`${API_URL}/dashboard/delays/${traineeId}`);
+
+export const fetchManagerDelays = (managerId) =>
+  axios.get(`${API_URL}/dashboard/manager-delays/${managerId}`);

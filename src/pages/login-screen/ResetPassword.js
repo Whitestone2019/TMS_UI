@@ -5,7 +5,7 @@ import Button from "../../components/ui/Button";
 import { Shield, Mail, Lock, Eye, EyeOff, AlertCircle } from "lucide-react";
 import { sendOtp, resetPassword } from "../../api_service";
 
-// import { forgetPassword, resetPassword } from "../../api_service";
+
 
 const ResetPassword = () => {
     const navigate = useNavigate();
@@ -30,9 +30,6 @@ const ResetPassword = () => {
         }
     };
 
-    // ======================
-    // STEP 1 – SEND OTP
-    // ======================
     const handleSendOTP = async (e) => {
         e.preventDefault();
 
@@ -61,9 +58,8 @@ const ResetPassword = () => {
         }
     };
 
-    // ======================
-    // STEP 2 – RESET PASSWORD
-    // ======================
+
+
     const handleResetPassword = async (e) => {
         e.preventDefault();
 
@@ -100,12 +96,7 @@ const ResetPassword = () => {
             console.error("Error in resetting password:", error);
         }
 
-        // setTimeout(() => {
-        //     console.log("Password reset data:", form);
-        //     alert("Password reset successfully (API not connected)");
-        //     setIsLoading(false);
-        //     navigate("/");
-        // }, 800);
+
     };
 
     return (

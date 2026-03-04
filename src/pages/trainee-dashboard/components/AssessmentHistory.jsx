@@ -2,77 +2,8 @@ import React, { useState } from 'react';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 
-const AssessmentHistory = ({ className = '', assessments = [] }) => {
+const AssessmentHistory = ({ className = '', assessments = [], syllabus = [] }) => {
   const [selectedAssessment, setSelectedAssessment] = useState(null);
-
-  //   const assessments = [
-  //     {
-  //       id: 1,
-  //       week: 1,
-  //       date: "2024-10-15",
-  //       step: "Introduction to Programming",
-  //       marks: 85,
-  //       maxMarks: 100,
-  //       grade: "A",
-  //       managerName: "Sarah Johnson",
-  //       managerAvatar: "https://images.unsplash.com/photo-1734456611474-13245d164868",
-  //       managerAvatarAlt: "Professional headshot of woman with brown hair in business attire smiling at camera",
-  //       remarks: `Excellent understanding of programming fundamentals. Shows strong logical thinking and problem-solving skills. Keep up the great work!
-
-  // Areas of strength:
-  // • Clear grasp of basic concepts
-  // • Good participation in discussions
-  // • Well-structured approach to problems
-
-  // Areas for improvement:
-  // • Practice more coding exercises
-  // • Focus on code optimization techniques`,
-  //       feedback: "Outstanding performance in the first week. The trainee demonstrates exceptional aptitude for programming concepts.",
-  //       submittedAt: "2024-10-15T14:30:00Z",
-  //       status: "completed"
-  //     },
-  //     {
-  //       id: 2,
-  //       week: 2,
-  //       date: "2024-10-22",
-  //       step: "Data Structures",
-  //       marks: 78,
-  //       maxMarks: 100,
-  //       grade: "B+",
-  //       managerName: "Sarah Johnson",
-  //       managerAvatar: "https://images.unsplash.com/photo-1734456611474-13245d164868",
-  //       managerAvatarAlt: "Professional headshot of woman with brown hair in business attire smiling at camera",
-  //       remarks: `Good progress in understanding data structures. The concepts of arrays and objects are well grasped, but there's room for improvement in complex data manipulation.
-
-  // Strengths observed:
-  // • Solid understanding of basic data structures
-  // • Good implementation of array operations
-  // • Clear documentation in code
-
-  // Recommendations:
-  // • Practice more with nested data structures
-  // • Work on algorithm efficiency
-  // • Review object-oriented principles`,
-  //       feedback: "Consistent improvement shown. Focus on practicing more complex data structure problems.",
-  //       submittedAt: "2024-10-22T16:45:00Z",
-  //       status: "completed"
-  //     },
-  //     {
-  //       id: 3,
-  //       week: 3,
-  //       date: "2024-10-29",
-  //       step: "Control Flow",
-  //       marks: null,
-  //       maxMarks: 100,
-  //       grade: null,
-  //       managerName: "Sarah Johnson",
-  //       managerAvatar: "https://images.unsplash.com/photo-1734456611474-13245d164868",
-  //       managerAvatarAlt: "Professional headshot of woman with brown hair in business attire smiling at camera",
-  //       remarks: null,
-  //       feedback: null,
-  //       submittedAt: null,
-  //       status: "pending"
-  //     }];
 
 
   const getGradeColor = (grade) => {
@@ -193,6 +124,8 @@ const AssessmentHistory = ({ className = '', assessments = [] }) => {
                 <span>Manager: {assessment?.managerName}</span>
               </div>
 
+
+
               {/* Remarks Preview */}
               {assessment?.remarks &&
                 <div className="bg-muted/30 rounded-lg p-3 mb-3">
@@ -252,6 +185,60 @@ const AssessmentHistory = ({ className = '', assessments = [] }) => {
                         <p className="text-xs text-muted-foreground">Training Manager</p>
                       </div>
                     </div>
+
+
+                    {syllabus?.[assessment.week - 1] && (
+                      <div className="bg-primary/5 rounded-lg p-3">
+                        <div className="flex items-start gap-2">
+
+                          {/* LEFT: SYLLABUS */}
+                          <div className="w-[28%] font-medium text-foreground text-sm whitespace-nowrap">
+                            📘 Syllabus:
+                            <span className="ml-1 font-normal">
+                              {syllabus[assessment.week - 1]?.title}
+                            </span>
+                          </div>
+
+                          {/* RIGHT: COMPLETED SUBTOPICS */}
+                          <div className="w-[72%] flex items-center gap-1 overflow-x-auto whitespace-nowrap text-sm">
+                            <span className="text-muted-foreground mr-1">
+                              Subtopics:
+                            </span>
+
+                            {syllabus[assessment.week - 1]?.subTopics
+                              ?.filter(sub =>
+                                sub?.stepProgress?.some(
+                                  p => p.complete === true && p.checker === true
+                                )
+                              )?.length > 0 ? (
+                              syllabus[assessment.week - 1]?.subTopics
+                                ?.filter(sub =>
+                                  sub?.stepProgress?.some(
+                                    p => p.complete === true && p.checker === true
+                                  )
+                                )
+                                ?.map((sub, idx) => (
+                                  <span
+                                    key={idx}
+                                    className="px-2 py-[2px] rounded-md
+                bg-primary/10 text-primary border border-primary/30
+                shrink-0"
+                                  >
+                                    {sub.name}
+                                  </span>
+                                ))
+                            ) : (
+                              <span className="text-muted-foreground">
+                                No subtopics completed
+                              </span>
+                            )}
+                          </div>
+
+                        </div>
+                      </div>
+                    )}
+
+
 
                     {/* Full Remarks */}
                     <div className="bg-muted/30 rounded-lg p-4">

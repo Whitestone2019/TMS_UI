@@ -50,10 +50,6 @@ const StepNavigationSidebar = ({
     }
   };
 
-  // const handleStepClick = (step) => {
-  //   if (step.isLocked) return; // ❌ prevent navigation
-  //   onStepSelect(step.id);
-  // };
 
 
   return (

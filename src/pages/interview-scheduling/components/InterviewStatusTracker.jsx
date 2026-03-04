@@ -20,26 +20,6 @@ const InterviewStatusTracker = ({
 
   console.log('Interviews:', interviews);
 
-  // const data = interviews;
-
-  // const transformedSchedules = Object.values(interviews).map(item => {
-  //   return {
-  //     id: item?.id,
-  //     scheduleId: item.interviewSchedule?.scheduleId,
-  //     traineeName: item.user?.firstname || "Trainee",
-  //     interviewerName: item.interviewSchedule?.trainer?.name || "N/A",
-  //     scheduledDate: item.interviewSchedule?.date,
-  //     time: item.interviewSchedule?.time,
-  //     duration: item.interviewSchedule?.duration,
-  //     type: item.interviewSchedule?.interviewType,
-  //     location: item.interviewSchedule?.location,
-  //     status: item?.rsvpStatus?.trim().toLowerCase() || "",
-  //     notes: item.interviewSchedule?.notes || ""
-  //   };
-  // });
-
-  // interviews = transformedSchedules;
-
 
   const data = interviews || [];
 
@@ -70,7 +50,7 @@ const InterviewStatusTracker = ({
     }
 
     if (item?.user && item?.roleRvsp?.toLowerCase() === 'manager') {
-       const managerStatus = item?.rsvpStatus?.trim().toLowerCase() || 'pending';
+      const managerStatus = item?.rsvpStatus?.trim().toLowerCase() || 'pending';
 
       grouped[scheduleId].manager.push({
         firstname: item.user?.firstname,
@@ -83,9 +63,6 @@ const InterviewStatusTracker = ({
 
   });
 
-  /* =====================================================
-     🔹 FINAL TRANSFORM (UI SAFE)
-  ===================================================== */
   const transformedSchedules = Object.values(grouped).map(group => {
     const trainees = group.trainees.filter(Boolean);
     const manager = group.manager?.filter(Boolean) || [];
@@ -108,11 +85,11 @@ const InterviewStatusTracker = ({
       notes: group.interviewSchedule?.notes || "",
       status: group.status,
 
-      // 👇 IMPORTANT: keeps all users for reschedule
+      //  IMPORTANT: keeps all users for reschedule
       rawItems: data.filter(
         i => i?.interviewSchedule?.scheduleId === group.scheduleId && i?.roleRvsp?.toLowerCase() === 'trainee'
       )
-      
+
     };
   });
 
@@ -122,9 +99,8 @@ const InterviewStatusTracker = ({
 
   const statusOptions = [
     { value: 'all', label: 'All Status' },
-    { value: 'pending', label: 'Pending Confirmation' },
+    { value: 'needsaction', label: 'Pending Confirmation' },
     { value: 'accepted', label: 'Accepted' },
-    { value: 'completed', label: 'Completed' },
     { value: 'declined', label: 'Declined' },
     { value: 'tentative', label: 'Tentative' }
   ];
@@ -210,77 +186,58 @@ const InterviewStatusTracker = ({
 
   const getStatusActions = (interview) => {
     const actions = [];
-     const anyAccepted = interview?.trainees?.length > 1 && interview?.trainees?.some(t => t.status === 'accepted');
+    const anyAccepted = interview?.trainees?.length > 1 && interview?.trainees?.some(t => t.status === 'accepted');
 
-      if (anyAccepted) {
-    // If any trainee accepted, show Complete + Reschedule + Cancel
-    actions.push(
-      { label: 'Complete', action: 'complete', variant: 'default', icon: 'CheckCircle' },
-      { label: 'Reschedule', action: 'reschedule', variant: 'default', icon: 'Calendar' },
-      { label: 'Cancel', action: 'cancel', variant: 'outline', icon: 'X' }
-    );
-  } else {
+    if (anyAccepted) {
+      // If any trainee accepted, show Complete + Reschedule + Cancel
+      actions.push(
+        { label: 'Complete', action: 'complete', variant: 'default', icon: 'CheckCircle' },
+        { label: 'Reschedule', action: 'reschedule', variant: 'default', icon: 'Calendar' },
+        { label: 'Cancel', action: 'cancel', variant: 'outline', icon: 'X' }
+      );
+    } else {
 
-    switch (interview?.status.toLowerCase()) {
-      case 'pending':
-      case 'tentative':
-      case 'declined':
-      case 'needsaction':
-        actions?.push(
-          { label: 'Reschedule', action: 'reschedule', variant: 'default', icon: 'Calendar' },
-          { label: 'Cancel', action: 'cancel', variant: 'outline', icon: 'X' },
-          
-          // { label: 'View Feedback', action: 'feedback', variant: 'outline', icon: 'MessageSquare' }
-        );
-        break;
-      case 'accepted':
-        actions?.push(
-          { label: 'Complete', action: 'complete', variant: 'default', icon: 'CheckCircle' },
-          { label: 'Cancel', action: 'cancel', variant: 'outline', icon: 'X' }
-        );
-        break;
-      case 'cancelled':
-        actions?.push(
-          { label: 'Reschedule', action: 'reschedule', variant: 'default', icon: 'Calendar' }
-        );
-        break;
-      default:
+      switch (interview?.status.toLowerCase()) {
+        case 'pending':
+        case 'tentative':
+        case 'declined':
+        case 'needsaction':
           actions?.push(
-          { label: 'Cancel', action: 'cancel', variant: 'outline', icon: 'X' }
-        );
+            { label: 'Reschedule', action: 'reschedule', variant: 'default', icon: 'Calendar' },
+            { label: 'Cancel', action: 'cancel', variant: 'outline', icon: 'X' },
+
+          );
+          break;
+        case 'accepted':
+          actions?.push(
+            { label: 'Complete', action: 'complete', variant: 'default', icon: 'CheckCircle' },
+            { label: 'Cancel', action: 'cancel', variant: 'outline', icon: 'X' }
+          );
+          break;
+        case 'cancelled':
+          actions?.push(
+            { label: 'Reschedule', action: 'reschedule', variant: 'default', icon: 'Calendar' }
+          );
+          break;
+        default:
+          actions?.push(
+            { label: 'Cancel', action: 'cancel', variant: 'outline', icon: 'X' }
+          );
+      }
     }
-}
     return actions;
-  
+
   };
 
   const handleActionClick = (interview, action) => {
 
-    
+
     switch (action) {
-      
+
       case 'reschedule':
-        //Single item fetch attempt
-        //         const selected = data.find(item => {
-        //   console.log(
-        //     'Comparing:',
-        //     item?.interviewSchedule?.scheduleId,
-        //     interview?.interviewSchedule?.scheduleId
-        //   );
-
-        //   return String(item?.interviewSchedule?.scheduleId) ===
-        //          String(interview?.interviewSchedule?.scheduleId);
-        // });
-
-        //Multiple item fetch attempt
-        //         const selected = data.filter(item =>
-        //   String(item?.interviewSchedule?.scheduleId) ===
-        //   String(interview?.interviewSchedule?.scheduleId)
-        // );
 
         console.log('Rescheduling Interview ID:', interview?.interviewSchedule?.scheduleId);
         const selected = data.filter(
-
           item => {
             console.log('Comparing:', item.interviewSchedule?.scheduleId, interview?.scheduleId);
             return item.interviewSchedule?.scheduleId === interview?.scheduleId
@@ -291,10 +248,10 @@ const InterviewStatusTracker = ({
           return;
         }
         onReschedule(selected);
-        // console.log('Rescheduling Interview ID:', selected);
+
         break;
-      
-        case 'cancel':
+
+      case 'cancel':
         onStatusUpdate(interview?.id, action);
         break;
 
@@ -304,7 +261,7 @@ const InterviewStatusTracker = ({
         onStatusUpdate(interview, action);
         // console.log('Completing Interview ID:', filteredAndSortedInterviews);
         break;
-      case 'feedback': 
+      case 'feedback':
         onViewDetails(interview?.id, 'feedback');
         break;
       default:
@@ -429,10 +386,7 @@ const InterviewStatusTracker = ({
                         </div>
 
 
-                        {/*                   
-                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${statusConfig?.bgColor} ${statusConfig?.color}`}>
-                          {statusConfig?.label} {interview?.scheduleId}
-                        </span> */}
+
                       </div>
 
                       {/* Interview Details */}

@@ -65,8 +65,7 @@ const InterviewSchedule = ({ className = '', interviews = [] }) => {
             </p>
           </div>
           <div className="text-right">
-            {/* <div className="text-2xl font-bold text-primary">{upcomingInterviews?.length}</div>
-            <div className="text-xs text-muted-foreground">Upcoming</div> */}
+
           </div>
         </div>
       </div>
@@ -82,7 +81,7 @@ const InterviewSchedule = ({ className = '', interviews = [] }) => {
             {/* Interview Header */}
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-start space-x-4">
-                {/* <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${getStatusBg(interview?.status)}`}></div> */}
+
                 <div className="flex-1">
                   <h3 className="font-semibold text-foreground mb-1">{interview?.interviewType}</h3>
                   <div className="flex items-center space-x-4 text-sm text-muted-foreground">
@@ -174,9 +173,7 @@ const InterviewSchedule = ({ className = '', interviews = [] }) => {
                   </div>
                   <div>
                     <h4 className="font-medium text-foreground mb-2">Approval Status: {interview?.rsvpStatus}</h4>
-                    {/* <div className="bg-muted/30 rounded-lg p-4">
-                       <p className="text-sm">RSVP Status: {interview?.rsvpStatus}</p>
-                    </div> */}
+
                   </div>
                 </div>
               </div>
