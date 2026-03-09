@@ -60,7 +60,7 @@ export const storeUserDetails = async () => {
       "lastname": "A",
       "emailid": "abs@gmail.bom",
       "phonenumber": "02345678444",
-      "roleId": "R001",
+      "roleId": "R005",
     }
   ]
   try {
