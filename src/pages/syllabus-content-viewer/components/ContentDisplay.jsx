@@ -312,7 +312,8 @@ useEffect(() => {
                               isLastSubOfLastStep
                             }
                           >
-                            {isLastSub ? "Next Step" : "Next Topic"}
+                            {isLastSub ? "Next Step" : "Next Topic"} 
+                  {process.env.REACT_APP_API_URL}
                           </Button>
 
                         </div>
