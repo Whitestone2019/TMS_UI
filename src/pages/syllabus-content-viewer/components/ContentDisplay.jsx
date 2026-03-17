@@ -80,6 +80,8 @@ const calcProgress = totalSubs > 0 ? Math.round((completedSubs / totalSubs) * 10
                   if (!sub?.filePath) { setFileData(null); return; }
                   const cleanFileName = sub.filePath.replace(/\\/g, "/").split("/").pop();
                   const relativePath = sub.filePath.replace(/\\/g, "/");
+
+                  console.log("Pdf Preview",${process.env.REACT_APP_API_URL});
                   //fetch(`http://localhost:8080/api/syllabus/preview?path=${cleanFileName}`)
                   fetch(`${process.env.REACT_APP_API_URL}/syllabus/preview?path=${cleanFileName}`)
                     .then(res => res.ok ? res.blob() : Promise.reject(res.status))
